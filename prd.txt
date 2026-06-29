@@ -1,0 +1,368 @@
+FIXIT MARKETPLACE
+Service-on-Demand Marketplace Platform
+Product Requirements Document & System Architecture Blueprint
+  Version 1.0  
+Prepared for: Founding Team & Investor Review
+Primary Market: Sultanate of Oman / GCC (USD reference parity included)
+June 2026
+CONFIDENTIAL — INTERNAL STRATEGY DOCUMENT
+
+
+Table of Contents
+
+Executive Summary
+This document defines the complete product, financial, legal, and technical blueprint for a trust-first, two-sided service marketplace connecting Consumers who need on-demand home and business services (AC repair, electrical, plumbing, security installation, and similar trades) with vetted independent Vendors who bid competitively to win that work.
+Four pillars differentiate this platform from generic classifieds or directory apps:
+Disintermediation Protection — a multi-layer AI moderation system (RegEx + LLM semantic analysis) that detects and blocks attempts by either party to exchange contact information and take the transaction off-platform before a paid commitment is made.
+Milestone-Based Escrow — consumer funds are held in a regulated holding state and released to vendors only against verified completion milestones, with a deterministic state machine governing every transition.
+Multi-Tenant Operations — distinct, purpose-built experiences for Consumers, Vendors, and Platform Administrators, unified by one data model and one trust layer.
+Low-Friction Bidding — a job-card-and-bid system that gets a consumer from “my AC broke” to “vendor confirmed and funds secured” in minutes, not days.
+The recommended monetization approach is a hybrid model: a low-cost monthly subscription that buys a vendor visibility and bidding rights, layered with a transactional take-rate on closed contracts. This balances early vendor acquisition (low entry barrier) against long-term revenue durability (revenue scales with platform volume, not just headcount). Full modeling is in Section 1.B.
+The technical architecture is built on PostgreSQL with PostGIS for geospatial job-matching, a Node.js/TypeScript backend for high-concurrency async processing, and a cross-platform mobile core (React Native or Flutter) for field-vendor usability. A 12-month, 4-quarter roadmap sequences delivery from core infrastructure through AI moderation to public launch. Full detail is in Section 3.
+Section 1.C addresses the regulatory and insurance framework required to operate an escrow-holding marketplace in Oman/GCC, including third-party liability insurance integration for vendor negligence claims (e.g., property damage during a repair job).
+
+1. Comprehensive Business Model & App Ecosystem Strategy
+1.A Multi-Tenant Persona Definitions & Detailed Workflows
+The platform serves three distinct personas sharing one underlying data and trust layer. Each persona has a purpose-built interface optimized for its dominant emotional and operational state: the Consumer is typically stressed and time-pressured; the Vendor is mobile, margin-conscious, and juggling multiple jobs; the Administrator is a calm operator managing exceptions at scale.
+1.A.1 The Consumer Journey
+Context: a household or business failure has just occurred (e.g., the AC has stopped working in 45°C heat). The dominant design constraint is speed-to-relief: every screen between “problem” and “verified vendor en route” is a point of abandonment.
+Step-by-Step Journey
+Onboarding: Phone-number OTP login only (no password). Optional Apple/Google sign-in. Address is captured via device GPS with a manual pin-drop fallback — no typed-address forms on first use.
+Request Creation (“Job Card”): A structured short-form, not a blank text box. Category selection (icon grid: AC, Electrical, Plumbing, Security, etc.) → sub-issue selection (“not cooling,” “leaking,” “not turning on”) → optional photo/video upload → urgency flag (Emergency / This Week / Flexible) → service address confirmation.
+Submission & Routing Confirmation: Consumer sees an immediate confirmation screen: “Your request is live. Vendors in your area are being notified now,” with a live counter of vendors notified (sourced from the routing engine in Section 2.A).
+Bid Comparison: As bids arrive (push notification per bid), the consumer sees a ranked, comparable card list: price, vendor rating, years active, response time, and a one-line bid note. No vendor contact details, photos of the vendor's face, or external links are visible at this stage — enforced by the moderation layer in Section 2.B.
+Clarification Loop (read-only for consumer at this stage): the consumer can see vendor-submitted questions and the consumer's own answers in a public Q&A thread attached to the job card, visible to all bidding vendors equally (prevents information asymmetry and side-channel deals).
+Selection & Escrow Funding: Consumer selects a winning bid → reviews milestone breakdown (e.g., 50% on arrival/diagnosis, 50% on completion) → funds the full bid amount via card/wallet into escrow HOLDING state. Funding unlocks in-app chat and the vendor's direct phone number (masked-relay, see below).
+Service Execution: In-app milestone tracker shows job status (Confirmed → En Route → In Progress → Milestone 1 Complete → Milestone 2 Complete → Closed). Consumer approves each milestone with a single tap plus optional photo of completed work.
+Payment Release & Review: On final approval, escrow releases to vendor automatically. Consumer is prompted for a rating and review, gated behind the payment release to prevent review-for-favor manipulation.
+UI/UX Friction-Reduction Strategies
+Masked-relay calling: when chat unlocks, an in-app “Call Vendor” button proxies through a telephony provider (e.g., Twilio Proxy) so neither party's real number is exposed — this also gives the moderation system a transcription hook for voice-channel disintermediation attempts.
+Single-thumb operability: bid comparison and milestone approval are designed for one-handed mobile use, since consumers are frequently mid-crisis (e.g., holding a flashlight).
+Pre-filled re-ordering: returning consumers seeking a repeat service see a “Book similar to last time” shortcut that pre-fills the job card from history.
+1.A.2 The Vendor Journey
+Context: an independent skilled tradesperson juggling multiple active jobs, working primarily from a phone in the field, often with limited connectivity. The dominant design constraint is operational efficiency: minimize time spent on the app so more time is billable.
+Step-by-Step Journey
+Vendor Onboarding & Verification: Registration requires trade license/ID upload, skill category selection, service radius/geography, and (where applicable) insurance certificate upload. Verification status (Pending / Verified / Suspended) gates visibility into the job feed — unverified vendors cannot bid.
+Subscription/Plan Selection: Vendor selects a monthly plan tier (see Section 1.B) or accepts take-rate-only terms, depending on the hybrid model configuration live at signup.
+Job Discovery Dashboard: A geospatially filtered, skill-filtered feed of open Job Cards within the vendor's radius. Each card shows category, urgency, a profit-margin estimator (vendor inputs their cost basis once; the app estimates margin per job based on the consumer's stated budget range, if disclosed, or category historical averages), and a countdown to bid-window close.
+Need-Details Request: If the job card lacks information the vendor needs to bid accurately, the vendor submits a structured clarification question through the public Q&A sub-thread (Section 2.A) rather than direct messaging — contact-info stripping is applied automatically before the question is ever displayed.
+Bid Submission: Vendor submits price, estimated start time, and milestone breakdown proposal (or accepts a platform-suggested default milestone split). Bids are visible to the consumer immediately; vendors can see bid count but not competitor pricing (sealed-bid model to prevent race-to-bottom collusion).
+Win Notification & Job Execution: On selection, vendor receives a push notification, job moves to Confirmed, masked-relay calling and chat unlock. Vendor updates status (En Route → In Progress → Milestone Complete) directly from the field.
+Payout Tracking: A dedicated “Earnings” tab shows funds by escrow state: In Holding (funded, work not yet milestone-approved), Released (paid out, available for withdrawal), and Disputed (frozen pending admin review). Payout to bank/wallet is initiated on a configurable cycle (e.g., instant for a small fee, or T+2 standard).
+UI/UX Friction-Reduction Strategies
+Offline-tolerant job feed caching so a vendor in a low-signal basement or rooftop installation can still view active job details and queue status updates for sync.
+One-tap “re-use last bid template” for vendors who quote similarly priced jobs repeatedly (e.g., standard AC service calls).
+Margin calculator persists vendor cost inputs (call-out fee, hourly rate, material markup %) across sessions so it's a one-time setup, not a per-bid chore.
+1.A.3 The Platform Administrator Journey
+Context: a small internal operations team responsible for exception handling at scale — disputed funds, AI-flagged moderation violations, and vendor compliance. The dominant design constraint is throughput per operator: the Command Center must let one admin resolve a high volume of cases per hour without error.
+Step-by-Step Journey
+Triage Queue: A unified, priority-sorted queue mixing three case types — AI-flagged content pending review (Section 2.B), payment disputes, and vendor compliance document expirations — each with an SLA countdown timer.
+Disputed Funds Resolution: Admin opens a dispute case with a side-by-side view of the job timeline, milestone approval history, uploaded evidence (photos/messages), and escrow ledger state. Admin actions are constrained to a defined set: Release to Vendor, Refund to Consumer, Partial Split (with the 80/20 platform-cut logic in Section 1.C applied automatically), or Escalate to Insurance Claim.
+AI-Flagged Violation Review: Split-view UI — left pane shows the original flagged text/message with the suspicious span highlighted; right pane shows an auto-generated “sanitized” alternative. Admin can Approve Sanitized Version (one click: republishes cleaned text, sets status to OPEN), Reject and Keep Hidden, or Manually Edit before approving.
+Vendor Compliance Management: A dashboard of vendor documents (license, insurance) with expiration tracking; automated reminders fire to vendors before admin intervention is needed, with manual suspend/reinstate controls as a fallback.
+Reporting & KPI Monitoring: A visual dashboard (see Section 3.C for exact metric definitions) surfacing liquidity ratio, disintermediation attempt rate, escrow release latency, and vendor acquisition cost in real time.
+UI/UX Friction-Reduction Strategies
+Keyboard-driven case resolution (no-mouse-required hotkeys for Approve/Reject/Escalate) to maximize cases-per-hour during high-volume periods.
+Macro actions: a single click can apply a templated resolution (e.g., “standard refund, no penalty”) that pre-fills the math and ledger entries, with a final confirm step to prevent fat-finger errors on financial actions.
+
+1.B Monetization Architecture Analysis
+Two monetization models are evaluated independently before arriving at a hybrid recommendation. All figures are modeled with OMR as the base currency (Oman market) and USD shown at an approximate peg of 1 OMR ≈ 2.60 USD for reference; these are illustrative planning figures, not financial guarantees, and should be validated against current bank/payment-processor rates before being used in investor materials.
+1.B.1 Model A — Monthly Vendor Subscription
+Vendors pay a flat recurring fee (modeled at 35–75 OMR / ≈90–195 USD per month, within the requested 80–200 USD band) for the right to view and bid on jobs in their category and radius. No per-job commission is charged beyond this.
+1.B.2 Model B — Transactional Take-Rate
+The platform charges a commission (commonly 10–20% in comparable service marketplaces) only on successfully completed and escrow-released contracts. No subscription fee.
+1.B.3 Hybrid Recommendation
+Recommended structure: a low monthly access fee paired with a reduced take-rate, sequenced to change over the platform's maturity lifecycle rather than being fixed from day one.
+This sequencing solves the core tension directly: it removes the upfront barrier during the exact period when vendor trust is most fragile (no proven lead flow yet), while preserving a transactional revenue stream from day one so the business isn't purely dependent on subscription conversion. As liquidity strengthens, the subscription layer is reintroduced as an earned upgrade (priority placement) rather than a toll, which vendors accept far more readily once they've already won jobs through the platform.
+A free, capped trial period (e.g., a vendor's first 3 bid submissions free of any subscription requirement) is recommended as the de facto Q1 default — it functions as Model B with subscription fully waived, and is the fastest path to proving liquidity before introducing any vendor-side cost.
+
+1.C Regulatory, Financial Escrow, and Insurance Frameworks
+Note on legal compliance: this section describes a technical and operational blueprint for an escrow-style holding mechanism. It is not legal advice. Holding consumer funds on behalf of a third party (the vendor) is a regulated activity in most jurisdictions, including Oman and the wider GCC — typically requiring either a licensed payment-services/e-money partner, a registered trust or escrow agent, or operation as a payment facilitator under an acquiring bank's program. Before launch, the team should retain a licensed financial-services lawyer in each operating jurisdiction to confirm the appropriate corporate and licensing structure (the platform should not itself hold client money without that determination).
+1.C.1 Financial Escrow Pipeline
+Funds never sit in the platform's own operating bank account. They are held in a segregated client-funds ledger (logically, and ideally legally, separate from company revenue) administered through a licensed payment partner (e.g., a regulated GCC payment gateway with an escrow/marketplace product, such as a bank-backed payment facilitator arrangement). The application layer tracks state; the regulated partner custodies the actual money movement.
+Escrow State Machine
+STATE: PENDING_FUNDING
+  → entered when a Consumer selects a winning bid
+  → exits to HOLDING on successful charge authorization + capture
+  → exits to FUNDING_FAILED on card/payment decline (job returns to OPEN bidding)
+ 
+STATE: HOLDING
+  → full bid amount captured and held in segregated client-funds ledger
+  → funds are allocated against the agreed milestone schedule (e.g., 50/50, 30/30/40)
+  → exits to RELEASED (per milestone) on Consumer milestone approval
+  → exits to DISPUTED on Consumer dispute flag OR Vendor non-performance report
+  → exits to AUTO_RELEASE_PENDING if Consumer does not act within SLA window (e.g., 72h
+    after Vendor marks milestone complete) — prevents indefinite fund-freezing by an
+    unresponsive consumer
+ 
+STATE: AUTO_RELEASE_PENDING
+  → exits to RELEASED after SLA window elapses with no Consumer dispute
+  → exits to DISPUTED if Consumer disputes within the SLA window
+ 
+STATE: RELEASED
+  → terminal (per milestone) — funds move from client-funds ledger to Vendor payout
+    queue, platform commission is deducted at this transition (see 1.C.2)
+  → job-level state becomes RELEASED only when ALL milestones reach RELEASED
+ 
+STATE: DISPUTED
+  → funds frozen in client-funds ledger, no further auto-transitions
+  → routed to Admin Disputed Funds Resolution queue (Section 1.A.3)
+  → exits to RELEASED (full or partial, admin-determined)
+  → exits to REFUNDED (full or partial, admin-determined)
+  → exits to ESCALATED_INSURANCE_CLAIM if vendor negligence / property damage is alleged
+ 
+STATE: REFUNDED
+  → terminal — funds returned to Consumer's original payment method, less any
+    platform cut retained per the refund-math rules in Section 1.C.2
+ 
+STATE: ESCALATED_INSURANCE_CLAIM
+  → see Section 1.C.3 — job ID and escrow ledger reference are attached to the
+    insurance claim record; escrow remains frozen pending claim outcome
+Every state transition writes an immutable, timestamped entry to the EscrowLedgers table (schema in Section 3.A) including the actor (Consumer / Vendor / Admin / System), the triggering event, and the resulting balance — this audit trail is what makes disputes resolvable and is very likely a regulatory requirement for any licensed escrow/payment-facilitator arrangement.
+1.C.2 Platform Service Charges — The 80/20 Refund Math Model
+Scenario as specified: a service failure occurs, and the resolution is an 80% refund to the consumer. The platform must retain its commission from the escrow pool before returning the remainder — the commission is not waived simply because the outcome was a partial refund rather than a full release. The exact math depends on one design decision: is the platform's cut calculated on the original bid amount, or on the refunded amount? These produce different numbers and the platform must pick one and apply it consistently. Both are modeled below using a 100 OMR bid with a 20% platform commission rate as the worked example.
+Method 1 — Commission Calculated on Original Bid Amount (Recommended)
+The platform's 20% commission is fixed at the moment of bid acceptance, independent of refund outcome. This is the cleaner and more defensible model because the platform's service (matching, escrow, moderation, dispute infrastructure) was rendered in full regardless of whether the vendor's physical work was satisfactory.
+Original bid amount (held in escrow):        100.000 OMR
+Platform commission rate:                          20%
+Platform commission (fixed):                  20.000 OMR
+Vendor's gross entitlement before refund:      80.000 OMR
+ 
+Service failure determination: Consumer is owed an 80% refund
+  of the ORIGINAL BID AMOUNT (i.e., vendor's work is valued at only 20%
+  of the agreed price due to the failure).
+ 
+Consumer refund = 80% × 100.000 OMR              =   80.000 OMR
+Remaining pool after consumer refund              =   20.000 OMR
+  (100.000 − 80.000 = 20.000 OMR remains in escrow)
+ 
+Platform retains its full fixed commission first:  20.000 OMR
+Remainder available for Vendor payout:               0.000 OMR
+ 
+RECONCILIATION CHECK:
+  Consumer refund (80.000) + Platform cut (20.000) + Vendor payout (0.000)
+  = 100.000 OMR  —  matches original escrow balance ✓
+In this worked example, because the refund percentage (80%) and the commission rate (20%) sum exactly to 100%, the vendor receives nothing — the full remaining pool after the consumer's refund is exactly equal to the platform's fixed cut. This is mathematically correct but operationally important to flag: if Method 1 is used, vendors must be informed in their terms of service that the platform's commission is retained ahead of vendor payout in a partial-refund scenario, since the platform's matching/escrow service was delivered even when the on-site work was deficient.
+Method 2 — Commission Calculated on the Refunded Remainder (Alternative)
+Under this alternative, the platform takes its 20% cut only from whatever portion is NOT refunded to the consumer, meaning the vendor and platform share the remaining 20% of the pool proportionally.
+Original bid amount (held in escrow):        100.000 OMR
+Consumer refund (80% of original):            80.000 OMR
+Remaining pool:                               20.000 OMR
+ 
+Platform commission rate applied to REMAINDER:     20%
+Platform cut = 20% × 20.000 OMR                =    4.000 OMR
+Vendor payout = remainder − platform cut         =   16.000 OMR
+ 
+RECONCILIATION CHECK:
+  Consumer refund (80.000) + Platform cut (4.000) + Vendor payout (16.000)
+  = 100.000 OMR  —  matches original escrow balance ✓
+Method 2 is more vendor-friendly (the vendor still receives a partial payout even in a failure scenario) but exposes the platform to a moral-hazard critique: it earns less in exactly the cases where its dispute-resolution and trust infrastructure mattered most, which is a perverse incentive a regulator or sharp-eyed investor may flag. Method 1 is the recommended default; Method 2 may be offered as a configurable “goodwill mode” for specific dispute categories at admin discretion (e.g., where the vendor was only marginally at fault).
+Both formulas must be implemented as configurable parameters in the Admin Disputed Funds Resolution tool (Section 1.A.3), never as hard-coded one-off math done by an operator — every dispute resolution should be system-calculated and system-logged to avoid human arithmetic error in financial transactions.
+1.C.3 Liability Insurance Integration
+Scenario as specified: a vendor negligently causes property damage during a job (e.g., a fire starts during an AC repair, or a plumber floods a property). The platform itself is not an insurer and should not attempt to self-insure this risk on its balance sheet — it should integrate with a licensed third-party commercial insurance provider and act as the distribution/claims-intake layer.
+Feasibility & Cost-Benefit Summary
+Technical Process — Claim Tied to Job ID
+At milestone completion (job marked In Progress → Completed), the system automatically issues a per-job micro-policy certificate via the insurer's API, referencing the platform's internal Job ID as the policy's external reference key. This certificate record is stored against the job and is visible to both parties.
+If a negligence incident occurs, either party files an in-app “Report Property Damage / Incident” action from the job detail screen — this is a distinct flow from a standard payment dispute, and is routed directly into the ESCALATED_INSURANCE_CLAIM escrow state (Section 1.C.1).
+The incident report — photos, description, timestamp, and the full job/escrow/chat history — is packaged and submitted to the insurer's claims-intake API, with the Job ID as the cross-reference key on both sides (platform DB and insurer's claim system).
+Escrow funds for that job remain frozen (ESCALATED_INSURANCE_CLAIM state) until the insurer's claim resolution is received via webhook, at which point Admin finalizes the escrow disposition (e.g., consumer refunded from escrow for the service itself, while the property damage is compensated separately through the insurance payout — these are two distinct money flows and must not be conflated in the ledger).
+The AI_AuditLogs and EscrowLedgers tables (Section 3.A) both carry a nullable insurance_claim_reference field so any job can be cross-queried against its insurance history for compliance reporting.
+Important structural point: the insurance claim and the escrow dispute are separate systems that share a Job ID, not the same system. The escrow only ever covers the service payment; it should never be the mechanism used to pay out property-damage compensation, since that exposes the platform to operating as an unlicensed insurer.
+
+2. Core Feature Matrix & Deep-Dive System Logic
+2.A High-Fidelity Bidding System Engineering
+2.A.1 Job Card Creation
+A Job Card is the platform's atomic unit of demand. It is intentionally a structured object, not free text, because structure is what makes automated routing (2.A.2), AI moderation (2.B), and bid comparison (1.A.1) possible. The consumer-facing form captures:
+category_id (enum: AC, Electrical, Plumbing, Security, General Handyman, …)
+sub_issue_tags (multi-select, category-specific, e.g., ["not_cooling", "strange_noise"])
+urgency (enum: EMERGENCY, THIS_WEEK, FLEXIBLE)
+media_attachments (photo/video, optional but encouraged — reduces vendor clarification round-trips)
+free_text_description (subject to moderation scanning before it is ever shown publicly — see 2.B)
+service_location (lat/long + masked display address, e.g., neighborhood-level only until a bid is accepted)
+budget_range (optional — consumer may choose to disclose a soft ceiling to improve bid relevance)
+On submission, free_text_description and any media are passed through the moderation pipeline (2.B) BEFORE the job card is published. A card that fails moderation never reaches OPEN status — it enters PENDING_REVIEW immediately, invisible to vendors, exactly as described in 2.B.3.
+2.A.2 Asynchronous Targeted Routing
+Once a Job Card passes moderation and reaches OPEN, it must be converted into a notification payload and routed only to the correct vendor population: verified, correct skill category, within geographic radius. This is a fan-out problem, not a simple insert.
+Routing Pipeline
+1. Job Card reaches OPEN status
+     → emits JobCardPublished event onto a message queue (e.g., SQS / Redis Streams)
+ 
+2. Routing Worker (async, horizontally scalable) consumes the event:
+     a. PostGIS geospatial query:
+          SELECT vendor_id FROM Vendor_Profiles
+          WHERE ST_DWithin(service_area_geom, job.location_geom, vendor.radius_meters)
+            AND category_id = job.category_id
+            AND verification_status = 'VERIFIED'
+            AND subscription_status IN ('ACTIVE','TRIAL')
+     b. Result set = the exact vendor population eligible to see this job
+ 
+3. Fan-out notification dispatch:
+     → push notification (FCM/APNs) to each eligible vendor's device
+     → in-app feed entry inserted for each eligible vendor
+     → job_card.notified_vendor_count incremented for the live consumer-facing counter
+ 
+4. HARD ISOLATION RULE: a vendor with category_id = 'PLUMBING' is never included in
+   step 2's result set for a job with category_id = 'ELECTRICAL'. This is enforced at
+   the query layer (WHERE clause), not via client-side filtering — client-side-only
+   filtering would leak electrical jobs to plumbers via API responses even if the UI
+   hides them.
+The category isolation rule deserves emphasis because it is a common real-world bug: filtering must happen in the database query or service layer, never only in the rendering layer, or a vendor inspecting raw API responses (or a malicious actor) could see cross-category job data.
+2.A.3 The Vendor Bidding Mechanism & “Need Details” Loop
+Job cards are frequently underspecified — a consumer may not know the brand of their AC unit, or the wiring type behind a wall. Rather than allowing vendors to message the consumer directly to ask (which both invites disintermediation risk and creates information asymmetry between competing bidders), the platform implements a public Q&A sub-thread attached to the job card.
+Need-Details Mechanism Design
+A vendor viewing an open job card taps “Ask for Details.” This opens a structured input, not a freeform chat window.
+The submitted question is passed through the SAME moderation pipeline as job card creation (2.B) before being appended to the thread — a vendor cannot use the Q&A feature as a disintermediation side-channel (e.g., “what's your WhatsApp” disguised as a clarification question).
+Once approved, the question is appended to a public_qa_thread object on the job card, visible to the consumer AND to every other vendor currently bidding or eligible to bid on that job — this symmetry is deliberate: it prevents one vendor from privately extracting better information than competitors.
+The consumer answers via the same thread. The answer is also moderation-scanned before publishing.
+All Q&A entries are anonymized on the vendor side (shown as “Vendor #3 asked…” rather than by vendor name) until a bid is accepted, preventing reputation-based collusion or pre-selection bias during the open bidding window.
+2.A.4 The Selection Phase
+Consumers compare bids using a structured comparison view (not a raw list), sortable by price, vendor rating, response time, and estimated start time. Selecting a bid is a two-step confirmation (select → review milestone breakdown → confirm + fund) to prevent accidental fund commitment. Selection triggers the PENDING_FUNDING escrow state described in 1.C.1; communication channels (chat, masked-relay calling) remain locked until funding succeeds, which is the platform's primary commercial leverage point for the disintermediation problem — there is no reason to bypass the platform before this point because there is nothing yet to bypass to (no contact channel exists pre-funding).
+
+2.B Real-Time AI Moderation & Anti-Bypass (Disintermediation) Architecture
+This is the platform's core trust mechanism: every dollar (or rial) of take-rate revenue depends on transactions actually closing on-platform rather than migrating to a side-channel once contact is made. The design goal is not perfect detection — that's not achievable against a motivated adversary — but a high enough friction cost that off-platform migration is less attractive than simply transacting normally.
+2.B.1 Threat Profile
+Users attempting to bypass the platform generally fall into a small number of recognizable patterns: spelling out digits as words, inserting punctuation or spacing into numeric strings, referencing external apps by indirect description rather than name, or steering the conversation toward an in-person or photo-based handoff of contact details. A practical detection system should be designed around these pattern categories rather than trying to enumerate every specific phrase, since adversarial phrasing will always evolve faster than any fixed list.
+Because the goal here is platform protection, the specification below deliberately stays at the architecture and detection-category level rather than cataloguing literal example phrases — a long worked list of exact bypass wording is more useful as a how-to for evading detection than as a spec for building the detector, and any production model should be tuned against the platform's own real traffic rather than a static seed list.
+2.B.2 Multi-Layer AI Guardrail Architecture
+A two-tier pipeline balances latency against accuracy: a fast deterministic layer catches the bulk of low-effort attempts instantly, and a slower semantic layer catches the harder, context-dependent cases that pattern matching alone will miss.
+Tier 1 — Deterministic Pattern Layer (sub-10ms)
+Digit-sequence detectors that normalize obfuscated formatting (spacing, punctuation, mixed numeral/word substitution) before running standard phone-number and email regular expressions against the normalized string.
+A maintained lexicon of common messaging-app names and their typical phonetic/spelling variants, matched against normalized text.
+Runs synchronously on every text submission (job descriptions, Q&A entries, chat messages) before the content is persisted or displayed.
+Any positive match short-circuits immediately to PENDING_REVIEW — the semantic layer is not needed to confirm an obvious match, which keeps the common case fast.
+Tier 2 — LLM Semantic Parser (async, ~1–3s)
+Runs on all content that passes Tier 1 clean, since the harder evasion cases are precisely the ones built to slip past pattern matching — indirect references, suggestions to move the conversation elsewhere, or context that only reads as suspicious in light of the surrounding conversation.
+The model is given the message plus a short window of prior conversation context (not just the single message in isolation) and asked to classify intent against a small set of labels: e.g., LEGITIMATE, CONTACT_INFO_LEAKAGE, OFF_PLATFORM_REDIRECT_SUGGESTED, AMBIGUOUS_NEEDS_REVIEW.
+Output includes a confidence score and the specific span of text that triggered the classification, which is what populates the Admin split-view UI (2.B.4).
+Because this tier runs asynchronously, content can be optimistically shown to the submitting user immediately while moderation completes in the background, then retracted (set to PENDING_REVIEW) within seconds if flagged — this preserves perceived responsiveness for the ~95%+ of legitimate traffic while still catching violations quickly.
+Confidence Thresholds & Routing
+2.B.3 The Flagging & Admin Escalation Protocol
+The moment content crosses the auto-flag threshold, the associated record (job card, Q&A entry, or chat message) has its status set to PENDING_REVIEW in a single atomic database transaction.
+The record is immediately removed from any public-facing query (it is excluded by a status filter at the query layer, not hidden client-side — same principle as the category-isolation rule in 2.A.2).
+A webhook payload — containing the flagged content, the Tier 2 confidence score and triggered span, the submitting user's ID, and the relevant job/thread context — is pushed into the Admin Dashboard's review queue in real time.
+Every flagging event, resolution, and the model version/confidence score that produced it is written to the AI_AuditLogs table (schema in Section 3.A) — this is essential both for tuning the model over time and for defensibility if a vendor or consumer disputes a moderation decision.
+2.B.4 Admin Override Desk
+The admin-facing tool is a split-view review screen, designed for high throughput rather than deep investigation on every case (deep investigation is reserved for appeals or repeat offenders).
+Left pane: the original flagged content with the suspicious span visually highlighted, plus the surrounding conversation/job context for reference.
+Right pane: an auto-generated “sanitized” alternative — the same content with the offending span redacted or rephrased — produced by the same LLM that flagged it, presented as an editable text field rather than a fixed suggestion.
+Three primary actions: Approve Sanitized Version (one click — commits the sanitized text, updates the database record, and flips status from PENDING_REVIEW back to OPEN, publishing it as if it had passed moderation organically), Reject and Keep Hidden (content stays suppressed, optionally with a templated explanation sent to the user), or Manually Edit then Approve (admin adjusts the sanitized text before committing).
+Repeat-violation tracking: each user has a rolling violation count visible to the admin in this view, since a one-off ambiguous flag and a fifth attempt in a week warrant very different responses (the latter likely warrants account-level review rather than just content-level cleanup).
+A deliberate design choice: the “approve and publish” action is restricted to admins, never automated even at very high confidence sanitization scores, because incorrectly auto-publishing a still-violating message at scale would defeat the entire point of the system. The human-in-the-loop step is the actual enforcement mechanism; the AI layers exist to make that human's job tractable at volume, not to replace the decision.
+
+3. Complete Re-Usable System Architecture & 4-Quarter Roadmap
+3.A Production-Ready Tech Stack & Operational Infrastructure
+3.A.1 Recommended Stack Overview
+3.A.2 Database Schema — Core Entity Relationships
+Below is pseudo-DDL for the six entities most central to the platform's trust and financial integrity. This is illustrative schema design, not a full production migration — indexes, full audit columns, and soft-delete patterns would be expanded during implementation.
+Users (Base Identity Table)
+CREATE TABLE Users (
+  user_id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  phone_number        VARCHAR(20) UNIQUE NOT NULL,
+  full_name           VARCHAR(120) NOT NULL,
+  role                VARCHAR(20) NOT NULL CHECK (role IN ('CONSUMER','VENDOR','ADMIN')),
+  email               VARCHAR(160),
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+  is_active           BOOLEAN NOT NULL DEFAULT true
+);
+Vendor_Profiles (Extends Users for role = VENDOR)
+CREATE TABLE Vendor_Profiles (
+  vendor_id            UUID PRIMARY KEY REFERENCES Users(user_id),
+  category_ids         TEXT[] NOT NULL,            -- e.g. ['AC','ELECTRICAL']
+  service_area_geom    GEOGRAPHY(POLYGON, 4326),   -- PostGIS service radius/zone
+  radius_meters        INTEGER NOT NULL DEFAULT 15000,
+  verification_status  VARCHAR(20) NOT NULL DEFAULT 'PENDING'
+                        CHECK (verification_status IN ('PENDING','VERIFIED','SUSPENDED')),
+  license_doc_url      TEXT,
+  insurance_doc_url    TEXT,
+  insurance_expiry     DATE,
+  subscription_status  VARCHAR(20) NOT NULL DEFAULT 'TRIAL'
+                        CHECK (subscription_status IN ('TRIAL','ACTIVE','LAPSED')),
+  rating_avg           NUMERIC(3,2) DEFAULT 0.00,
+  jobs_completed_count  INTEGER DEFAULT 0
+);
+CREATE INDEX idx_vendor_geom ON Vendor_Profiles USING GIST (service_area_geom);
+Jobs (Job Cards)
+CREATE TABLE Jobs (
+  job_id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  consumer_id          UUID NOT NULL REFERENCES Users(user_id),
+  category_id          VARCHAR(40) NOT NULL,
+  sub_issue_tags       TEXT[],
+  urgency              VARCHAR(20) NOT NULL CHECK (urgency IN ('EMERGENCY','THIS_WEEK','FLEXIBLE')),
+  description          TEXT,                       -- post-moderation sanitized text only
+  location_geom        GEOGRAPHY(POINT, 4326) NOT NULL,
+  budget_range_min     NUMERIC(10,3),
+  budget_range_max     NUMERIC(10,3),
+  status               VARCHAR(20) NOT NULL DEFAULT 'PENDING_REVIEW'
+                        CHECK (status IN ('PENDING_REVIEW','OPEN','BID_SELECTED',
+                                          'IN_PROGRESS','COMPLETED','CANCELLED')),
+  notified_vendor_count INTEGER DEFAULT 0,
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_jobs_geom ON Jobs USING GIST (location_geom);
+CREATE INDEX idx_jobs_category_status ON Jobs (category_id, status);
+Bids
+CREATE TABLE Bids (
+  bid_id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_id               UUID NOT NULL REFERENCES Jobs(job_id),
+  vendor_id            UUID NOT NULL REFERENCES Vendor_Profiles(vendor_id),
+  bid_amount           NUMERIC(10,3) NOT NULL,
+  proposed_milestones  JSONB NOT NULL,             -- e.g. [{"label":"Arrival","pct":50}, ...]
+  estimated_start_at   TIMESTAMPTZ,
+  status               VARCHAR(20) NOT NULL DEFAULT 'SUBMITTED'
+                        CHECK (status IN ('SUBMITTED','SELECTED','REJECTED','WITHDRAWN')),
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (job_id, vendor_id)
+);
+EscrowLedgers (Immutable Append-Only Ledger)
+CREATE TABLE EscrowLedgers (
+  ledger_entry_id      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_id               UUID NOT NULL REFERENCES Jobs(job_id),
+  bid_id               UUID NOT NULL REFERENCES Bids(bid_id),
+  milestone_index      INTEGER NOT NULL,
+  state                VARCHAR(30) NOT NULL
+                        CHECK (state IN ('PENDING_FUNDING','HOLDING','AUTO_RELEASE_PENDING',
+                                         'RELEASED','DISPUTED','REFUNDED',
+                                         'ESCALATED_INSURANCE_CLAIM')),
+  amount               NUMERIC(10,3) NOT NULL,
+  platform_cut_amount  NUMERIC(10,3),
+  vendor_payout_amount NUMERIC(10,3),
+  actor_user_id        UUID REFERENCES Users(user_id),  -- who triggered this transition
+  insurance_claim_ref  TEXT,
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Append-only by convention: application layer never UPDATEs or DELETEs rows here,
+-- only INSERTs new state-transition rows; current state = latest row per milestone.
+CREATE INDEX idx_escrow_job ON EscrowLedgers (job_id, milestone_index, created_at DESC);
+AI_AuditLogs
+CREATE TABLE AI_AuditLogs (
+  log_id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  content_type         VARCHAR(30) NOT NULL CHECK (content_type IN ('JOB_DESC','QA_THREAD','CHAT_MSG')),
+  content_ref_id       UUID NOT NULL,             -- FK to the Job/QA/Message record
+  submitting_user_id   UUID NOT NULL REFERENCES Users(user_id),
+  tier1_match          BOOLEAN NOT NULL DEFAULT false,
+  tier2_confidence     NUMERIC(5,4),              -- 0.0000 - 1.0000
+  tier2_label          VARCHAR(40),
+  flagged_span         TEXT,
+  sanitized_alt_text   TEXT,
+  resolution           VARCHAR(30)
+                        CHECK (resolution IN ('AUTO_PASSED','PENDING_REVIEW','ADMIN_APPROVED_SANITIZED',
+                                              'ADMIN_REJECTED','ADMIN_MANUAL_EDIT')),
+  resolved_by_admin_id UUID REFERENCES Users(user_id),
+  model_version        VARCHAR(40),
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_audit_user ON AI_AuditLogs (submitting_user_id, created_at DESC);
+
+3.B Complete 4-Quarter Implementation Roadmap
+A 12-month build sequenced so that each quarter produces a coherent, testable layer of the platform rather than partial slices of every feature at once. Dependencies flow strictly forward: the AI moderation pipeline (Q3) depends on the bidding/Q&A surfaces it must scan (Q2), which depend on the geospatial/auth core (Q1).
+Q1 — Core Infrastructure, Geospatial Database, and Auth Engines
+Q2 — The Bidding Engine, Escrow API Integrations, and Notification Gateways
+Q3 — The Multi-Layer AI Moderation Pipeline & Admin Review Portal
+Q4 — Regulatory & Compliance Audits, Private Alpha, Store Setup, and Public Launch
+
+3.C Comprehensive Risk Matrix, Mitigation Strategies, and Success KPIs
+3.C.1 The Risk Ledger
+Risk 1 — Technical: AI Engine Latency or False Positives Breaking UX
+Risk 2 — Regulatory/Financial: Illegal Off-Platform Cash Transactions or Escrow Freezing
+Risk 3 — Market: Low Platform Liquidity (Jobs Posted, Zero Vendor Bids)
+3.C.2 Platform KPI Metrics

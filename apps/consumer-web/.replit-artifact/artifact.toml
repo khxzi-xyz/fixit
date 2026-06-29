@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "FixIt"
+version = "1.0.0"
+id = "artifacts/fixit"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24756
+
+[services.development]
+run = "pnpm --filter @workspace/fixit run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fixit", "run", "build" ]
+publicDir = "artifacts/fixit/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24756"
+BASE_PATH = "/"

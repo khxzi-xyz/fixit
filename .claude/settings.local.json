@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm --workspace apps/backend run build)",
+      "Bash(npm --workspace apps/admin-web run build)",
+      "Bash(npm --workspace apps/consumer-web run build)",
+      "Bash(npm --workspace apps/vendor-web run build)",
+      "Bash(npm --workspace apps/mobile run tsc -- --noEmit)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}

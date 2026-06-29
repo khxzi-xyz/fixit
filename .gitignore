@@ -1,0 +1,41 @@
+# Secrets — NEVER commit these
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Firebase — contains API keys
+google-services.json
+google-services.json.example
+
+# Local database / seed data (may contain sensitive info)
+db.json
+
+# Large chat/log artifacts
+claude_chat.md
+firebase-debug.log
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+.next/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Temp / scratch directories
+temp_fixit_repo/
