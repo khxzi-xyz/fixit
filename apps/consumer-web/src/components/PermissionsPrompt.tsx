@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Camera } from "@capacitor/camera";
 import { Geolocation } from "@capacitor/geolocation";
-import { LocalNotifications } from "@capacitor/local-notifications";
+import { PushNotifications } from "@capacitor/push-notifications";
 import { Preferences } from "@capacitor/preferences";
 import { Capacitor } from "@capacitor/core";
 import { ShieldCheck, MapPin, Camera as CameraIcon, Bell, ArrowRight } from "lucide-react";
@@ -30,7 +30,7 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
     try {
       await Camera.requestPermissions();
       await Geolocation.requestPermissions();
-      await LocalNotifications.requestPermissions();
+      await PushNotifications.requestPermissions();
     } catch (e) {
       console.error("Permission request error", e);
     } finally {

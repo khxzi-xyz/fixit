@@ -13,6 +13,7 @@ import { OnboardingGate } from "@/components/OnboardingGate";
 import { PermissionsPrompt } from "@/components/PermissionsPrompt";
 import { NotificationManager } from "@/components/NotificationManager";
 import NotFound from "@/pages/not-found";
+import { loginWithFingerprint } from "@/lib/biometrics";
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 import UserRegister from "./pages/auth/UserRegister";
@@ -176,6 +177,21 @@ function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.access_token) setToken(session.access_token);
     });
+    
+    // Biometric Auth Hook
+    loginWithFingerprint().then(async (result) => {
+      if (result?.token) {
+        // Technically biometric gives us a token, if we also saved refresh token it'd be better.
+        // Assuming we saved the JWT access token here:
+        setToken(result.token);
+        // Supabase session hydration is limited without refresh token but we set client token.
+        // Navigate to home if we are on login screen
+        if (window.location.pathname.includes("/auth/")) {
+          window.location.replace("/home");
+        }
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setToken(session?.access_token ?? null);
     });

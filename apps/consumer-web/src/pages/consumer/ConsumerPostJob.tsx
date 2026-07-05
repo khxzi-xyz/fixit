@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { api } from "@/lib/api";
+import { renderApi } from "@/lib/renderApi";
 import { useToast } from "@/hooks/use-toast";
 import {
   ChevronLeft, ChevronRight, Zap, Clock, Sparkles,
@@ -146,7 +147,7 @@ export default function ConsumerPostJob() {
         photos.map((p) => api.uploadImage(p, "jobs").then((r) => r.url).catch(() => ""))
       ).then((urls) => urls.filter(Boolean));
 
-      await api.createJob({
+      await renderApi.post("/api/jobs/create", {
         categoryId: selectedCat,
         urgency,
         description,
@@ -159,7 +160,7 @@ export default function ConsumerPostJob() {
       });
       setDone(true);
     } catch (e: any) {
-      toast({ title: "Couldn't post job", description: e.message, variant: "destructive" });
+      toast({ title: "Couldn't post job", description: e.message || "Network connection failed", variant: "destructive" });
     } finally {
       setPosting(false);
     }

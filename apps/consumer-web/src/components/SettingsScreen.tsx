@@ -5,7 +5,7 @@ import { VendorLayout } from "@/components/layouts/VendorLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ChevronLeft, Moon, Sun, Bell, Globe, MapPin, Check, LogOut, UserCog, ShieldCheck, Plus, Trash2, Home } from "lucide-react";
+import { ChevronLeft, Moon, Sun, Bell, Globe, MapPin, Check, LogOut, UserCog, ShieldCheck, Plus, Trash2, Home, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useI18n, LANGUAGES, COUNTRIES, flagUrl, type Lang } from "@/lib/i18n";
 import { api, setToken } from "@/lib/api";
