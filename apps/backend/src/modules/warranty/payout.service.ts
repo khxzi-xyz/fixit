@@ -5,13 +5,13 @@ import { requireDb } from '../../common/db.util';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 
 /**
- * The Rolling Warranty Payout (master_specs Fix 1) — the single real escrow
+ * The Rolling Warranty Payout (master_specs Fix 1) -the single real escrow
  * schedule, replacing the two contradictory promises (full 30-day lock vs.
  * instant milestones) found in the audit. On a job worth `total`:
  *   60% -> vendor, the moment Triple-Verify completion clears
  *   10% -> vendor, at the warranty halfway mark (no open claim)
  *   10% -> vendor, at warranty clearance (no claim the entire period)
- *   20% -> FixIt, held the whole window, released alongside the final 10%
+ *   20% -> FixIt Now, held the whole window, released alongside the final 10%
  * If the vendor ghosts a valid claim, whatever is still locked is forfeited
  * to fund a replacement vendor and the account takes a strike.
  */
@@ -20,7 +20,7 @@ export class PayoutService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
 
   private split(total: number) {
     const platformCut = round3(total * 0.2);

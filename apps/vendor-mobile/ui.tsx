@@ -1,5 +1,5 @@
 /**
- * Premium UI primitives — theme-aware. Each reads the active palette from
+ * Premium UI primitives -theme-aware. Each reads the active palette from
  * useTheme() and builds styles at render so switching themes re-skins instantly.
  */
 import { ReactNode, useEffect, useMemo, useRef } from "react";

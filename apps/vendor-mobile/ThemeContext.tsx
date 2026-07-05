@@ -1,5 +1,5 @@
 /**
- * Theme provider — holds the active palette, lets any screen switch it at
+ * Theme provider -holds the active palette, lets any screen switch it at
  * runtime via useTheme(), and persists the choice per user (localStorage on
  * web + the backend user-settings endpoint so it follows the account).
  */
@@ -8,7 +8,7 @@ import { Platform } from "react-native";
 import { buildTheme, THEMES, type Theme, type ThemeKey } from "./theme";
 import { api } from "./api";
 
-const STORAGE_KEY = "fixit_theme";
+const STORAGE_KEY = "FixIt Now_theme";
 
 interface ThemeCtx {
   t: Theme;

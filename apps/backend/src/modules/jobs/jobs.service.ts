@@ -9,16 +9,17 @@ import { AiService } from '../ai/ai.service';
 export interface CreateJobInput {
   categoryId: string;
   subIssueTags?: string[];
-  urgency: 'EMERGENCY' | 'THIS_WEEK' | 'FLEXIBLE';
+  urgency: 'EMERGENCY' | 'TODAY' | 'THIS_WEEK' | 'FLEXIBLE';
   description?: string;
   lat: number;
   lng: number;
   budgetMin?: number;
   budgetMax?: number;
-  postingKind?: 'STANDARD' | 'BOUNTY';
+  postingKind?: 'STANDARD' | 'BOUNTY' | 'AUCTION';
   bountyPrice?: number;
   aiRewritten?: boolean;
   originalDescription?: string;
+  mediaUrls?: string[];
 }
 
 @Injectable()
@@ -28,7 +29,7 @@ export class JobsService {
     private readonly moderation: ModerationService,
     private readonly routing: RoutingService,
     private readonly ai: AiService,
-  ) {}
+  ) { }
 
   /**
    * Create a Job Card. The description is moderation-scanned BEFORE publish
@@ -37,6 +38,8 @@ export class JobsService {
    */
   async create(consumerId: string, input: CreateJobInput) {
     const db = requireDb(this.db);
+
+    const hasVideo = input.mediaUrls?.some(url => url.includes('.mp4') || url.includes('.mov') || url.includes('.webm'));
 
     const insert = await db
       .from('jobs')
@@ -59,6 +62,13 @@ export class JobsService {
       .single();
     if (insert.error) throw new BadRequestException(insert.error.message);
     const job = insert.data;
+
+    // Best-effort: persist attached photos. Non-fatal if the column isn't
+    // present yet (run migration 0014_job_media.sql to enable).
+    if (input.mediaUrls?.length) {
+      await db.from('jobs').update({ media_urls: input.mediaUrls }).eq('job_id', job.job_id)
+        .then(() => undefined, () => undefined);
+    }
 
     let status: 'OPEN' | 'PENDING_REVIEW' = 'OPEN';
     if (input.description?.trim()) {
@@ -105,7 +115,7 @@ export class JobsService {
     return data;
   }
 
-  /** Vendor job feed — only OPEN jobs the vendor is eligible for (category +
+  /** Vendor job feed -only OPEN jobs the vendor is eligible for (category +
    *  geo + verification enforced in the DB function, PRD §2.A.2 isolation). */
   async feedForVendor(vendorId: string) {
     const db = requireDb(this.db);
@@ -117,7 +127,7 @@ export class JobsService {
     if (!profile) return [];
     const { data, error } = await db
       .from('jobs')
-      .select('job_id, category_id, sub_issue_tags, urgency, description, budget_range_min, budget_range_max, created_at')
+      .select('job_id, category_id, sub_issue_tags, urgency, description, budget_range_min, budget_range_max, created_at, media_urls')
       .eq('status', 'OPEN')
       .in('category_id', profile.category_ids)
       .order('created_at', { ascending: false })
@@ -126,7 +136,7 @@ export class JobsService {
     return data;
   }
 
-  /** Jobs a vendor has won (has a SELECTED bid on) — their active work queue. */
+  /** Jobs a vendor has won (has a SELECTED bid on) -their active work queue. */
   async listForVendor(vendorId: string) {
     const db = requireDb(this.db);
     const { data: bids, error: bidsError } = await db

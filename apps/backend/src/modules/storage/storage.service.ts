@@ -50,4 +50,20 @@ export class StorageService {
     const { data } = db.storage.from(BUCKET).getPublicUrl(path);
     return { url: data.publicUrl, path };
   }
+
+  /** Accepts a raw binary buffer (multipart upload). */
+  async uploadFile(userId: string, buffer: Buffer, mime: string, ext: string, folder = 'misc'): Promise<{ url: string; path: string }> {
+    const db = requireDb(this.db);
+    await this.ensureBucket(db);
+
+    if (buffer.length === 0) throw new BadRequestException('empty upload');
+    if (buffer.length > 8 * 1024 * 1024) throw new BadRequestException('file too large (max 8MB)');
+
+    const path = `${folder}/${userId.slice(0, 8)}/${randomUUID()}.${ext}`;
+    const { error } = await db.storage.from(BUCKET).upload(path, buffer, { contentType: mime, upsert: false });
+    if (error) throw new BadRequestException(`upload failed: ${error.message}`);
+
+    const { data } = db.storage.from(BUCKET).getPublicUrl(path);
+    return { url: data.publicUrl, path };
+  }
 }

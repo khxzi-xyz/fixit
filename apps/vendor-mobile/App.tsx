@@ -46,17 +46,6 @@ function AppRoot() {
 
   useEffect(() => { ensureFonts(); }, []);
 
-  const onDevLogin = useCallback(async () => {
-    setBusy(true);
-    try {
-      const res = await api.devLogin();
-      setToken(res.accessToken);
-      const uid = (res.user as { user_id?: string }).user_id ?? null;
-      if (uid) { setUserId(uid); setUid(uid); joinUser(uid); }
-      setLoggedIn(true);
-    } finally { setBusy(false); }
-  }, []);
-
   const handleLoginSuccess = async (token: string, name: string, uid: string) => {
     setToken(token);
     setUserId(uid);
@@ -296,8 +285,8 @@ function JobDetailModal({ job, userId, onClose }: { job: MyJob; userId?: string;
     setBusy(true);
     try { await api.requestParts(job.job_id, partsDesc, amt); setPartsDesc(""); setPartsAmount(""); await load(); } finally { setBusy(false); }
   };
-  const onMyWay = async () => { try { await api.startTracking(job.job_id); alert("Tracking on — consumer can see you en route."); } catch (e) { alert(e instanceof Error ? e.message : String(e)); } };
-  const arrived = async () => { try { await api.arrive(job.job_id); alert("Arrived — tracking ended."); } catch (e) { alert(e instanceof Error ? e.message : String(e)); } };
+  const onMyWay = async () => { try { await api.startTracking(job.job_id); alert("Tracking on -consumer can see you en route."); } catch (e) { alert(e instanceof Error ? e.message : String(e)); } };
+  const arrived = async () => { try { await api.arrive(job.job_id); alert("Arrived -tracking ended."); } catch (e) { alert(e instanceof Error ? e.message : String(e)); } };
   const uploadVendorAfter = async () => {
     setBusy(true);
     try {

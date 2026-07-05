@@ -3,11 +3,12 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_CLIENT } from '../../supabase/supabase.module';
 import { requireDb } from '../../common/db.util';
 import { GeminiClient } from '../moderation/gemini.client';
+import { AiProviderService } from './ai-provider.service';
 
 /**
  * AI layer (master_specs Module 01): the bilingual job-ticket rewriter (user
  * facing) and the internal price estimator + bid-floor guard (admin/system
- * only — the number is NEVER returned to consumers).
+ * only -the number is NEVER returned to consumers).
  */
 @Injectable()
 export class AiService {
@@ -16,16 +17,37 @@ export class AiService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly gemini: GeminiClient,
-  ) {}
+    private readonly aiProvider: AiProviderService,
+  ) { }
 
   /** AI Rewrite button. Returns a cleaned ticket + optional clarifying questions. */
   async rewriteTicket(input: { rawText: string; categoryHint?: string; targetLanguage?: string }) {
     if (!input.rawText?.trim()) throw new BadRequestException('rawText is required');
+
+    try {
+      const activeProvider = await this.aiProvider.getProvider();
+      if (activeProvider === 'groq') {
+        const groqRes = await this.aiProvider.rewriteTicket(input.rawText, input.categoryHint);
+        return {
+          title: groqRes.slice(0, 50),
+          ticket: groqRes,
+          rewritten: groqRes,
+          categoryGuess: input.categoryHint ?? null,
+          clarifyingQuestions: [],
+          detectedLanguage: input.targetLanguage ?? 'en',
+          modelVersion: 'groq-llama-3.3-70b',
+        };
+      }
+    } catch (e) {
+      this.logger.warn(`Provider check/groq call failed, falling back to gemini client: ${e}`);
+    }
+
     if (!this.gemini.configured) {
-      // Graceful fallback when the key is unset — echo a tidied version.
+      // Graceful fallback when the key is unset -echo a tidied version.
       return {
         title: input.rawText.slice(0, 60),
         ticket: input.rawText.trim(),
+        rewritten: input.rawText.trim(),
         categoryGuess: input.categoryHint ?? null,
         clarifyingQuestions: [],
         detectedLanguage: input.targetLanguage ?? 'en',
@@ -33,8 +55,33 @@ export class AiService {
       };
     }
     const result = await this.gemini.rewriteJobTicket(input);
-    if (!result) throw new BadRequestException('AI rewrite temporarily unavailable');
-    return result;
+    if (!result) {
+      // Configured but the call failed (bad key, quota, network) — degrade the
+      // same way as the no-key path instead of failing the request.
+      this.logger.warn('AI rewrite failed; echoing original text');
+      return {
+        title: input.rawText.slice(0, 60),
+        ticket: input.rawText.trim(),
+        rewritten: input.rawText.trim(),
+        categoryGuess: input.categoryHint ?? null,
+        clarifyingQuestions: [],
+        detectedLanguage: input.targetLanguage ?? 'en',
+        modelVersion: 'fallback-error',
+      };
+    }
+    return {
+      ...result,
+      rewritten: result.ticket,
+    };
+  }
+
+  /** Live translation for dynamic text (job titles/descriptions, etc.). No DB
+   *  needed -pure AI. Falls back to the source text when unconfigured. */
+  async translate(texts: string[], targetLang: string): Promise<{ items: string[]; translated: boolean }> {
+    if (!Array.isArray(texts) || texts.length === 0) return { items: [], translated: false };
+    if (targetLang === 'en' || !this.gemini.configured) return { items: texts, translated: false };
+    const out = await this.gemini.translateBatch(texts, targetLang);
+    return out ? { items: out, translated: true } : { items: texts, translated: false };
   }
 
   /**
@@ -98,5 +145,24 @@ export class AiService {
     const db = requireDb(this.db);
     const { data } = await db.from('job_price_estimates').select('*').eq('job_id', jobId).maybeSingle();
     return data ?? null;
+  }
+
+  /**
+   * AI enrichment for custom services.
+   * Given a custom description, returns a JSON object with category, title, tags, and a professional description.
+   */
+  async enrichCustomService(description: string) {
+    if (!description?.trim()) throw new BadRequestException('description is required');
+    if (!this.gemini.configured) {
+      return {
+        category: 'Custom',
+        title: description.slice(0, 30),
+        tags: ['custom'],
+        professional_description: description.trim(),
+      };
+    }
+    const result = await this.gemini.enrichCustomService(description);
+    if (!result) throw new BadRequestException('AI enrichment temporarily unavailable');
+    return result;
   }
 }

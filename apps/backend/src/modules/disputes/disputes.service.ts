@@ -7,14 +7,14 @@ import { RealtimeGateway } from '../realtime/realtime.gateway';
 
 /** Disputes & resolution (master_specs §1.A.3 / Module 06). Admin reviews the
  *  before/after photos and either refunds the consumer or releases to the
- *  vendor — moving the real escrow-held wallet funds. */
+ *  vendor -moving the real escrow-held wallet funds. */
 @Injectable()
 export class DisputesService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly wallet: WalletService,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
 
   async listOpen() {
     const db = requireDb(this.db);

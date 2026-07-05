@@ -1,5 +1,5 @@
 /**
- * Realtime client for the vendor app — Socket.IO gateway (namespace /rt).
+ * Realtime client for the vendor app -Socket.IO gateway (namespace /rt).
  * Vendors join their user room for direct bounties, wallet, and bid signals.
  */
 import { io, Socket } from "socket.io-client";

@@ -30,7 +30,7 @@ export class ModuleRepository {
         currency: data.currency,
       };
     } catch (e) {
-      console.error("[FixIt Node Failure]: Wallet fetch failed", e);
+      console.error("[FixIt Now Node Failure]: Wallet fetch failed", e);
       throw e;
     }
   }
@@ -48,7 +48,7 @@ export class ModuleRepository {
         created_at: t.created_at,
       }));
     } catch (e) {
-      console.error("[FixIt Node Failure]: Transactions fetch failed", e);
+      console.error("[FixIt Now Node Failure]: Transactions fetch failed", e);
       throw e;
     }
   }
@@ -58,7 +58,7 @@ export class ModuleRepository {
       const res = await api.topup(amount);
       return { credited: res.credited, balance: res.balance };
     } catch (e) {
-      console.error("[FixIt Node Failure]: Escrow lock transaction failed", e);
+      console.error("[FixIt Now Node Failure]: Escrow lock transaction failed", e);
       throw e;
     }
   }

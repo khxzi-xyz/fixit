@@ -1,8 +1,8 @@
 kind = "web"
 previewPath = "/"
-title = "FixIt"
+title = "FixIt One"
 version = "1.0.0"
-id = "artifacts/fixit"
+id = "artifacts/FixIt One"
 router = "path"
 
 [[integratedSkills]]
@@ -15,11 +15,11 @@ paths = [ "/" ]
 localPort = 24756
 
 [services.development]
-run = "pnpm --filter @workspace/fixit run dev"
+run = "pnpm --filter @workspace/FixIt One run dev"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/fixit", "run", "build" ]
-publicDir = "artifacts/fixit/dist/public"
+build = [ "pnpm", "--filter", "@workspace/FixIt One", "run", "build" ]
+publicDir = "artifacts/FixIt One/dist/public"
 serve = "static"
 
 [[services.production.rewrites]]

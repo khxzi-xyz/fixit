@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS voucher_redemptions (
   UNIQUE (voucher_id, user_id)
 );
 
--- 6. Dynamic fee-drop scale: helper to compute FixIt's cut by job size ----
+-- 6. Dynamic fee-drop scale: helper to compute FixIt Now's cut by job size ----
 CREATE OR REPLACE FUNCTION fn_platform_fee_pct(p_amount NUMERIC)
 RETURNS NUMERIC AS $$
 BEGIN

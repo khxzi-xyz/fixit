@@ -1,58 +1,81 @@
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "wouter";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
-import { ChevronRight, Wrench, Truck, Zap } from "lucide-react";
-import { Link } from "wouter";
+import { ServiceIcon } from "@/components/ServiceIcon";
+import { api } from "@/lib/api";
 
-const CATEGORIES = [
-  {
-    title: "Framework A: Repair & Installation",
-    icon: Wrench,
-    items: ["Plumbing", "Electrical", "AC Repair & Servicing", "Carpentry", "Appliance Repair"]
-  },
-  {
-    title: "Framework B: Transit & Delivery",
-    icon: Truck,
-    items: ["Furniture Moving", "Water Tanker", "Gas Cylinder Delivery", "Tow Truck Recovery"]
-  },
-  {
-    title: "Framework C: Instant & Gig",
-    icon: Zap,
-    items: ["Deep Cleaning", "Car Washing", "Pest Control", "Hourly Labor"]
-  }
-];
+import { ChevronLeft, HelpCircle } from "lucide-react";
 
 export default function ConsumerCategories() {
+  const [, navigate] = useLocation();
+  const [cats, setCats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.categories()
+      .then(setCats)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <ConsumerLayout>
-      <div className="p-4 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Full Catalog</h1>
-          <p className="text-muted-foreground text-sm">Browse all available services</p>
+      <div className="sticky top-0 z-40 hero-blue text-white px-4 pt-4 pb-5 rounded-b-3xl shadow-md">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate("/home")}><ChevronLeft className="w-6 h-6" /></button>
+          <div>
+            <h1 className="text-xl font-extrabold">All Categories</h1>
+            <p className="text-xs text-white/70">Browse every service on FixIt Now</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-4 py-5 space-y-5 pb-24">
+        <p className="font-bold text-lg">Popular services</p>
+        <div className="grid grid-cols-2 gap-3">
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-card border border-border rounded-2xl p-4 h-24 animate-pulse">
+                <div className="w-10 h-10 bg-muted rounded-xl mb-3" />
+                <div className="h-4 bg-muted rounded w-3/4" />
+              </div>
+            ))
+          ) : cats.length > 0 ? (
+            cats.map((cat) => {
+
+
+              return (
+                <Link key={cat.category_id} href={`/post-job?category=${cat.category_id}`}>
+                  <div className="bg-card rounded-2xl border border-border shadow-sm p-4 flex flex-col gap-3 hover:shadow-md transition-shadow h-full cursor-pointer">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                      <ServiceIcon id={cat.category_id} className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm leading-tight">{cat.display_name}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">Tap to post a job</p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground col-span-2 text-center py-10">No categories found.</p>
+          )}
         </div>
 
-        <div className="space-y-6">
-          {CATEGORIES.map((section, idx) => {
-            const Icon = section.icon;
-            return (
-              <div key={idx}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-2 bg-primary/20 rounded-lg text-primary">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <h2 className="font-bold text-foreground">{section.title}</h2>
-                </div>
-                <div className="bg-card border border-border rounded-xl overflow-hidden">
-                  {section.items.map((item, itemIdx) => (
-                    <Link key={itemIdx} href="/search">
-                      <div className="flex items-center justify-between p-4 border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer transition-colors">
-                        <span className="font-medium">{item}</span>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+        <div className="pt-6 border-t border-border mt-4">
+          <p className="font-bold text-lg mb-3">Can't find your service?</p>
+          <Link href="/request-service">
+            <div className="bg-slate-50 dark:bg-slate-900 border border-primary/20 rounded-2xl p-4 flex items-center gap-4 hover:bg-primary/10 transition-colors cursor-pointer group">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <HelpCircle className="w-6 h-6 text-primary" />
               </div>
-            );
-          })}
+              <div className="flex-1">
+                <p className="font-bold text-sm text-primary group-hover:text-primary/80 transition-colors">Request Custom Service</p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Tell us exactly what you need and we'll find a pro for you.</p>
+              </div>
+            </div>
+          </Link>
         </div>
       </div>
     </ConsumerLayout>

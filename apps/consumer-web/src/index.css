@@ -73,60 +73,73 @@
 }
 
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(0, 0, 0, .10);
+  --badge-outline: rgba(0, 0, 0, .05);
 
   --opaque-button-border-intensity: -8;
 
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  --elevate-1: rgba(0, 0, 0, .03);
+  --elevate-2: rgba(0, 0, 0, .08);
 
-  --background: 226 44% 7%; /* Deep navy #0A0E1A */
-  --foreground: 210 40% 98%; 
+  /* FixIt Now -Talabat-style light theme, blue brand */
+  --background: 210 20% 98%;
+  /* off-white app canvas #F7F9FB */
+  --foreground: 212 50% 14%;
+  /* navy ink #0B2545 */
 
-  --border: 226 30% 18%; 
+  --border: 214 24% 90%;
+  /* hairline gray */
 
-  --card: 226 40% 10%; 
-  --card-foreground: 210 40% 98%;
-  --card-border: 226 30% 18%;
+  --card: 0 0% 100%;
+  /* white cards */
+  --card-foreground: 212 50% 14%;
+  --card-border: 214 24% 90%;
 
-  --sidebar: 226 44% 7%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-border: 226 30% 18%;
-  --sidebar-primary: 217 91% 53%; /* Electric Blue */
-  --sidebar-primary-foreground: 210 40% 98%;
-  --sidebar-accent: 226 30% 18%;
-  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 212 50% 14%;
+  --sidebar-border: 214 24% 90%;
+  --sidebar-primary: 217 91% 53%;
+  /* Electric Blue */
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 20% 96%;
+  --sidebar-accent-foreground: 212 50% 14%;
   --sidebar-ring: 217 91% 53%;
 
-  --popover: 226 40% 10%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 226 30% 18%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 212 50% 14%;
+  --popover-border: 214 24% 90%;
 
-  --primary: 217 91% 53%; /* Electric blue #1B6EF3 */
-  --primary-foreground: 210 40% 98%;
+  --primary: 217 91% 53%;
+  /* Electric blue #1B6EF3 */
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 226 30% 18%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 210 20% 96%;
+  /* light chip bg */
+  --secondary-foreground: 212 50% 14%;
 
-  --muted: 226 30% 18%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 16% 47%;
+  /* slate gray */
 
-  --accent: 43 96% 56%; /* Amber/Gold */
-  --accent-foreground: 226 44% 7%;
+  --accent: 212 67% 16%;
+  /* deep navy accent #0B2545 */
+  --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 84% 60%; /* Red */
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  /* Red */
+  --destructive-foreground: 0 0% 100%;
 
-  --success: 142 71% 45%; /* Green */
-  --success-foreground: 226 44% 7%;
+  --success: 152 69% 38%;
+  /* Green */
+  --success-foreground: 0 0% 100%;
 
-  --warning: 43 96% 56%;
-  --warning-foreground: 226 44% 7%;
+  --warning: 38 92% 50%;
+  /* Amber */
+  --warning-foreground: 0 0% 100%;
 
-  --input: 226 30% 18%;
+  --input: 214 24% 90%;
   --ring: 217 91% 53%;
-  
+
   --chart-1: 217 91% 53%;
   --chart-2: 43 96% 56%;
   --chart-3: 142 71% 45%;
@@ -136,16 +149,16 @@
   --app-font-sans: 'Plus Jakarta Sans', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
-  --radius: 0.75rem; 
+  --radius: 0.75rem;
 
-  --shadow-2xs: 0px 2px 0px 0px rgba(0,0,0,0.1);
-  --shadow-xs: 0px 2px 0px 0px rgba(0,0,0,0.1);
-  --shadow-sm: 0px 2px 0px 0px rgba(0,0,0,0.1), 0px 1px 2px -1px rgba(0,0,0,0.1);
-  --shadow: 0px 2px 0px 0px rgba(0,0,0,0.1), 0px 1px 2px -1px rgba(0,0,0,0.1);
-  --shadow-md: 0px 2px 0px 0px rgba(0,0,0,0.1), 0px 2px 4px -1px rgba(0,0,0,0.1);
-  --shadow-lg: 0px 2px 0px 0px rgba(0,0,0,0.1), 0px 4px 6px -1px rgba(0,0,0,0.1);
-  --shadow-xl: 0px 2px 0px 0px rgba(0,0,0,0.1), 0px 8px 10px -1px rgba(0,0,0,0.1);
-  --shadow-2xl: 0px 2px 0px 0px rgba(0,0,0,0.1);
+  --shadow-2xs: 0px 1px 2px 0px rgba(11, 37, 69, 0.04);
+  --shadow-xs: 0px 1px 3px 0px rgba(11, 37, 69, 0.06);
+  --shadow-sm: 0px 1px 2px 0px rgba(11, 37, 69, 0.06), 0px 1px 3px 0px rgba(11, 37, 69, 0.08);
+  --shadow: 0px 2px 6px -1px rgba(11, 37, 69, 0.08), 0px 1px 3px 0px rgba(11, 37, 69, 0.06);
+  --shadow-md: 0px 4px 12px -2px rgba(11, 37, 69, 0.10), 0px 2px 6px -2px rgba(11, 37, 69, 0.06);
+  --shadow-lg: 0px 10px 24px -4px rgba(11, 37, 69, 0.12), 0px 4px 10px -4px rgba(11, 37, 69, 0.08);
+  --shadow-xl: 0px 20px 40px -8px rgba(11, 37, 69, 0.16), 0px 8px 16px -8px rgba(11, 37, 69, 0.10);
+  --shadow-2xl: 0px 28px 60px -12px rgba(11, 37, 69, 0.22);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -159,7 +172,30 @@
 }
 
 .dark {
-  /* FixIt defaults to dark mode natively in :root */
+  --background: 226 44% 7%;
+  --foreground: 210 40% 98%;
+  --border: 226 30% 18%;
+  --card: 226 40% 10%;
+  --card-foreground: 210 40% 98%;
+  --card-border: 226 30% 18%;
+  --sidebar: 226 44% 7%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-border: 226 30% 18%;
+  --sidebar-accent: 226 30% 18%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --popover: 226 40% 10%;
+  --popover-foreground: 210 40% 98%;
+  --popover-border: 226 30% 18%;
+  --primary: 217 91% 53%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 226 30% 18%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 226 30% 18%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 212 70% 30%;
+  --accent-foreground: 210 40% 98%;
+  --input: 226 30% 18%;
+  --ring: 217 91% 53%;
 }
 
 @layer base {
@@ -169,12 +205,33 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 }
 
 @layer utilities {
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Talabat-style hero gradient (blue brand) */
+  .hero-blue {
+    background-image: linear-gradient(135deg, hsl(217 91% 53%) 0%, hsl(212 67% 26%) 100%);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   [contenteditable][data-placeholder]:empty::before {
@@ -184,6 +241,7 @@
   }
 
   .no-default-hover-elevate {}
+
   .no-default-active-elevate {}
 
   .toggle-elevate::before,

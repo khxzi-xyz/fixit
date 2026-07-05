@@ -30,7 +30,7 @@ CREATE OR REPLACE FUNCTION fn_prevent_banned_user()
 RETURNS TRIGGER AS $$
 BEGIN
   IF EXISTS (SELECT 1 FROM banned_users WHERE phone_number = NEW.phone_number) THEN
-    RAISE EXCEPTION 'This phone number has been permanently banned from the FixIt network.';
+    RAISE EXCEPTION 'This phone number has been permanently banned from the FixIt Now network.';
   END IF;
   RETURN NEW;
 END;

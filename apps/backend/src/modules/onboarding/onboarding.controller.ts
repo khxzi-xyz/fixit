@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { IsBoolean, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import { OnboardingService } from './onboarding.service';
+import { SupportChatService } from './support-chat.service';
 import { JwtAuthGuard, Roles, type AuthedRequest } from '../auth/jwt.guard';
 
 class DocDto {
@@ -8,14 +9,27 @@ class DocDto {
   @IsString() dataUrl!: string;
 }
 class ResolveDto { @IsIn(['APPROVE', 'REJECT']) decision!: string; @IsOptional() @IsString() reason?: string; }
-class AddrDto { @IsString() label!: string; @IsOptional() @IsNumber() lat?: number; @IsOptional() @IsNumber() lng?: number; @IsOptional() @IsString() details?: string; }
+class AddrDto { 
+  @IsString() label!: string; 
+  @IsOptional() @IsNumber() lat?: number; 
+  @IsOptional() @IsNumber() lng?: number; 
+  @IsOptional() @IsString() details?: string; 
+  @IsOptional() @IsString() floor?: string;
+  @IsOptional() @IsString() building?: string;
+  @IsOptional() @IsBoolean() isDefault?: boolean;
+}
 class TicketDto { @IsString() subject!: string; @IsOptional() @IsString() body?: string; }
 class ReplyDto { @IsString() reply!: string; }
+class ChatMsgDto { @IsString() content!: string; }
+class EscalateDto { @IsOptional() @IsString() summary?: string; }
 
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class OnboardingController {
-  constructor(private readonly svc: OnboardingService) {}
+  constructor(
+    private readonly svc: OnboardingService,
+    private readonly supportChat: SupportChatService,
+  ) {}
 
   // KYC (vendor)
   @Post('vendor/kyc/document') @Roles('VENDOR')
@@ -35,7 +49,8 @@ export class OnboardingController {
 
   // Addresses
   @Get('addresses') addresses(@Req() r: AuthedRequest) { return this.svc.addresses(r.user!.sub); }
-  @Post('addresses') addAddr(@Req() r: AuthedRequest, @Body() d: AddrDto) { return this.svc.addAddress(r.user!.sub, d.label, d.lat, d.lng, d.details); }
+  @Post('addresses') addAddr(@Req() r: AuthedRequest, @Body() d: AddrDto) { return this.svc.addAddress(r.user!.sub, d.label, d.lat, d.lng, d.details, d.floor, d.building, d.isDefault); }
+  @Put('addresses/:id') updateAddr(@Req() r: AuthedRequest, @Param('id') id: string, @Body() d: AddrDto) { return this.svc.updateAddress(r.user!.sub, id, d); }
   @Delete('addresses/:id') delAddr(@Req() r: AuthedRequest, @Param('id') id: string) { return this.svc.deleteAddress(r.user!.sub, id); }
 
   // Support
@@ -43,4 +58,13 @@ export class OnboardingController {
   @Post('support/tickets') createTicket(@Req() r: AuthedRequest, @Body() d: TicketDto) { return this.svc.createTicket(r.user!.sub, d.subject, d.body); }
   @Get('admin/support') @Roles('ADMIN') supportQueue() { return this.svc.ticketQueue(); }
   @Post('admin/support/:id') @Roles('ADMIN') reply(@Param('id') id: string, @Body() d: ReplyDto) { return this.svc.replyTicket(id, d.reply); }
+
+  // Permanent AI support chat (Temu/Talabat-style)
+  @Get('support/chat') chatHistory(@Req() r: AuthedRequest) { return this.supportChat.history(r.user!.sub); }
+  @Post('support/chat') chatSend(@Req() r: AuthedRequest, @Body() d: ChatMsgDto) {
+    return this.supportChat.send(r.user!.sub, (r.user as any)?.full_name ?? 'Customer', d.content);
+  }
+  @Post('support/chat/escalate') chatEscalate(@Req() r: AuthedRequest, @Body() d: EscalateDto) {
+    return this.supportChat.escalate(r.user!.sub, d.summary);
+  }
 }

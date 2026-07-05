@@ -1,9 +1,9 @@
-# FixIt Marketplace - Ideas, Modules, and App Structure
+# FixIt Now Marketplace - Ideas, Modules, and App Structure
 
 ## 1. Pivot: Liability & Insurance Disclaimer Strategy
 Based on recent decisions, the platform will **not** provide or integrate third-party liability insurance. We act strictly as a matchmaking and escrow platform.
 - **Implementation**: A 1-time "Terms of Service & Liability Disclaimer" popup will appear on the first app launch for both Consumers and Vendors. 
-- **Popup Content Summary**: "FixIt connects you with independent service providers. We do not employ the vendors, nor do we provide insurance or guarantee the safety/quality of work. Any property damage or disputes over physical work must be resolved directly with the vendor. By proceeding, you agree that FixIt is not liable for vendor negligence."
+- **Popup Content Summary**: "FixIt Now connects you with independent service providers. We do not employ the vendors, nor do we provide insurance or guarantee the safety/quality of work. Any property damage or disputes over physical work must be resolved directly with the vendor. By proceeding, you agree that FixIt Now is not liable for vendor negligence."
 - **Escrow Impact**: The `ESCALATED_INSURANCE_CLAIM` escrow state is removed. Disputes will only be resolved via Escrow Refunds/Releases.
 
 ---
@@ -99,7 +99,7 @@ Based on recent decisions, the platform will **not** provide or integrate third-
 
 ## 4. Competitor Analysis & Feature Inspiration
 
-Based on a web search of top home-service marketplace apps (TaskRabbit, Urban Company, Thumbtack), FixIt Marketplace can integrate the best of their models:
+Based on a web search of top home-service marketplace apps (TaskRabbit, Urban Company, Thumbtack), FixIt Now Marketplace can integrate the best of their models:
 
 ### A. TaskRabbit (Direct Selection & Same-Day)
 * **What they do well**: Real-time availability, direct chat, and "Happiness Pledge".
@@ -107,14 +107,14 @@ Based on a web search of top home-service marketplace apps (TaskRabbit, Urban Co
 
 ### B. Urban Company (Standardized, Full-Stack Service)
 * **What they do well**: Fixed pricing, high professional standards, trained providers.
-* **Feature to steal**: **Standardized "Common Jobs" Menu**. While FixIt is bid-based, we can offer "Fixed-Price Quick Books" for extremely common tasks (e.g., "Standard AC Cleaning - 15 OMR"). Vendors can opt-in to automatically accept these fixed-price jobs without the friction of bidding.
+* **Feature to steal**: **Standardized "Common Jobs" Menu**. While FixIt Now is bid-based, we can offer "Fixed-Price Quick Books" for extremely common tasks (e.g., "Standard AC Cleaning - 15 OMR"). Vendors can opt-in to automatically accept these fixed-price jobs without the friction of bidding.
 
 ### C. Thumbtack (Quote-Based Projects)
 * **What they do well**: Lead generation, complex projects (renovations), "Home Profile" tracker.
 * **Feature to steal**: **The "Home Profile" Hub**. Let consumers create profiles for their homes (e.g., "2-Bedroom Apartment", "4 AC Units (Carrier)", "Built in 2018"). This context is automatically attached to their Job Cards, saving them from re-typing their home setup for every new repair and helping vendors bid more accurately.
 
 ### Refined "Super App" Flow Integration
-By combining these, FixIt's core flow evolves to:
+By combining these, FixIt Now's core flow evolves to:
 1. **The Choice**: Consumer selects a category (AC Repair).
 2. **Standard vs Custom**: App asks: "Standard Cleaning (Fixed 15 OMR)" or "Custom Repair (Get Quotes)".
 3. **Smart Context**: App pulls from the consumer's "Home Profile" (e.g., 3-Ton Daikin AC) automatically.

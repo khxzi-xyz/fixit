@@ -7,7 +7,7 @@ import { requireDb } from '../../common/db.util';
  *  and ad campaigns (100-page Zone 6 / Pages 50-58). */
 @Injectable()
 export class VendorOpsService {
-  constructor(@Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null) {}
+  constructor(@Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null) { }
 
   /** Monthly earnings + totals derived from real wallet_transactions. */
   async analytics(vendorId: string) {
@@ -42,7 +42,7 @@ export class VendorOpsService {
     const db = requireDb(this.db);
     const { data, error } = await db.from('vendor_staff').insert({ vendor_id: vendorId, name, phone: phone ?? null, vehicle_plate: vehicle ?? null }).select('*').maybeSingle();
     if (error) throw new BadRequestException(error.message);
-    // multi-staff shops are exempt from the single-job Busy lock — bump staff_count
+    // multi-staff shops are exempt from the single-job Busy lock -bump staff_count
     const { count } = await db.from('vendor_staff').select('*', { count: 'exact', head: true }).eq('vendor_id', vendorId);
     await db.from('vendor_profiles').update({ staff_count: (count ?? 1) + 1 }).eq('vendor_id', vendorId).then(() => undefined, () => undefined);
     return data;

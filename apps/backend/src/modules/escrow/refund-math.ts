@@ -6,7 +6,7 @@
  *  - METHOD_1 (recommended): commission fixed on the ORIGINAL bid amount.
  *  - METHOD_2 ("goodwill"):  commission taken only from the non-refunded remainder.
  *
- * Every dispute resolution MUST go through this function and be logged — never
+ * Every dispute resolution MUST go through this function and be logged -never
  * hand-calculated by an operator (PRD §1.C.2).
  */
 export type RefundMethod = 'METHOD_1' | 'METHOD_2';
@@ -49,7 +49,7 @@ export function computeRefund(input: RefundInput): RefundResult {
 
   const vendorPayout = remainder - platformCut;
 
-  // Reconciliation invariant — must always sum to the original escrow balance.
+  // Reconciliation invariant -must always sum to the original escrow balance.
   if (consumerRefund + platformCut + vendorPayout !== total) {
     throw new Error('reconciliation failed: parts do not sum to original amount');
   }

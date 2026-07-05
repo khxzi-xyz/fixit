@@ -1,9 +1,9 @@
 -- =============================================================================
--- 0013: Vendor operations — multi-staff team, ad campaigns, campaign metrics.
+-- 0013: Vendor operations -multi-staff team, ad campaigns, campaign metrics.
 -- (Analytics derives from wallet_transactions, no new table needed.)
 -- =============================================================================
 
--- Page 50 — multi-staff / fleet
+-- Page 50 -multi-staff / fleet
 CREATE TABLE IF NOT EXISTS vendor_staff (
   staff_id    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id   UUID NOT NULL REFERENCES vendor_profiles(vendor_id) ON DELETE CASCADE,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS vendor_staff (
 );
 CREATE INDEX IF NOT EXISTS idx_vendor_staff_vendor ON vendor_staff (vendor_id);
 
--- Pages 57/91 — ad campaigns (homepage banners)
+-- Pages 57/91 -ad campaigns (homepage banners)
 CREATE TABLE IF NOT EXISTS ad_campaigns (
   campaign_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id   UUID NOT NULL REFERENCES vendor_profiles(vendor_id) ON DELETE CASCADE,

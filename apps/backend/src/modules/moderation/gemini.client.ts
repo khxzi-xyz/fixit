@@ -17,7 +17,7 @@ export interface Tier2Result {
 
 /**
  * Tier-2 semantic disintermediation classifier via Google AI Studio (Gemini).
- * Server-side only — the key never reaches a client (PRD §3.A).
+ * Server-side only -the key never reaches a client (PRD §3.A).
  *
  * Configure: GOOGLE_AI_API_KEY, MODERATION_MODEL (default gemini-2.0-flash).
  * Detects context-dependent evasion that Tier-1 regex misses (PRD §2.B.2).
@@ -26,7 +26,7 @@ export interface Tier2Result {
 export class GeminiClient {
   private readonly logger = new Logger(GeminiClient.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService) { }
 
   get configured(): boolean {
     return Boolean(this.config.get<string>('GOOGLE_AI_API_KEY'));
@@ -129,7 +129,7 @@ export class GeminiClient {
   }
 
   /**
-   * Internal AI price estimator (master_specs Module 01) — admin/system only,
+   * Internal AI price estimator (master_specs Module 01) -admin/system only,
    * NEVER shown to the consumer. Produces a fair market range + a floor used by
    * the bid-floor guard (Module 03) to flag/block sabotage lowball bids.
    */
@@ -137,7 +137,7 @@ export class GeminiClient {
     const prompt = [
       'You are an internal pricing model for a hyper-local labor marketplace in',
       'Oman (currency OMR). Estimate a FAIR market labor-only price range for the',
-      'job below. Labor only — exclude parts. Be realistic for local rates.',
+      'job below. Labor only -exclude parts. Be realistic for local rates.',
       input.categoryId ? `Category: ${input.categoryId}.` : '',
       '',
       `Job ticket: """${input.ticket}"""`,
@@ -163,6 +163,55 @@ export class GeminiClient {
     };
   }
 
+  /**
+   * AI enrichment for custom services in the Vendor portal.
+   * Cleans up custom descriptions into professional titles, tags, and standard categories.
+   */
+  async enrichCustomService(description: string): Promise<{ title: string; category: string; tags: string[]; professional_description: string; } | null> {
+    const prompt = [
+      'You are an AI assistant for a professional services marketplace.',
+      `A vendor provided the following custom service description: """${description}"""`,
+      '',
+      'Please analyze this and output a JSON object with:',
+      '1. "category": the closest standard category (e.g., "Plumbing", "Electrical", "Cleaning", "Automotive", "Custom").',
+      '2. "title": a professional, concise title for this service (max 5 words).',
+      '3. "tags": an array of 3-5 keywords for search indexing.',
+      '4. "professional_description": A polished, professional rewrite of their description (1-2 sentences).',
+      '',
+      'Output ONLY valid JSON, no markdown blocks.'
+    ].join('\n');
+
+    const parsed = await this.generateJson<{
+      title: string;
+      category: string;
+      tags: string[];
+      professional_description: string;
+    }>(prompt, 5000);
+
+    return parsed;
+  }
+
+  /**
+   * Batch-translate short UI/job strings into a target language. Preserves order,
+   * keeps numbers/prices/proper-nouns intact, returns null when unconfigured so
+   * the caller can fall back to the source text.
+   */
+  async translateBatch(texts: string[], targetLang: string): Promise<string[] | null> {
+    const cleaned = texts.map((t) => (t ?? '').toString());
+    if (cleaned.every((t) => !t.trim())) return cleaned;
+    const langName: Record<string, string> = { en: 'English', ar: 'Arabic', ur: 'Urdu', hi: 'Hindi', bn: 'Bangla' };
+    const prompt = [
+      `Translate each string in the JSON array below into ${langName[targetLang] ?? targetLang}.`,
+      'Keep numbers, currency amounts (OMR), and proper names unchanged. Keep it natural and concise.',
+      'Return ONLY a JSON object: {"items": [<translated strings in the SAME order>]}.',
+      '',
+      JSON.stringify(cleaned),
+    ].join('\n');
+    const parsed = await this.generateJson<{ items: string[] }>(prompt, 8000);
+    if (!parsed?.items || !Array.isArray(parsed.items) || parsed.items.length !== cleaned.length) return null;
+    return parsed.items.map((s, i) => (typeof s === 'string' && s.trim() ? s : cleaned[i]));
+  }
+
   /** Shared one-shot JSON generation with a hard timeout and fail-open null. */
   private async generateJson<T>(prompt: string, timeoutMs: number): Promise<T | null> {
     const apiKey = this.config.get<string>('GOOGLE_AI_API_KEY');
@@ -170,9 +219,17 @@ export class GeminiClient {
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent`;
     try {
+      const isBearer = apiKey.startsWith('ya29.') || apiKey.startsWith('AQ.');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (isBearer) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      } else {
+        headers['x-goog-api-key'] = apiKey;
+      }
+
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        headers,
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },

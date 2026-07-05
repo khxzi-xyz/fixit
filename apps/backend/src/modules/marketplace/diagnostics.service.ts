@@ -6,7 +6,7 @@ import { RealtimeGateway } from '../realtime/realtime.gateway';
 import { WalletService } from '../wallet/wallet.service';
 
 /**
- * Workshop Diagnostics — the Rolling Diagnostic Pass (master_specs Module 18).
+ * Workshop Diagnostics -the Rolling Diagnostic Pass (master_specs Module 18).
  * User pays ONE 3 OMR pass. Shops that can't diagnose release it untouched. The
  * shop that solves it gets 1 OMR immediately; the remaining 2 OMR rolls into
  * the repair as a discount.
@@ -17,7 +17,7 @@ export class DiagnosticsService {
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
     private readonly wallet: WalletService,
-  ) {}
+  ) { }
 
   /** Buy the rolling pass; 3 OMR locked in escrow. */
   async buyPass(consumerId: string, input: { categoryId?: string; description?: string }) {

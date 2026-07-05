@@ -1,5 +1,5 @@
 -- =============================================================================
--- FixIt Marketplace — views, functions, triggers, and Realtime publication.
+-- FixIt Now Marketplace -views, functions, triggers, and Realtime publication.
 -- Implements: ledger immutability guard, refund math (§1.C.2), rating
 -- recompute, current-escrow-state view, and the KPI views (§3.C.2).
 -- =============================================================================

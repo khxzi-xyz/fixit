@@ -1,33 +1,35 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
   base: "/",
   plugins: [
-    react(),
-    tailwindcss()
+    react()
   ],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
-      "@assets": path.resolve(import.meta.dirname, "..", "..", "temp_fixit_repo", "attached_assets"),
     },
     dedupe: ["react", "react-dom"],
   },
   server: {
-    port: 8080,
-    strictPort: true,
+    port: 8082,
+    strictPort: false,
     host: "0.0.0.0",
     allowedHosts: true,
-    fs: {
-      strict: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
+    watch: {
+      ignored: ['**/android/**'],
     },
   },
   preview: {
-    port: 8080,
+    port: 8082,
     host: "0.0.0.0",
-    allowedHosts: true,
   },
 });

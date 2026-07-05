@@ -16,7 +16,7 @@ export type EscrowState =
 /**
  * Allowed transitions (PRD §1.C.1), amended per ideas.md "Pivot": the platform
  * no longer provides liability insurance, so ESCALATED_INSURANCE_CLAIM is
- * unreachable — disputes resolve only via RELEASED or REFUNDED. The state value
+ * unreachable -disputes resolve only via RELEASED or REFUNDED. The state value
  * remains in the type/DB enum for backward compatibility but is never entered.
  */
 const TRANSITIONS: Record<EscrowState, EscrowState[]> = {
@@ -36,7 +36,7 @@ export class EscrowService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient,
     private readonly paypal: PaypalClient,
-  ) {}
+  ) { }
 
   /** Latest ledger row for a (job, milestone) = current state. */
   private async currentState(jobId: string, milestoneIndex: number) {
@@ -64,7 +64,7 @@ export class EscrowService {
     }
   }
 
-  /** Append-only write — never UPDATE/DELETE (PRD §3.A.2). */
+  /** Append-only write -never UPDATE/DELETE (PRD §3.A.2). */
   private async appendLedger(row: {
     job_id: string;
     bid_id: string;

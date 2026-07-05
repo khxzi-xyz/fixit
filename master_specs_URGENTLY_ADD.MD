@@ -13,15 +13,15 @@ Contents
 12. Risk Matrix & Platform Killers 13
 13. Launch Roadmap 14
 14. Final Word 15
-FixIt Internal Specification Draft v1.0
+FixIt One Internal Specification Draft v1.0
 B E TA B U I L D S P E C I F I C AT I O N · I N T E R N A L D O C U M E N T
-FixIt
+FixIt One
 Master Specification
 A decentralized, privacy-first, hyper-local peer-to-peer marketplace for on-demand
 physical labor (Khidmah). This document consolidates every system, mechanic, and
 decision finalized to date into one buildable specification.
-E X E C U T I V E S U M M A RY What FixIt is, and what makes it different
-FixIt is a hyper-local, reverse-auction marketplace for physical, on-demand labor: plumbing, electrical, AC
+E X E C U T I V E S U M M A RY What FixIt One is, and what makes it different
+FixIt One is a hyper-local, reverse-auction marketplace for physical, on-demand labor: plumbing, electrical, AC
 repair, transport, and any other service a verified local provider can perform in person. It is not a digital-gig
 platform and not a generic classifieds app. It is built around one core idea: the platform holds the money,
 the platform holds the trust, and neither side has a reason to leave.
@@ -54,7 +54,7 @@ Every module below reflects a finalized decision, including the mechanics that w
 rejected along the way (insurance-based protection, group/public job posting, emergency-only bidding windows, and
 toolbox-inventory profile checks were all considered and cut; see the relevant module for why). What remains is the build
 target for the beta.
-FixIt · Master Specification Page 2 of 15
+FixIt One · Master Specification Page 2 of 15
 A R C H I T E C T U R E The complete system map, end to end
 Every module in this document is a zoom-in on one stage of this pipeline. Read this once, then use it as the
 index for everything that follows.
@@ -116,7 +116,7 @@ YES NO
  [Warranty Clears Clean]
  │
  ▼
- [80% Released to Vendor Wallet / 20% to FixIt]
+ [80% Released to Vendor Wallet / 20% to FixIt One]
  │
  ▼
  [Verified Review Unlocked] (only after full escrow clears)
@@ -124,7 +124,7 @@ One Rule
 Nothing financial happens outside this pipeline. No side payments, no pre-payment chat, no
 warranty the platform invents on its own. Every branch above ends in either a locked agreement
 or a returned dollar, never an ambiguous state.
-FixIt · Master Specification Page 3 of 15
+FixIt One · Master Specification Page 3 of 15
 MODULE 01
 J O B P O S T I N G From a blurry photo to a clear, biddable job
 Most posting friction comes from users who can't describe their own problem well. A user who writes
@@ -132,7 +132,7 @@ Most posting friction comes from users who can't describe their own problem well
 reaches a vendor.
 Core posting flow
 1 Media upload, tiered by plan
-Free tier: up to 3 images and 1 video. FixIt Plus: up to 10 images and 3 to 5 videos. Limits exist to manage storage
+Free tier: up to 3 images and 1 video. FixIt One Plus: up to 10 images and 3 to 5 videos. Limits exist to manage storage
 cost, not to punish free users.
 2
 The AI Rewrite button
@@ -145,7 +145,7 @@ The AI Rewrite adapts to both sides' app language settings. It is not a translat
 understands colloquial slang in Arabic, Urdu, Hindi, or English and converts it into a clean technical request natively.
 4
 Usage caps by tier
-Free: 5 standard AI rewrites per month. FixIt Plus: 20 bilingual AI uses per week. Caps exist to keep inference cost
+Free: 5 standard AI rewrites per month. FixIt One Plus: 20 bilingual AI uses per week. Caps exist to keep inference cost
 predictable while making the paid tier clearly worth it.
 The internal AI price estimator (admin and system only, never shown to users)
 A background model reads the post's text and photos and calculates an estimated fair market range for that job (for
@@ -167,9 +167,9 @@ Flagged for manual admin review before it reaches the public feed.
 Considered and parked: A full public-facing price suggestion shown to users was discussed and intentionally avoided for the
 beta. Showing a visible "fair price" number to consumers risks anchoring every bid toward that number and killing the genuine
 competitive bidding dynamic the platform depends on. The estimate stays internal only.
-FixIt · Master Specification Page 4 of 15
+FixIt One · Master Specification Page 4 of 15
 MODULE 02
-S E R V I C E C ATA L O G FixIt is not a trades app. It's an any-service app.
+S E R V I C E C ATA L O G FixIt One is not a trades app. It's an any-service app.
 A plumber, an electrician, and a taxi driver are all just verified providers of a service. The catalog has to
 grow with demand instead of being hardcoded to a handful of trade categories at launch.
 The "Request to Add Service" loop
@@ -203,7 +203,7 @@ becoming "any random person."
 Rejected: A separate "Toolbox Inventory" checklist where vendors self-report owned tools (torch, threader, drain auger, etc.) was
 proposed and cut. It added profile complexity without a clear enforcement mechanism, since self-reported tool ownership can't
 be verified the way a work photo or certificate can.
-FixIt · Master Specification Page 5 of 15
+FixIt One · Master Specification Page 5 of 15
 MODULE 03
 B I D D I N G E N G I N E Blind bids for standard jobs, direct bargaining for bounties
 Two distinct paths exist depending on how the user wants to hire. Both stay entirely inside the app's ledger.
@@ -255,10 +255,10 @@ Pro upgrade (unlimited bids) feel like a real, deserved upgrade rather than a fo
 •
 •
 •
-FixIt · Master Specification Page 6 of 15
+FixIt One · Master Specification Page 6 of 15
 MODULE 04
 E S C R O W & WA L L E T S Where the money actually sits, and who can touch it
-FixIt runs on two separate wallets and one manual verification gate. This keeps transaction fees low and
+FixIt One runs on two separate wallets and one manual verification gate. This keeps transaction fees low and
 gives the platform full control over fraud and dispute scenarios before money ever leaves the system.
 The consumer top-up scale
 Designed to reward bigger upfront commitments with a compounding bonus, which improves platform liquidity and reduces
@@ -297,7 +297,7 @@ Admin confirms against the real
 ledger
 One click moves the job to "Active / Open for Bids" once the admin matches the transfer
 to the actual bank or PayPal balance.
-FixIt · Master Specification Page 7 of 15
+FixIt One · Master Specification Page 7 of 15
 MODULE 05
 PA R T S P R O T O C O L Bidding covers labor. Parts get sorted out on-site, fairly.
 No bid ever guesses at parts pricing. Every job starts as a Khidmah-only (labor-only) quote. If materials are
@@ -335,7 +335,7 @@ without adding a fourth.
 •
 •
 •
-FixIt · Master Specification Page 8 of 15
+FixIt One · Master Specification Page 8 of 15
 MODULE 06
 C O M P L E T I O N Triple-Verify: making "he said, she said" impossible
 The single biggest fraud risk in any job-completion system is a dishonest "yes" or "no" from either side.
@@ -354,10 +354,10 @@ If the vendor's and consumer's "After" photos clearly match each other and show 
 photo, there is effectively no room left for either side to dispute in bad faith.
 The final confirmation question
 [System pings Consumer]: "Is the Job Done?"
-YES --> 80% released to Vendor Wallet / 20% to FixIt Cut
+YES --> 80% released to Vendor Wallet / 20% to FixIt One Cut
  Triggers the agreed Peer-to-Peer Warranty Lock (Module 07)
 NO --> Escrow freeze, Dispute Mode triggered
- FixIt reviews submitted Before/After photos from both sides
+ FixIt One reviews submitted Before/After photos from both sides
  Vendor flaked or did poor work --> Refund to user
  User is lying despite clear photo evidence --> Funds released to vendor
 Communication during the job: raw voice notes, WhatsApp-style
@@ -368,11 +368,11 @@ which is handled separately by the AI Rewrite engine before the job ever starts.
 Considered and rejected: Automatic real-time voice translation (mirroring the text chat's bilingual bridge) was proposed for voice
 notes specifically and explicitly turned down. Voice notes are meant to stay raw and immediate, the way two people on a job site
 would actually talk.
-FixIt · Master Specification Page 9 of 15
+FixIt One · Master Specification Page 9 of 15
 MODULE 07
 WA R R A N T Y SYS T E M The vendor gives the warranty. The platform just
 enforces it.
-FixIt does not sell insurance and does not impose a fixed warranty period. The platform isn't a service
+FixIt One does not sell insurance and does not impose a fixed warranty period. The platform isn't a service
 provider and states this clearly in its terms of service. What it does instead is let two parties agree to their
 own warranty, then hold the full payment hostage to make sure that agreement is honored.
 How a custom warranty gets set
@@ -383,7 +383,7 @@ Consumer can counter For example: "Make it 30 days and I accept." Negotiation ha
 negotiation does, fully logged.
 Both parties click "Agree on Terms" Only once both sides explicitly accept does the warranty duration bind to that specific
 order ID.
-Zero-day warranties are valid If both sides agree to no warranty at all, that's a legitimate outcome. FixIt does not force a
+Zero-day warranties are valid If both sides agree to no warranty at all, that's a legitimate outcome. FixIt One does not force a
 minimum.
 No
 Imposed
@@ -409,13 +409,13 @@ re-registering under a new account.
 4
 Escalation compensation, not cash refunds
 If a warranty issue escalates beyond a simple re-fix, the consumer is compensated with platform credits or coupons
-toward their next order, rather than a cash payout. This keeps the resolution inside the FixIt ecosystem instead of
+toward their next order, rather than a cash payout. This keeps the resolution inside the FixIt One ecosystem instead of
 draining the escrow pool.
-Rejected: A "Platform Insurance" model (FixIt insuring jobs up to a fixed cash amount, for example $5,000 against property
+Rejected: A "Platform Insurance" model (FixIt One insuring jobs up to a fixed cash amount, for example $5,000 against property
 damage) was proposed and explicitly cut. A cash-payout insurance model creates a moral hazard: a consumer has a financial
 incentive to claim or even cause damage once they know a verified break unlocks a guaranteed payout. The vendor-given
 warranty model removes that incentive entirely, since there's no cash to game, only a free re-fix or platform credit.
-FixIt · Master Specification Page 10 of 15
+FixIt One · Master Specification Page 10 of 15
 MODULE 08
 T R U S T & P R I VA C Y Why neither side has a real reason to leave the app
 Every disintermediation-prevention mechanic in this system works because it removes the incentive to
@@ -438,7 +438,7 @@ Why staying inside the app is the rational choice, for both sides
 For the Consumer
 If they save a vendor's number and book directly next time,
 they lose the warranty enforcement entirely. If that vendor
-does sloppy work or disappears, FixIt has no leverage to
+does sloppy work or disappears, FixIt One has no leverage to
 send a replacement for free. The platform holding the
 money is what makes the warranty real; a private phone
 number can't enforce anything.
@@ -456,12 +456,12 @@ file. This keeps every active job fully staffed and prevents a vendor from over-
 multiple consumers at once.
 Rejected: Public or "Group" job posts, where multiple neighbors link similar requests together for a bulk discount, were proposed
 and rejected outright. The entire platform is built around private, individual, peer-to-peer transactions, closer to a blockchainstyle closed ledger than a public marketplace feed. Group visibility breaks that privacy model.
-FixIt · Master Specification Page 11 of 15
+FixIt One · Master Specification Page 11 of 15
 MODULE 09
 M O N E T I Z AT I O N Plus for consumers, Pro for vendors, both paying directly
 The 20% take-rate on closed jobs is the core revenue engine. These tiers exist to add a second, recurring
 revenue layer on top, by giving both sides a reason to pay for more than the basic free experience.
-FixIt Plus (Consumers)
+FixIt One Plus (Consumers)
 Media allowance: Up to 10 images and 3 to 5 videos
 per post, versus 3 images and 1 video on free.
 AI engine access: 20 bilingual AI rewrite uses per
@@ -475,7 +475,7 @@ often resulting in faster, better bids.
 Direct vendor visibility: Plus members can see a Pro
 vendor's full shop profile, including phone and shop
 location, before committing to a job.
-FixIt Pro (Vendors)
+FixIt One Pro (Vendors)
 Featured Bids: Pro vendors can pin their bid to the
 top of the customer's job page with a highlighted
 border, getting seen first.
@@ -517,7 +517,7 @@ having actually moved through the platform first.
 •
 •
 •
-FixIt · Master Specification Page 12 of 15
+FixIt One · Master Specification Page 12 of 15
 MODULE 10
 R I S K M AT R I X The three platform killers, and what stops each one
 Marketplace apps don't usually fail because of bad code. They fail because of fraud loops, supply gaps, or
@@ -575,7 +575,7 @@ payout fees going out. The effective net margin on the 20% headline take-rate is
 closer to 15 to 16% once processing costs are factored in. This is already accounted for in the
 dual-wallet design, which batches vendor payouts to minimize the number of fee-incurring
 transactions.
-FixIt · Master Specification Page 13 of 15
+FixIt One · Master Specification Page 13 of 15
 ROADMAP
 T H E P L A N Three phases from zero to a live, monetized marketplace
 Admin tooling and a dedicated vendor-side app are deliberately scoped out of this initial build phase. The
@@ -596,7 +596,7 @@ Escort Mode parts flows alongside Triple-Verify to confirm operational stability
 PHASE 3
 WEEK 9 ONWARD
 Marketplace Expansion & Monetization
-Unlock FixIt Plus and FixIt Pro tiers, including Featured Bids and the Blue Tick verification process. Enable the
+Unlock FixIt One Plus and FixIt One Pro tiers, including Featured Bids and the Blue Tick verification process. Enable the
 dynamic "Request to Add Service" catalog so the market itself drives category expansion. Deploy the
 background AI price-floor guard at scale to protect market health as bidding volume grows.
 What's intentionally not in this build yet
@@ -609,7 +609,7 @@ Multi-staff or multi-vehicle shop profile logic for vendors who want to bypass t
 •
 •
 •
-FixIt · Master Specification Page 14 of 15
+FixIt One · Master Specification Page 14 of 15
 F I N A L W O R D What makes this defensible in a low-competition market
 Low competition is an opening, not a guarantee. The mechanics in this document exist because trust, not
 features, is what actually wins a market like this one. Every module above was chosen specifically because
@@ -634,7 +634,7 @@ Next decisions to make
 Two items remain open for the next working session, once this core specification is locked: the exact admin panel layout
 for manual payment verification, and the vendor storefront rules for multi-staff Pro accounts. Everything else in this
 document is considered final for the beta build.
-FixIt · Master Specification Page 15 of 15
+FixIt One · Master Specification Page 15 of 15
 Contents
 1. Executive Summary 02
 2. Loophole 1: Escrow vs. Milestones 03
@@ -657,12 +657,12 @@ Contents
 19. Unit Economics & Monthly Budget 20
 20. Updated Roadmap 21
 21. Final Word 22
-FixIt Internal Specification Revision v2.0
+FixIt One Internal Specification Revision v2.0
 I N T E R N A L A U D I T & R E V I S I O N B L U E P R I N T
-FixIt
+FixIt One
 Audit, Fixes, and the Next Five Modules
 A brutally honest look at where the Beta Build Specification breaks under real-world
-pressure, the fixes that actually got decided on, and the new modules that take FixIt from
+pressure, the fixes that actually got decided on, and the new modules that take FixIt One from
 a service marketplace into a full local trading platform.
 E X E C U T I V E S U M M A RY The Master Specification looked complete. It wasn't.
 An external review of the v1.0 Master Specification surfaced six structural loopholes serious enough to
@@ -696,10 +696,10 @@ cover the fixes that were actually decided on, not every fix that was proposed. 
 third-party arbitration, B2B supplier API integrations, open-banking payment rails) were considered and intentionally left
 out of this revision because they assume infrastructure and partnerships the platform doesn't have yet. What's kept is what
 can actually be built and trusted at beta scale.
-Pages 13 onward cover genuinely new ground: turning FixIt from a services-only app into a platform that also handles
+Pages 13 onward cover genuinely new ground: turning FixIt One from a services-only app into a platform that also handles
 diagnostics-first repairs, peer-to-peer goods sales, high-ticket items like cars, and scrap and junk resale, all without
 repeating the mistakes found in the first six loopholes.
-FixIt · Audit & Fix Blueprint Page 2 of 22
+FixIt One · Audit & Fix Blueprint Page 2 of 22
 LOOPHOLE 01
 E S C R O W V S .
 M I L E S T O N E S
@@ -717,10 +717,10 @@ direct, offline word-of-mouth work.
 2
 If the milestone payouts are real
 The vendor already has their money in hand by the time a warranty issue would even surface. If they ghost a valid
-warranty claim, FixIt has nothing left to claw back from them, and has to pay a second vendor entirely out of pocket
+warranty claim, FixIt One has nothing left to claw back from them, and has to pay a second vendor entirely out of pocket
 to finish the job properly.
 The loss, either way: Following the full-lock version costs vendor trust and adoption. Following the milestone version
-costs FixIt real cash every time a vendor ghosts after being paid. There is no version of "do both" that doesn't eventually
+costs FixIt One real cash every time a vendor ghosts after being paid. There is no version of "do both" that doesn't eventually
 break.
 Where this shows up in the original system map
 [Job Marked Done] --> [User Confirms: Job Done?]
@@ -737,7 +737,7 @@ Matters
 This isn't a wording inconsistency to quietly fix in copy. It's a fork in the actual database schema
 and state machine. The fix chosen for this (page 9) has to pick one real mechanism and make
 every other document in the system match it.
-FixIt · Audit & Fix Blueprint Page 3 of 22
+FixIt One · Audit & Fix Blueprint Page 3 of 22
 LOOPHOLE 02
 PA R T S P R O T O C O L
 F R A U D
@@ -751,14 +751,14 @@ Receipts are trivially forgeable A vendor and a friendly local shop can print a 
 cost 20 OMR, and split the 30 OMR difference in cash. Nothing in the app can tell a real
 receipt from a favor.
 Labor gets deliberately underbid A vendor bids 5 OMR labor to win the job cheaply, knowing they'll make their real margin
-by inflating the parts bill afterward, which never passes through FixIt's 20% cut at all.
+by inflating the parts bill afterward, which never passes through FixIt One's 20% cut at all.
 Option B: Escort Mode
 The moment a vendor and a consumer physically walk into a shop together, the app has no eyes on the conversation at all.
 [At the hardware shop, vendor turns to consumer]:
  "Instead of paying the remaining 40 OMR labor through the app and waiting
  weeks for the warranty to clear, just hand the shop owner 30 OMR cash now.
  He passes it to me, you save 10 OMR, we cancel the app job."
- Result: FixIt's cut on this job just went to 0 OMR.
+ Result: FixIt One's cut on this job just went to 0 OMR.
 The loss: Every job that goes through Escort Mode or a heavily parts-loaded receipt is a job where the platform's actual
 revenue share could be near zero, even though the job shows as "completed" in the system.
 The
@@ -767,7 +767,7 @@ Both loopholes exist because the platform asks the vendor and consumer to step o
 app's visibility "just for this one part," and that exact moment is where every disintermediation
 risk in this document concentrates. Anything that takes a transaction physically outside the app,
 even briefly, needs its own guardrail.
-FixIt · Audit & Fix Blueprint Page 4 of 22
+FixIt One · Audit & Fix Blueprint Page 4 of 22
 LOOPHOLE 03
 T R I P L E - V E R I F Y B L I N D S P O T S A photo cannot prove an AC is blowing cold air
 Triple-Verify works well for visually obvious jobs: a painted wall, a replaced fixture, a cleaned surface. It
@@ -802,7 +802,7 @@ Disputes stay with internal review
 for now
 Slower, but accountable. A formal, faster dispute process is a real future need, just not one
 solved by outsourcing judgment to a stranger for pocket change.
-FixIt · Audit & Fix Blueprint Page 5 of 22
+FixIt One · Audit & Fix Blueprint Page 5 of 22
 LOOPHOLE 04
 C R E D I T L I A B I L I T Y D R A I N A platform credit is a promise to pay real cash later
 The original spec compensates escalated warranty failures with platform credits or coupons instead of cash
@@ -811,22 +811,22 @@ costs real money.
 [Rogue vendor does bad electrical work, appliance is damaged, vendor vanishes]
  │
  ▼
- [FixIt issues the consumer a platform credit]
+ [FixIt One issues the consumer a platform credit]
  │
  ▼
  [Consumer books a new job with a completely different, blameless vendor]
  │
  ▼
- [That new vendor expects real payment, not a credit. FixIt must cover it
+ [That new vendor expects real payment, not a credit. FixIt One must cover it
  out of actual operating cash, even though this vendor did nothing wrong]
 The loss: A platform credit is not free to issue. It's a deferred cash liability sitting on the books. A single bad vendor can
 trigger a chain of credits that eventually have to be paid out in real money to vendors who had nothing to do with the
 original failure. At scale, this is exactly the kind of liability that quietly bankrupts a marketplace's working capital.
 The proposed "insurance levy" fix, and why it's parked for now
 One proposed fix was a micro-premium insurance levy: deduct a small percentage from every transaction to fund a real,
-licensed third-party insurance pool, so catastrophic failures get settled by an actual insurer instead of FixIt's own cash.
+licensed third-party insurance pool, so catastrophic failures get settled by an actual insurer instead of FixIt One's own cash.
 WHY IT'S NOT IN THIS REVISION DETAIL
-FixIt is not, and does not want to be,
+FixIt One is not, and does not want to be,
 an insurance provider
 This is already stated clearly in the platform's own terms of service. Standing up even a
 thin insurance layer means a real underwriting partner, not a feature toggle.
@@ -835,7 +835,7 @@ problem
 At beta volume, the actual dollar exposure from warranty escalations is small enough to
 absorb directly. The fix that matters right now is reducing how often this scenario happens
 at all, which the rolling warranty payout (page 9) does directly.
-FixIt · Audit & Fix Blueprint Page 6 of 22
+FixIt One · Audit & Fix Blueprint Page 6 of 22
 LOOPHOLE 05
 T H E M A N U A L G AT E B O T T L E N E C K Nobody with a burst pipe waits 24 hours for an
 admin
@@ -868,16 +868,16 @@ Wiring in a real local instant-payment rail is a partnership and compliance proj
 beta feature. It's on the roadmap (page 21), not promised before it's actually buildable.
 The loss if this isn't addressed: Every emergency-category job is exactly the job most likely to abandon the app the
 moment a delay shows up. Losing the emergency use case loses the exact users most likely to become repeat, highvalue customers.
-FixIt · Audit & Fix Blueprint Page 7 of 22
+FixIt One · Audit & Fix Blueprint Page 7 of 22
 LOOPHOLE 06
 T H E P L U S / P R O C O N TA C T
 L E A K
 Paying 3 OMR to unlock the exact thing the app is
 supposed to hide
-The original FixIt Plus tier promised direct vendor visibility, including the vendor's phone number and shop
+The original FixIt One Plus tier promised direct vendor visibility, including the vendor's phone number and shop
 location, before any booking happened. This directly contradicts the platform's own core anti-poach rule:
 zero contact before full payment.
-[Consumer pays 3 OMR/month for FixIt Plus]
+[Consumer pays 3 OMR/month for FixIt One Plus]
  │
  ▼
  [Plus tier unlocks phone numbers + shop locations for nearby Pro vendors]
@@ -886,16 +886,16 @@ zero contact before full payment.
  [Consumer calls the best-rated vendor directly, off-platform]
  │
  ▼
- [A 100 OMR job happens entirely outside the app. FixIt earned 3 OMR total
+ [A 100 OMR job happens entirely outside the app. FixIt One earned 3 OMR total
  instead of a 20 OMR cut, on every major job this consumer ever books again]
-The loss: A single Plus subscriber who figures this out doesn't just cost FixIt one job's commission. They cost every
+The loss: A single Plus subscriber who figures this out doesn't just cost FixIt One one job's commission. They cost every
 future job's commission, because once they have a trusted vendor's direct number, they have no reason to ever open
 the app again for that trade.
 Why this loophole is more dangerous than the others
 The other loopholes are exploited by accident or opportunism. This one is a feature, working exactly as designed, that
 happens to be the one feature the entire trust architecture was built to prevent. It's the clearest example in the whole spec of
 a paid tier accidentally undoing the platform's own core defense.
-FixIt · Audit & Fix Blueprint Page 8 of 22
+FixIt One · Audit & Fix Blueprint Page 8 of 22
 FIX 01
 T H E R O L L I N G WA R R A N T Y
 PAYO U T
@@ -906,7 +906,7 @@ their money fast enough to stay liquid. A meaningful slice stays on the hook unt
 clears, so there's still a real financial reason to honor a warranty claim instead of ghosting it.
 The split, on a 100 OMR job with a 30-day warranty
 LEDGER CLASS AMOUNT RELEASE TIMING
-FixIt Platform Cut 20 OMR Held the entire warranty period. Released to FixIt only once the
+FixIt One Platform Cut 20 OMR Held the entire warranty period. Released to FixIt One only once the
 warranty clears clean.
 Vendor Immediate Payout 60 OMR Released as soon as Triple-Verify confirms the job is complete.
 This is what keeps the vendor liquid to cover groceries, fuel,
@@ -917,7 +917,7 @@ Vendor Final Retention 10 OMR Released only when the full warranty period clears
 unresolved claim (Day 30).
 Day 0 (Job Verified Complete) --> Vendor receives 60 OMR instantly
 Day 15 (Warranty Halfway, No Claim) --> Vendor receives 10 OMR
-Day 30 (Warranty Clears Clean) --> Vendor receives 10 OMR / FixIt receives 20 OMR
+Day 30 (Warranty Clears Clean) --> Vendor receives 10 OMR / FixIt One receives 20 OMR
 If vendor ghosts a valid claim raised on Day 10:
  --> Vendor forfeits the remaining 20 OMR (the 10+10 still held)
  --> Forfeited amount funds a replacement vendor to finish the job properly
@@ -931,7 +931,7 @@ a polite suggestion.
 What this replaces: Neither the "full 100% lock for 30 days" promise nor the "instant milestone payout at Arrival,
 Progress, Completion" promise survives as originally written. Both get replaced by this single schedule, and every other
 document referencing payout timing should be corrected to match it.
-FixIt · Audit & Fix Blueprint Page 9 of 22
+FixIt One · Audit & Fix Blueprint Page 9 of 22
 FIX 02
 I N - A P P PA R T S
 F U N D I N G
@@ -946,7 +946,7 @@ How it actually works
  "We need a new compressor. It costs 40 OMR at the local shop."
  │
  ▼
- [Vendor opens the FixIt app, types "Compressor - 40 OMR",
+ [Vendor opens the FixIt One app, types "Compressor - 40 OMR",
  taps "Request Parts Funding"]
  │
  ▼
@@ -974,7 +974,7 @@ user wants control over which part gets bought, they approve or reject the fundi
 request, they don't need to leave the house.
 What this replaces: Both Option A (Multi-Receipt Log) and Option B (Escort Mode) are retired. Option C (No Parts
 Required) stays unchanged, since it never involved a parts transaction in the first place.
-FixIt · Audit & Fix Blueprint Page 10 of 22
+FixIt One · Audit & Fix Blueprint Page 10 of 22
 FIX 03
 V E R I F I C AT I O N , K E P T
 S T R I C T
@@ -1010,7 +1010,7 @@ that magically removes ambiguity.
 What actually changes: Nothing in the verification mechanism itself. What changes is awareness: dispute volume for
 mechanical and electrical trades should be watched specifically, since these are the categories most likely to need a
 human judgment call rather than a clean photo match.
-FixIt · Audit & Fix Blueprint Page 11 of 22
+FixIt One · Audit & Fix Blueprint Page 11 of 22
 FIX 04
 M AS K I N G T H AT A C T U A L LY
 H O L D S
@@ -1019,7 +1019,7 @@ for free
 The fix here is straightforward: a paid tier can absolutely make a vendor's profile more visible and
 impressive, it just can never hand over the literal phone number or exact address before a job is paid for.
 Visibility and contact are two different things, and the original spec accidentally merged them.
-What FixIt Plus actually unlocks now
+What FixIt One Plus actually unlocks now
 1
 Full storefront visibility
 Plus members can see a Pro vendor's complete shop profile: bio, portfolio photos, reviews, and badges. Nothing
@@ -1037,7 +1037,7 @@ One Rule Visibility can be a paid feature. Contact information is never a paid f
 every future tier, plan, or promotion from accidentally recreating this exact loophole again.
 What this replaces: The original promise of direct phone number and shop location access for Plus members. The
 masked, in-app relay already built for active jobs now simply extends to pre-booking conversations as well.
-FixIt · Audit & Fix Blueprint Page 12 of 22
+FixIt One · Audit & Fix Blueprint Page 12 of 22
 MODULE 18
 W O R KS H O P
 D I A G N O S T I C S
@@ -1082,13 +1082,13 @@ Works
 The user never pays repeatedly just to get a diagnosis. The shop that actually solves the problem
 gets rewarded immediately. And once a real price is agreed, the deposit makes the engagement
 financially serious for both sides before any parts get touched.
-FixIt · Audit & Fix Blueprint Page 13 of 22
+FixIt One · Audit & Fix Blueprint Page 13 of 22
 MODULE 19
 T H E O P E N
 M A R K E T P L A C E
 Normal users buying and selling everyday items, with or
 without bidding
-This is the layer that turns FixIt from a services-only app into something people open daily, the same reason
+This is the layer that turns FixIt One from a services-only app into something people open daily, the same reason
 OpenSooq and OLX get checked constantly even when nobody currently needs a plumber. It only applies to
 ordinary, lower-value goods. High-ticket items like cars get their own module, since the economics are
 completely different (see Module 20).
@@ -1115,14 +1115,14 @@ immediately, before any physical meetup happens.
 Buyer and seller meet in person The buyer inspects the item directly. There is no rush to release funds before the buyer is
 actually satisfied.
 QR scan releases the funds Once satisfied, the buyer scans the seller's item delivery QR code. This instantly releases
-the funds (minus FixIt's flat fee) to the seller. No cash changes hands, and neither side
+the funds (minus FixIt One's flat fee) to the seller. No cash changes hands, and neither side
 risks a no-show or a swapped item after the fact.
 Flat Fee,
 Not %
 This module takes a flat 5% transaction fee on peer-to-peer goods sales, not the 20% labor takerate used for services. Goods resale margins don't support a service-level commission, and a
 lighter fee is what keeps casual sellers actually using the app instead of just listing on a free
 classifieds site instead.
-FixIt · Audit & Fix Blueprint Page 14 of 22
+FixIt One · Audit & Fix Blueprint Page 14 of 22
 MODULE 20
 H I G H - T I C K E T L E A D -
 L O C K
@@ -1160,24 +1160,24 @@ Deal succeeds IRL Seller flakes/lies
 Why It
 Works
 The actual car sale, the test drive, the cash or bank transfer for 9,700 OMR, all happens directly
-between buyer and seller, the way it normally would. FixIt never touches that money and never
-needs to be trusted with it. What FixIt sells here is the lead: a verified, masked introduction, paid
+between buyer and seller, the way it normally would. FixIt One never touches that money and never
+needs to be trusted with it. What FixIt One sells here is the lead: a verified, masked introduction, paid
 for with a small flat fee either side would happily pay for a serious buyer.
-FixIt · Audit & Fix Blueprint Page 15 of 22
+FixIt One · Audit & Fix Blueprint Page 15 of 22
 MODULE 21
 V O U C H E R
 E C O N O M Y
 One code system for disputes, marketing, and growth, all
 at once
 Instead of handling every dispute or promotion as a manual, one-off cash adjustment, a single alphanumeric
-voucher system (format: FIXIT-XXXX) handles all three at once: wallet credit, plan unlocks, and fee
+voucher system (format: FixIt One-XXXX) handles all three at once: wallet credit, plan unlocks, and fee
 discounts.
 [User Enters Voucher Code]
  │
  ┌──────────────────────┼──────────────────────┐
  ▼ ▼ ▼
  [Wallet Credit] [Time-Based Plan Unlock] [Fee % Discount]
- Adds a fixed OMR Unlocks Plus or Pro for Drops FixIt's cut on
+ Adds a fixed OMR Unlocks Plus or Pro for Drops FixIt One's cut on
  balance instantly. a set number of days. the user's next job.
 Three practical uses for the same system
 1
@@ -1194,7 +1194,7 @@ mechanism that doesn't depend on paid ad spend.
 Why this matters for Loophole 4: This is the same credit mechanism flagged earlier as a liability risk if overused for
 warranty failures. Used here for small disputes and marketing, in modest amounts, it's a manageable cost. The
 discipline is in the amount and the reason, not the mechanism itself.
-FixIt · Audit & Fix Blueprint Page 16 of 22
+FixIt One · Audit & Fix Blueprint Page 16 of 22
 MODULE 22
 R E V E R S E J U N K
 A U C T I O N S
@@ -1234,7 +1234,7 @@ Value
 This module costs almost nothing to run, since there's no warranty, no labor verification, and no
 complex dispute surface. Its real value is engagement: a user who checks the app weekly for
 scrap pickup offers is far more likely to remember it the next time something actually breaks.
-FixIt · Audit & Fix Blueprint Page 17 of 22
+FixIt One · Audit & Fix Blueprint Page 17 of 22
 ANTI-POACH
 T H E DY N A M I C F E E - D R O P
 S C A L E
@@ -1243,18 +1243,18 @@ jobs
 On a small job, a 20% cut feels fine to everyone. On a large job, that same 20% becomes a real number both
 sides are tempted to avoid by going offline. The fix isn't a flat rate forever, it's a fee that shrinks as the job
 size grows, so the platform's cut never becomes worth bypassing.
-JOB SIZE FIXIT'S CUT WHAT HAPPENS TO THE DIFFERENCE
+JOB SIZE FixIt One'S CUT WHAT HAPPENS TO THE DIFFERENCE
 Standard jobs (under 15 OMR) 20% Full standard rate. Small jobs don't carry enough absolute value
 to tempt anyone offline anyway.
 Medium jobs (16 to 50 OMR) 12% The platform drops its cut to 12%, and passes 3% back to the
-consumer as instant FixIt Wallet cash-back for their next
+consumer as instant FixIt One Wallet cash-back for their next
 booking.
 Major jobs (50 OMR and above) 8% A flat 8% cut. At this size, both the vendor and consumer save
 real money simply by staying on the platform instead of
 negotiating a side deal.
 Example: a 100 OMR transmission rebuild
- At a flat 20% rate: FixIt takes 20 OMR --> real temptation to go offline
- Under this scale: FixIt takes 8 OMR --> vendor keeps 92 OMR, fully
+ At a flat 20% rate: FixIt One takes 20 OMR --> real temptation to go offline
+ Under this scale: FixIt One takes 8 OMR --> vendor keeps 92 OMR, fully
  covered by warranty + escrow
  The vendor's logic becomes: "Why would I risk losing my platform standing,
  my warranty enforcement, and my access to future jobs, just to dodge an
@@ -1263,7 +1263,7 @@ Why It
 Works
 This directly targets the exact dollar amount where disintermediation risk is highest: large, highvalue jobs. Cutting the fee right where the temptation is strongest costs less in lost revenue than
 losing the entire job to an offline deal would.
-FixIt · Audit & Fix Blueprint Page 18 of 22
+FixIt One · Audit & Fix Blueprint Page 18 of 22
 MONETIZATION
 S U B S C R I P T I O N T I E R S ,
 R E V I S I T E D
@@ -1273,7 +1273,7 @@ friction
 decision for the user, while still adding up to real recurring revenue at scale (the math is on page 20). A third
 tier is added above Pro specifically for the high-volume players, like car dealers and scrap yards, who bring
 serious inventory to the new marketplace modules.
-FixIt Plus
+FixIt One Plus
 3 OMR/mo
 Extended media uploads and
 priority AI job-posting rewrites.
@@ -1282,7 +1282,7 @@ contact details always masked.
 Periodic exclusive coupon
 drops and reduced-price bid
 windows.
-FixIt Pro
+FixIt One Pro
 3 OMR/mo
 Unlimited bidding, no daily bidtoken cap.
 Featured Bids pinned to the top
@@ -1290,7 +1290,7 @@ of the customer's job page.
 Rich shop profile, Blue Tick
 verification, reviews on every
 job.
-FixIt Elite
+FixIt One Elite
 7 OMR/mo
 Built for car dealers, scrap
 yards, and large workshops.
@@ -1317,7 +1317,7 @@ placement, not casual users, which is the right split.
 •
 •
 •
-FixIt · Audit & Fix Blueprint Page 19 of 22
+FixIt One · Audit & Fix Blueprint Page 19 of 22
 THE NUMBERS
 U N I T E C O N O M I C S & M O N T H LY
 B U D G E T
@@ -1329,8 +1329,8 @@ The wallet top-up math, checked
 STEP AMOUNT
 User tops up wallet 50 OMR
 Bonus credited (per the standard scale) +5 OMR (user now has 55 OMR balance)
-User spends the full 50 OMR balance on a job FixIt takes its cut at the moment the job closes, not at top-up
-FixIt's 20% cut on a 50 OMR job 10 OMR
+User spends the full 50 OMR balance on a job FixIt One takes its cut at the moment the job closes, not at top-up
+FixIt One's 20% cut on a 50 OMR job 10 OMR
 Net profit after the 5 OMR bonus given at top-up 5 OMR per 50 OMR topped up
 This confirms the original math: the take-rate is charged on job closure, not on deposit, so the bonus given at top-up is fully
 recoverable through normal platform commission.
@@ -1352,7 +1352,7 @@ Founder Salary ~200 OMR Keeping the founding team liquid enough to build full-ti
 without outside income.
 Disputes & Credit Buffer ~50 OMR Covers manual refunds and the voucher system's small
 credit drops (Module 21).
-FixIt's Pocket ~50 OMR Actual take-home margin, which will vary with real running
+FixIt One's Pocket ~50 OMR Actual take-home margin, which will vary with real running
 costs as the app and database scale.
 Total Allocated ~500 OMR Matches the gross monthly income exactly at this early
 scale, with no separate marketing line yet.
@@ -1360,7 +1360,7 @@ Verdict
 At just 100 paying subscribers and modest transaction volume, the platform covers its own
 hosting, development, and founder salary, with a real buffer left for disputes and a genuine takehome margin. The exact split will flex as real infrastructure costs become clearer, but the model
 holds together even at this early, modest scale.
-FixIt · Audit & Fix Blueprint Page 20 of 22
+FixIt One · Audit & Fix Blueprint Page 20 of 22
 ROADMAP
 U P DAT E D
 R O A D M A P
@@ -1401,7 +1401,7 @@ A flat percentage take-rate on high-ticket
 goods
 Produces an absurd fee on items like cars or real estate. Module 20's flat lead fee
 replaces it.
-FixIt · Audit & Fix Blueprint Page 21 of 22
+FixIt One · Audit & Fix Blueprint Page 21 of 22
 F I N A L W O R D An audit is only useful if it changes what gets built
 Every loophole in this document existed because a rule looked complete in isolation but hadn't been tested
 against another rule, or against an actual person trying to get around it. The fixes here aren't extra features
@@ -1438,7 +1438,7 @@ None of these fixes make the platform more complicated to use. A consumer or ven
 experiences a simpler, faster, more honest version of the same app. The complexity that got
 removed was the kind that only existed to paper over a contradiction, and contradictions are
 exactly what sophisticated users and bad actors find first.
-FixIt · Audit & Fix Blueprint Page 22 of 22
+FixIt One · Audit & Fix Blueprint Page 22 of 22
 Who this is for
 For Consumers
 Post a job, compare real
@@ -1480,11 +1480,11 @@ disputes. A dedicated review
 team, not just an algorithm,
 has the final say when
 something goes wrong.
-© 2026 FixIt Marketplace Page 1 of 5
+© 2026 FixIt One Marketplace Page 1 of 5
 T R U S T & S A F E T Y , B U I LT I N
 Every job, verified.
 Every payment, protected.
-FixIt Marketplace connects households and businesses with
+FixIt One Marketplace connects households and businesses with
 vetted tradespeople, and holds every payment in escrow until the
 work is actually done. Here's exactly how, and what's coming
 next.
@@ -1539,7 +1539,7 @@ Approve & Release
 Confirm the work,
 payment releases
 instantly
-© 2026 FixIt Marketplace Page 2 of 5
+© 2026 FixIt One Marketplace Page 2 of 5
 F O R V E N D O R S Win jobs in your trade, get paid fairly, stay
 protected
 Most platforms ask tradespeople to pay upfront for leads that may never close. We built ours
@@ -1590,12 +1590,12 @@ secured before you start
 Get Paid
 Payouts release as
 milestones are approved
-© 2026 FixIt Marketplace Page 3 of 5
+© 2026 FixIt One Marketplace Page 3 of 5
 F O R A D V E R T I S E R S &
 P A R T N E R S
 A trusted audience that's actively
 transacting, not just browsing
-Every user on FixIt Marketplace is either mid-decision on a real home or business need, or
+Every user on FixIt One Marketplace is either mid-decision on a real home or business need, or
 actively running a trade business. That's a meaningfully different audience from a passive
 content feed, and our trust infrastructure is what keeps that audience engaged for the long
 term.
@@ -1628,7 +1628,7 @@ placement keeps getting seen.
 As we scale city by city, partner and advertiser placements expand alongside
 verified vendor and consumer growth. We'll share audience and inventory
 details directly as each market opens.
-© 2026 FixIt Marketplace Page 4 of 5
+© 2026 FixIt One Marketplace Page 4 of 5
 W H AT ' S N E X T Where we're headed, and what we need to get
 there
 Everything on the previous pages is either live today or already in active development. None
@@ -1673,4 +1673,4 @@ Name & Signature
 Development Lead
 Name & Signature
 Date
-© 2026 FixIt Marketplace Page 5 of 5
+© 2026 FixIt One Marketplace Page 5 of 5

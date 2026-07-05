@@ -1,5 +1,5 @@
 /**
- * Demo seeder — populates the live backend with believable data so every screen
+ * Demo seeder -populates the live backend with believable data so every screen
  * has something to show on first load. Idempotent-ish: safe to run repeatedly
  * (it just adds more listings). Talks to the running API, no direct DB access.
  *
@@ -45,7 +45,7 @@ async function main() {
 
   // --- Vendor requests a skill tag (so admin Skill queue has a row) ----------
   try {
-    await call("/vendors/skill-tags", { method: "POST", token: V, body: { categoryId: "SECURITY", proofUrl: "https://picsum.photos/seed/cctv/400", proofNote: "CCTV install — 6 yrs" } });
+    await call("/vendors/skill-tags", { method: "POST", token: V, body: { categoryId: "SECURITY", proofUrl: "https://picsum.photos/seed/cctv/400", proofNote: "CCTV install -6 yrs" } });
     ok("vendor skill-tag request (SECURITY)");
   } catch (e) { warn("skill tag", e); }
 
@@ -75,7 +75,7 @@ async function main() {
   const goods = [
     { title: "DeWalt cordless drill (used)", saleKind: "FIXED", price: 18.5, description: "Barely used, with 2 batteries." },
     { title: "Office desk + chair", saleKind: "FIXED", price: 35, description: "Solid wood, great condition." },
-    { title: "Mountain bike — 21 speed", saleKind: "AUCTION", startingBid: 20, auctionHours: 48, description: "Starting low, no reserve." },
+    { title: "Mountain bike -21 speed", saleKind: "AUCTION", startingBid: 20, auctionHours: 48, description: "Starting low, no reserve." },
   ];
   for (const g of goods) {
     try { await call("/marketplace/listings", { method: "POST", token: C, body: g }); ok(`listing: ${g.title}`); }

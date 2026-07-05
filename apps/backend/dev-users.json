@@ -1,0 +1,33 @@
+{
+  "_comment": "Editable dev/test users. Hit POST /api/auth/dev-login with {\"key\":\"<key>\"} (or {\"role\":\"CONSUMER\"} to use the first matching role). Edit/add entries and restart the backend. When the DB is reachable these are upserted into the users table; when it is not, a token is still issued from the user_id below so you can test the UI offline. user_id MUST be a valid UUID.",
+  "users": [
+    {
+      "key": "CONSUMER",
+      "role": "CONSUMER",
+      "name": "Aisha Al Lawati",
+      "phone": "+96890000001",
+      "user_id": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "key": "vendor",
+      "role": "VENDOR",
+      "name": "Khalid Al Balushi",
+      "phone": "+96890000002",
+      "user_id": "22222222-2222-4222-8222-222222222222"
+    },
+    {
+      "key": "admin",
+      "role": "ADMIN",
+      "name": "Ops Admin",
+      "phone": "+96890000003",
+      "user_id": "33333333-3333-4333-8333-333333333333"
+    },
+    {
+      "key": "consumer2",
+      "role": "CONSUMER",
+      "name": "Test Consumer Two",
+      "phone": "+96890000004",
+      "user_id": "44444444-4444-4444-8444-444444444444"
+    }
+  ]
+}

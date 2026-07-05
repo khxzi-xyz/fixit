@@ -13,7 +13,7 @@ export class OnboardingService {
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly storage: StorageService,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
 
   // --- KYC -------------------------------------------------------------------
   async uploadDocument(vendorId: string, documentType: string, dataUrl: string) {
@@ -34,7 +34,7 @@ export class OnboardingService {
     return data ?? [];
   }
 
-  /** Vendor submits for review — flips profile to PENDING. */
+  /** Vendor submits for review -flips profile to PENDING. */
   async submitForReview(vendorId: string) {
     const db = requireDb(this.db);
     await db.from('vendor_profiles').update({ verification_status: 'PENDING' }).eq('vendor_id', vendorId);
@@ -71,11 +71,33 @@ export class OnboardingService {
     const { data } = await db.from('user_addresses').select('*').eq('user_id', userId).order('created_at', { ascending: false });
     return data ?? [];
   }
-  async addAddress(userId: string, label: string, lat?: number, lng?: number, details?: string) {
+  async addAddress(userId: string, label: string, lat?: number, lng?: number, details?: string, floor?: string, building?: string, isDefault?: boolean) {
     const db = requireDb(this.db);
-    const row: Record<string, unknown> = { user_id: userId, label, details: details ?? null };
+    if (isDefault) {
+      await db.from('user_addresses').update({ is_default: false }).eq('user_id', userId);
+    }
+    const row: Record<string, unknown> = { user_id: userId, label, details: details ?? null, floor: floor ?? null, building: building ?? null, is_default: isDefault ?? false };
     if (lat != null && lng != null) row.geom = `SRID=4326;POINT(${lng} ${lat})`;
     const { data, error } = await db.from('user_addresses').insert(row).select('*').maybeSingle();
+    if (error) throw new BadRequestException(error.message);
+    return data;
+  }
+  async updateAddress(userId: string, addressId: string, updates: any) {
+    const db = requireDb(this.db);
+    if (updates.isDefault) {
+      await db.from('user_addresses').update({ is_default: false }).eq('user_id', userId);
+    }
+    const row: Record<string, unknown> = { ...updates };
+    if (updates.lat != null && updates.lng != null) {
+      row.geom = `SRID=4326;POINT(${updates.lng} ${updates.lat})`;
+      delete row.lat;
+      delete row.lng;
+    }
+    if (row.isDefault !== undefined) {
+      row.is_default = row.isDefault;
+      delete row.isDefault;
+    }
+    const { data, error } = await db.from('user_addresses').update(row).eq('address_id', addressId).eq('user_id', userId).select('*').maybeSingle();
     if (error) throw new BadRequestException(error.message);
     return data;
   }
@@ -93,6 +115,9 @@ export class OnboardingService {
   }
   async createTicket(userId: string, subject: string, body?: string) {
     const db = requireDb(this.db);
+    // Auto-vivify user in public.users to prevent FK failures in dev environments without triggers
+    await db.from('users').upsert({ user_id: userId, email: `${userId.slice(0, 8)}@temp.com`, full_name: 'Platform User' }, { onConflict: 'user_id' }).then(() => undefined, () => undefined);
+
     const { data, error } = await db.from('support_tickets').insert({ user_id: userId, subject, body: body ?? null }).select('*').maybeSingle();
     if (error) throw new BadRequestException(error.message);
     return data;

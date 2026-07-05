@@ -1,5 +1,5 @@
 -- =============================================================================
--- DEV SEED — fake personas + sample data so the three apps are testable.
+-- DEV SEED -fake personas + sample data so the three apps are testable.
 -- Idempotent (ON CONFLICT). Safe to re-run. DO NOT run in production.
 -- Login via POST /api/auth/dev-login { role } or the "Login as…" buttons.
 -- =============================================================================

@@ -116,13 +116,22 @@ export class BidsService {
 
     const amount = Number(bid.bid_amount);
 
-    // Fund escrow from the consumer's wallet. Clear, actionable error if short.
+    // Apply 5% Wallet Discount
+    const discount = amount * 0.05;
+    const discountedPrice = amount - discount;
+
     const balance = await this.wallet.getBalance(consumerId);
-    if (balance.balance < amount) {
+    if (balance.balance < discountedPrice) {
       throw new BadRequestException(
-        `Top up your wallet to accept this bid. Need ${amount.toFixed(3)} OMR, you have ${balance.balance.toFixed(3)} OMR.`,
+        `Top up your wallet to accept this bid. Need ${discountedPrice.toFixed(3)} OMR, you have ${balance.balance.toFixed(3)} OMR.`
       );
     }
+
+    // Give them the discount as a credit so the hold works correctly
+    if (discount > 0) {
+      await this.wallet.post({ userId: consumerId, kind: 'ADJUSTMENT', amount: discount, note: '5% Wallet Payment Discount' });
+    }
+
     await this.wallet.hold({ userId: consumerId, amount, kind: 'JOB_FUND_HOLD', jobId, note: `escrow for job ${jobId.slice(0, 8)}` });
 
     // Refund Bid-Back tokens to the fairly-rejected vendors (Module 03).

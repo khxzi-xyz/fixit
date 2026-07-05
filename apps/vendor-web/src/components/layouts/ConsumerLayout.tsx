@@ -1,35 +1,52 @@
 import { Link, useLocation } from "wouter";
-import { Home, Search, PlusCircle, Wallet, User } from "lucide-react";
+import { Home, Search, Plus, Wallet, User, MessageCircle, Briefcase } from "lucide-react";
 
 export function ConsumerLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
-  const navItems = [
+  const left = [
     { href: "/home", icon: Home, label: "Home" },
-    { href: "/search", icon: Search, label: "Search" },
-    { href: "/post-job", icon: PlusCircle, label: "Post" },
-    { href: "/wallet", icon: Wallet, label: "Wallet" },
+    { href: "/my-jobs", icon: Briefcase, label: "Jobs" },
+  ];
+  const right = [
+    { href: "/chats", icon: MessageCircle, label: "Chats" },
     { href: "/profile", icon: User, label: "Profile" },
   ];
 
+  const isGuest = sessionStorage.getItem("FixIt Now_guest") === "true";
+
+  const Item = ({ href, icon: Icon, label }: { href: string; icon: any; label: string }) => {
+    const active = location === href;
+    const restricted = isGuest && href !== "/home";
+    const targetHref = restricted ? "/auth/user/login" : href;
+    
+    return (
+      <Link href={targetHref} className="flex flex-col items-center gap-0.5 flex-1 min-w-0 cursor-pointer">
+        <Icon className={`w-6 h-6 transition-colors ${active ? "text-primary" : "text-muted-foreground"}`} strokeWidth={active ? 2.5 : 2} />
+        <span className={`text-[10px] font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>{label}</span>
+      </Link>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <main className="flex-1 overflow-y-auto pb-20">
-        {children}
-      </main>
-      <nav className="fixed bottom-0 w-full bg-card border-t border-border px-4 py-2 flex justify-between items-center z-50 safe-area-bottom">
-        {navItems.map((item) => {
-          const isActive = location === item.href;
-          const Icon = item.icon;
-          return (
-            <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 min-w-[64px] text-center cursor-pointer">
-              <div className={`p-2 rounded-xl transition-all ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
-                <Icon className="w-6 h-6" />
+      <main className="flex-1 overflow-y-auto pb-24">{children}</main>
+
+      <nav className="fixed bottom-0 inset-x-0 z-50 bg-card border-t border-border safe-area-bottom">
+        <div className="relative flex items-center px-2 py-2">
+          {left.map((i) => <Item key={i.href} {...i} />)}
+
+          {/* Center floating Post action */}
+          <div className="flex-1 flex justify-center">
+            <Link href={isGuest ? "/auth/user/login" : "/post-job"} className="relative -mt-8">
+              <div className="w-14 h-14 rounded-full hero-blue text-white flex items-center justify-center shadow-lg ring-4 ring-background">
+                <Plus className="w-7 h-7" strokeWidth={2.5} />
               </div>
-              <span className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-muted-foreground"}`}>{item.label}</span>
             </Link>
-          );
-        })}
+          </div>
+
+          {right.map((i) => <Item key={i.href} {...i} />)}
+        </div>
       </nav>
     </div>
   );

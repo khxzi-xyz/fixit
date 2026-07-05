@@ -3,7 +3,7 @@
 -- Adds the launch-gate + enterprise pieces from the 100-page matrix.
 -- =============================================================================
 
--- Zone 1 — Vendor KYC documents (Module 08/09)
+-- Zone 1 -Vendor KYC documents (Module 08/09)
 CREATE TABLE IF NOT EXISTS vendor_documents (
   document_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vendor_id     UUID NOT NULL REFERENCES vendor_profiles(vendor_id) ON DELETE CASCADE,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS vendor_documents (
 CREATE INDEX IF NOT EXISTS idx_vendor_docs_vendor ON vendor_documents (vendor_id, status);
 CREATE INDEX IF NOT EXISTS idx_vendor_docs_status ON vendor_documents (status, created_at);
 
--- Zone 4 — Saved address book (Page 40)
+-- Zone 4 -Saved address book (Page 40)
 CREATE TABLE IF NOT EXISTS user_addresses (
   address_id  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS user_addresses (
 );
 CREATE INDEX IF NOT EXISTS idx_user_addresses_user ON user_addresses (user_id);
 
--- Zone 8 — Support tickets (Pages 71/72)
+-- Zone 8 -Support tickets (Pages 71/72)
 CREATE TABLE IF NOT EXISTS support_tickets (
   ticket_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
@@ -49,7 +49,7 @@ DROP TRIGGER IF EXISTS trg_support_updated ON support_tickets;
 CREATE TRIGGER trg_support_updated BEFORE UPDATE ON support_tickets
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- Zone 3 — Dynamic framework + per-category custom fields (Pages 21/24)
+-- Zone 3 -Dynamic framework + per-category custom fields (Pages 21/24)
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS framework_type VARCHAR(20) NOT NULL DEFAULT 'A_REPAIR'
   CHECK (framework_type IN ('A_REPAIR','B_TRANSIT','C_INSTANT'));
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS custom_fields JSONB;

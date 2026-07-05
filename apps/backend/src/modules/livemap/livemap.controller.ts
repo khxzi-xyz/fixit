@@ -77,6 +77,13 @@ export class LiveMapController {
     return this.map.arrive(jobId, req.user!.sub);
   }
 
+  /** Consumer reports their location so the vendor's map shows the destination. */
+  @Post('jobs/:jobId/tracking/destination')
+  @UseGuards(JwtAuthGuard)
+  setDestination(@Param('jobId') jobId: string, @Body() dto: LocationDto) {
+    return this.map.setDestination(jobId, dto.lat, dto.lng);
+  }
+
   @Get('jobs/:jobId/tracking')
   @UseGuards(JwtAuthGuard)
   session(@Param('jobId') jobId: string) {

@@ -37,7 +37,7 @@ export function FirebaseLogin({ onSuccess }: FirebaseLoginProps) {
       const loginRes = await api.devLogin();
       setToken(loginRes.accessToken);
       setUserId(uid);
-      
+
       // Write user node to Firestore
       const userRef = doc(db, "users", uid);
       await setDoc(userRef, {
@@ -49,10 +49,10 @@ export function FirebaseLogin({ onSuccess }: FirebaseLoginProps) {
         created_at: new Date().toISOString(),
       });
 
-      console.log(`[FixIt Node Success]: Firebase authenticated vendor sync'd to Firestore node.`);
+      console.log(`[FixIt Now Node Success]: Firebase authenticated vendor sync'd to Firestore node.`);
       onSuccess(loginRes.accessToken, fullName, uid);
     } catch (e) {
-      console.error("[FixIt Node Failure]: Sync to live cluster failed", e);
+      console.error("[FixIt Now Node Failure]: Sync to live cluster failed", e);
     }
   };
 
@@ -103,7 +103,7 @@ export function FirebaseLogin({ onSuccess }: FirebaseLoginProps) {
     setBusy(true);
     try {
       const mockUid = `google_vendor_${Date.now()}`;
-      await syncVendorWithBackend(mockUid, "Omani Vendor Pro", "+96890000002", "vendor@fixit.om");
+      await syncVendorWithBackend(mockUid, "Omani Vendor Pro", "+96890000002", "vendor@FixIt Now.om");
     } catch (e: any) {
       alert(e.message);
     } finally {
@@ -114,7 +114,7 @@ export function FirebaseLogin({ onSuccess }: FirebaseLoginProps) {
   return (
     <Card style={styles.card}>
       <Text style={styles.headerTitle}>Pro Portal Sign In</Text>
-      
+
       {/* Tab Switcher */}
       <View style={styles.tabs}>
         {(["phone", "email", "google"] as const).map((m) => (
@@ -153,7 +153,7 @@ export function FirebaseLogin({ onSuccess }: FirebaseLoginProps) {
             </>
           )}
           <Text style={styles.label}>Email Address</Text>
-          <TextInput style={styles.input} placeholder="vendor@fixit.om" placeholderTextColor={t.fgFaint} keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
+          <TextInput style={styles.input} placeholder="vendor@FixIt Now.om" placeholderTextColor={t.fgFaint} keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
           <Text style={styles.label}>Password</Text>
           <TextInput style={styles.input} placeholder="••••••••" placeholderTextColor={t.fgFaint} secureTextEntry value={password} onChangeText={setPassword} />
           <GradientButton label={isSignUp ? "Sign Up" : "Sign In"} onPress={handleEmailAuth} busy={busy} />

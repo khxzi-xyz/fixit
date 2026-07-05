@@ -11,7 +11,7 @@ import { Logger } from '@nestjs/common';
 import type { Server, Socket } from 'socket.io';
 
 /**
- * Realtime gateway (PRD §3.A — WebSocket gateway). Carries:
+ * Realtime gateway (PRD §3.A -WebSocket gateway). Carries:
  *  - live chat (post-funding)
  *  - milestone status updates
  *  - bid-arrival notifications
@@ -54,14 +54,14 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     return { joined: `user:${body.userId}` };
   }
 
-  /** Live map room — consumers watching available vendors in their area. */
+  /** Live map room -consumers watching available vendors in their area. */
   @SubscribeMessage('join_map')
   joinMap(@ConnectedSocket() client: Socket) {
     client.join('map');
     return { joined: 'map' };
   }
 
-  /** Marketplace listing room — buyers watching an auction. */
+  /** Marketplace listing room -buyers watching an auction. */
   @SubscribeMessage('join_listing')
   joinListing(@ConnectedSocket() client: Socket, @MessageBody() body: { listingId: string }) {
     client.join(`listing:${body.listingId}`);
@@ -108,7 +108,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // --- Live map / tracking ----------------------------------------------------
-  /** A vendor's live pin moved or availability flipped — fan out to the map room. */
+  /** A vendor's live pin moved or availability flipped -fan out to the map room. */
   emitVendorLocationUpdate(payload: unknown) {
     this.server.to('map').emit('vendor_location_update', payload);
   }

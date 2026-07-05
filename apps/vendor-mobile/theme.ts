@@ -1,5 +1,5 @@
 /**
- * FixIt design system — multi-theme. A light (default) palette plus dark and
+ * FixIt Now design system -multi-theme. A light (default) palette plus dark and
  * accent variants. Shared tokens (spacing, radii, type, gradients) stay
  * constant; only colors swap. Consumed via useTheme() so the whole app
  * re-themes at runtime and the choice is saved per user.
@@ -49,7 +49,7 @@ const tokens = {
   shadowGlow: { shadowColor: "#10A875", shadowOpacity: 0.35, shadowRadius: 22, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
 };
 
-// --- Light (default) — clean white, emerald accent --------------------------
+// --- Light (default) -clean white, emerald accent --------------------------
 const light: Palette = {
   name: "Light",
   mode: "light",
@@ -83,7 +83,7 @@ const light: Palette = {
   gradViolet: ["#8B7BFF", "#5E4BD6"],
 };
 
-// --- Dark — emerald night ----------------------------------------------------
+// --- Dark -emerald night ----------------------------------------------------
 const dark: Palette = {
   name: "Dark",
   mode: "dark",
@@ -117,7 +117,7 @@ const dark: Palette = {
   gradViolet: ["#8B7BFF", "#5E4BD6"],
 };
 
-// --- Midnight — deep indigo --------------------------------------------------
+// --- Midnight -deep indigo --------------------------------------------------
 const midnight: Palette = {
   ...dark,
   name: "Midnight",
@@ -139,7 +139,7 @@ const midnight: Palette = {
   gradHero: ["#1A2147", "#0D1228", "#080B1A"],
 };
 
-// --- Sunset — warm amber -----------------------------------------------------
+// --- Sunset -warm amber -----------------------------------------------------
 const sunset: Palette = {
   ...dark,
   name: "Sunset",
@@ -161,7 +161,7 @@ const sunset: Palette = {
   gradHero: ["#34211A", "#211410", "#160E0B"],
 };
 
-// --- Corporate (default) — blue & white, Talabat/OLX-grade -------------------
+// --- Corporate (default) -blue & white, Talabat/OLX-grade -------------------
 const corporate: Palette = {
   name: "Blue",
   mode: "light",

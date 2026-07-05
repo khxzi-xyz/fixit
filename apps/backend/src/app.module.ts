@@ -28,6 +28,16 @@ import { DisputesModule } from './modules/disputes/disputes.module';
 import { EngagementModule } from './modules/engagement/engagement.module';
 import { OnboardingModule } from './modules/onboarding/onboarding.module';
 import { VendorOpsModule } from './modules/vendorops/vendorops.module';
+import { TranslationModule } from './modules/translation/translation.module';
+import { SystemLogsModule } from './modules/systemlogs/systemlogs.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { RewardsModule } from './modules/rewards/rewards.module';
+import { AdsModule } from './modules/ads/ads.module';
+import { StoreModule } from './modules/store/store.module';
+import { EmergencyModule } from './modules/emergency/emergency.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { FeedModule } from './modules/feed/feed.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
 
 @Module({
   imports: [
@@ -64,6 +74,16 @@ import { VendorOpsModule } from './modules/vendorops/vendorops.module';
     EngagementModule,
     OnboardingModule,
     VendorOpsModule,
+    TranslationModule,
+    SystemLogsModule,
+    AdminModule,
+    RewardsModule,
+    AdsModule,
+    StoreModule,
+    EmergencyModule,
+    MaintenanceModule,
+    FeedModule,
+    FavoritesModule,
   ],
 })
 export class AppModule {}

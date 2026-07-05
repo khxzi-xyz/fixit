@@ -20,7 +20,7 @@ export class BountyService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
 
   // --- Bid-Back Tokens ------------------------------------------------------
 
@@ -52,7 +52,7 @@ export class BountyService {
   async consumeToken(vendorId: string, bidId?: string) {
     const db = requireDb(this.db);
     const current = await this.ensureTokens(vendorId);
-    if (current <= 0) throw new ForbiddenException('no bid tokens left today — upgrade to Pro for unlimited bids');
+    if (current <= 0) throw new ForbiddenException('no bid tokens left today -upgrade to Pro for unlimited bids');
     await db.from('vendor_profiles').update({ bid_tokens: current - 1 }).eq('vendor_id', vendorId);
     await db.from('bid_token_ledger').insert({ vendor_id: vendorId, bid_id: bidId ?? null, delta: -1, reason: 'BID_PLACED' });
     return current - 1;

@@ -12,12 +12,27 @@ import { RealtimeGateway } from '../realtime/realtime.gateway';
  *  - Direct Strike-Bounty: consumer taps an available vendor and sends a
  *    fixed-price offer straight to them.
  */
+type LiveLoc = { lat: number; lng: number; at: string };
+
 @Injectable()
 export class LiveMapService {
+  // Ephemeral live locations per job (vendor pings + consumer destination).
+  // In-memory by design -tracking is short-lived and privacy-first (cleared on
+  // "Arrived"). Survives within a single backend instance, which is all live
+  // tracking needs.
+  private readonly liveVendor = new Map<string, LiveLoc>();
+  private readonly liveDest = new Map<string, LiveLoc>();
+
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
+
+  /** Consumer reports their (destination) location so the vendor map can show it. */
+  setDestination(jobId: string, lat: number, lng: number) {
+    this.liveDest.set(jobId, { lat, lng, at: new Date().toISOString() });
+    return { ok: true };
+  }
 
   // --- Availability ("Available Now") ---------------------------------------
 
@@ -42,7 +57,7 @@ export class LiveMapService {
     return data;
   }
 
-  /** Vendor heartbeat while available — moves the live pin. */
+  /** Vendor heartbeat while available -moves the live pin. */
   async updateLocation(vendorId: string, lat: number, lng: number, heading?: number) {
     const db = requireDb(this.db);
     const { data: avail } = await db
@@ -50,7 +65,7 @@ export class LiveMapService {
       .select('is_available')
       .eq('vendor_id', vendorId)
       .maybeSingle();
-    if (!avail?.is_available) throw new ForbiddenException('not available — toggle Available Now first');
+    if (!avail?.is_available) throw new ForbiddenException('not available -toggle Available Now first');
 
     const { error } = await db
       .from('vendor_availability')
@@ -101,7 +116,7 @@ export class LiveMapService {
     }
   }
 
-  /** "On My Way" — opens a tracking session for this job only. */
+  /** "On My Way" -opens a tracking session for this job only. */
   async startTracking(jobId: string, vendorId: string) {
     const db = requireDb(this.db);
     await this.assertVendorOnJob(jobId, vendorId);
@@ -137,11 +152,13 @@ export class LiveMapService {
     if (session.vendor_id !== vendorId) throw new ForbiddenException('not your tracking session');
 
     await db.from('job_tracking_pings').insert({ session_id: session.session_id, geom: `SRID=4326;POINT(${lng} ${lat})` });
-    this.realtime.emitTrackingPing(jobId, { lat, lng, at: new Date().toISOString() });
+    const at = new Date().toISOString();
+    this.liveVendor.set(jobId, { lat, lng, at });
+    this.realtime.emitTrackingPing(jobId, { lat, lng, at });
     return { ok: true };
   }
 
-  /** "Arrived" — terminates tracking completely (no lingering location data). */
+  /** "Arrived" -terminates tracking completely (no lingering location data). */
   async arrive(jobId: string, vendorId: string) {
     const db = requireDb(this.db);
     const { data: session } = await db
@@ -153,6 +170,8 @@ export class LiveMapService {
     if (!session) throw new NotFoundException('no active tracking session');
     if (session.vendor_id !== vendorId) throw new ForbiddenException('not your tracking session');
 
+    this.liveVendor.delete(jobId);
+    this.liveDest.delete(jobId);
     const now = new Date().toISOString();
     const { data, error } = await db
       .from('job_tracking_sessions')
@@ -161,7 +180,7 @@ export class LiveMapService {
       .select('*')
       .single();
     if (error) throw new BadRequestException(error.message);
-    // Purge breadcrumb pings — privacy-first, nothing lingers.
+    // Purge breadcrumb pings -privacy-first, nothing lingers.
     await db.from('job_tracking_pings').delete().eq('session_id', session.session_id);
     this.realtime.emitTrackingStatus(jobId, { status: 'ARRIVED', session: data });
     return data;
@@ -176,7 +195,9 @@ export class LiveMapService {
       .neq('status', 'ENDED')
       .order('started_at', { ascending: false })
       .maybeSingle();
-    return data ?? null;
+    if (!data) return null;
+    // Merge ephemeral live locations so both apps can render the map.
+    return { ...data, vendorLocation: this.liveVendor.get(jobId) ?? null, destination: this.liveDest.get(jobId) ?? null };
   }
 
   // --- Direct Strike-Bounty (Module 09) -------------------------------------

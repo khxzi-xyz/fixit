@@ -27,7 +27,7 @@ function createPages(baseDir, routes) {
 export default function Page() {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-8">
-      <h1 className="text-4xl font-bold mb-4">FixIt Enterprise</h1>
+      <h1 className="text-4xl font-bold mb-4">FixIt One Enterprise</h1>
       <h2 className="text-2xl text-blue-400">{ \`${route} Page\` }</h2>
     </div>
   );

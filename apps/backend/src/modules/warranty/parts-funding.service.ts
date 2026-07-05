@@ -5,7 +5,7 @@ import { requireDb } from '../../common/db.util';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 
 /**
- * In-App Parts Funding (master_specs Fix 2) — replaces the forgeable
+ * In-App Parts Funding (master_specs Fix 2) -replaces the forgeable
  * multi-receipt log and unsupervised "escort mode". Vendor requests an
  * amount in-app, consumer approves/declines, vendor proves install with a
  * photo + serial. No cash, no paper receipts.
@@ -15,7 +15,7 @@ export class PartsFundingService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
 
   async request(jobId: string, vendorId: string, description: string, amount: number) {
     const db = requireDb(this.db);

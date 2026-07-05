@@ -1,5 +1,5 @@
 -- =============================================================================
--- Row-Level Security — baseline policies.
+-- Row-Level Security -baseline policies.
 -- The backend uses the service_role key (bypasses RLS) for trusted operations,
 -- but RLS is enabled as defense-in-depth so the anon/authenticated keys can
 -- never leak cross-tenant data (e.g. the category-isolation rule, PRD §2.A.2).

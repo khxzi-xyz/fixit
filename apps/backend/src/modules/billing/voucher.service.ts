@@ -5,7 +5,7 @@ import { requireDb } from '../../common/db.util';
 import { WalletService } from '../wallet/wallet.service';
 
 /**
- * Voucher economy (master_specs Module 21). One FIXIT-XXXX code system for
+ * Voucher economy (master_specs Module 21). One FixIt Now-XXXX code system for
  * wallet credit, time-based plan unlocks, and fee discounts.
  */
 @Injectable()
@@ -13,7 +13,7 @@ export class VoucherService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly wallet: WalletService,
-  ) {}
+  ) { }
 
   async redeem(userId: string, code: string) {
     const db = requireDb(this.db);

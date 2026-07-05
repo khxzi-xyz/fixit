@@ -1,4 +1,4 @@
--- FixIt Escrow & Dual-Wallet System Database Schema
+-- FixIt Now Escrow & Dual-Wallet System Database Schema
 -- Optimized for P2P Escrow Hyper-Local Labor Network (Oman/GCC)
 
 CREATE TYPE wallet_currency AS ENUM ('OMR', 'AED', 'SAR');

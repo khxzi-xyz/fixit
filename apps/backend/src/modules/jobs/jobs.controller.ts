@@ -8,16 +8,17 @@ import { JwtAuthGuard, Roles, type AuthedRequest } from '../auth/jwt.guard';
 class CreateJobDto {
   @IsString() categoryId!: string;
   @IsOptional() @IsArray() @IsString({ each: true }) subIssueTags?: string[];
-  @IsIn(['EMERGENCY', 'THIS_WEEK', 'FLEXIBLE']) urgency!: 'EMERGENCY' | 'THIS_WEEK' | 'FLEXIBLE';
+  @IsIn(['EMERGENCY', 'TODAY', 'THIS_WEEK', 'FLEXIBLE']) urgency!: 'EMERGENCY' | 'TODAY' | 'THIS_WEEK' | 'FLEXIBLE';
   @IsOptional() @IsString() description?: string;
   @IsNumber() @Min(-90) @Max(90) lat!: number;
   @IsNumber() @Min(-180) @Max(180) lng!: number;
   @IsOptional() @IsNumber() budgetMin?: number;
   @IsOptional() @IsNumber() budgetMax?: number;
-  @IsOptional() @IsIn(['STANDARD', 'BOUNTY']) postingKind?: 'STANDARD' | 'BOUNTY';
+  @IsOptional() @IsIn(['STANDARD', 'BOUNTY', 'AUCTION']) postingKind?: 'STANDARD' | 'BOUNTY' | 'AUCTION';
   @IsOptional() @IsNumber() bountyPrice?: number;
   @IsOptional() @IsBoolean() aiRewritten?: boolean;
   @IsOptional() @IsString() originalDescription?: string;
+  @IsOptional() @IsArray() @IsString({ each: true }) mediaUrls?: string[];
 }
 
 @Controller('jobs')

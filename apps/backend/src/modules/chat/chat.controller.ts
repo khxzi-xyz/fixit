@@ -1,35 +1,51 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { IsIn, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { ChatService } from './chat.service';
-import { JwtAuthGuard, type AuthedRequest } from '../auth/jwt.guard';
+import { Controller, Get, Post, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard, AuthedRequest } from '../auth/jwt.guard';
+import { Inject } from '@nestjs/common';
+import { SUPABASE_CLIENT } from '../../supabase/supabase.module';
+import { SupabaseClient } from '@supabase/supabase-js';
 
-class SendMessageDto {
-  @IsString() @MinLength(1) @MaxLength(2000) body!: string;
-}
-class SendMediaDto {
-  @IsIn(['VOICE', 'IMAGE']) type!: 'VOICE' | 'IMAGE';
-  @IsString() mediaUrl!: string;
-  @IsOptional() @IsNumber() durationSecs?: number;
-}
-
-@Controller('jobs/:jobId/chat')
-@UseGuards(JwtAuthGuard)
+@Controller('chat')
 export class ChatController {
-  constructor(private readonly chat: ChatService) {}
+  constructor(@Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null) {}
 
-  @Post()
-  send(@Req() req: AuthedRequest, @Param('jobId') jobId: string, @Body() dto: SendMessageDto) {
-    return this.chat.send(jobId, req.user!.sub, dto.body);
+  @Get(':jobId')
+  @UseGuards(JwtAuthGuard)
+  async getMessages(@Param('jobId') jobId: string) {
+    if (!this.db) return [];
+    const { data } = await this.db
+      .from('messages')
+      .select('*')
+      .eq('job_id', jobId)
+      .order('created_at', { ascending: true });
+    return data || [];
   }
 
-  /** Voice note / image — raw, no translation (Module 06). */
-  @Post('media')
-  sendMedia(@Req() req: AuthedRequest, @Param('jobId') jobId: string, @Body() dto: SendMediaDto) {
-    return this.chat.sendMedia(jobId, req.user!.sub, dto);
+  @Post(':jobId')
+  @UseGuards(JwtAuthGuard)
+  async sendMessage(
+    @Req() req: AuthedRequest, 
+    @Param('jobId') jobId: string, 
+    @Body() body: { content: string; mediaUrl?: string }
+  ) {
+    if (!this.db) return null;
+    const { data } = await this.db.from('messages').insert({
+      job_id: jobId,
+      sender_id: req.user!.sub,
+      content: body.content,
+      media_url: body.mediaUrl || null
+    }).select('*').single();
+    return data;
   }
 
-  @Get()
-  list(@Req() req: AuthedRequest, @Param('jobId') jobId: string) {
-    return this.chat.list(jobId, req.user!.sub);
+  @Post(':jobId/read')
+  @UseGuards(JwtAuthGuard)
+  async markRead(@Param('jobId') jobId: string, @Req() req: AuthedRequest) {
+    if (!this.db) return { success: true };
+    await this.db.from('messages')
+      .update({ read_at: new Date().toISOString() })
+      .eq('job_id', jobId)
+      .is('read_at', null)
+      .neq('sender_id', req.user!.sub);
+    return { success: true };
   }
 }

@@ -20,13 +20,13 @@ export interface ProxySession {
 export class TwilioClient {
   private readonly logger = new Logger(TwilioClient.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService) { }
 
   get configured(): boolean {
     return Boolean(
       this.config.get('TWILIO_ACCOUNT_SID') &&
-        this.config.get('TWILIO_AUTH_TOKEN') &&
-        this.config.get('TWILIO_PROXY_SERVICE_SID'),
+      this.config.get('TWILIO_AUTH_TOKEN') &&
+      this.config.get('TWILIO_PROXY_SERVICE_SID'),
     );
   }
 
@@ -39,7 +39,7 @@ export class TwilioClient {
   /** Create a Proxy session and add both participants by real number. */
   async createMaskedSession(consumerPhone: string, vendorPhone: string): Promise<ProxySession> {
     if (!this.configured) {
-      this.logger.warn('Twilio unconfigured — returning SIMULATED masked session');
+      this.logger.warn('Twilio unconfigured -returning SIMULATED masked session');
       return { sessionSid: `SIM-${Date.now()}`, proxyNumber: null, simulated: true };
     }
     const { header } = this.auth();

@@ -1,5 +1,5 @@
 -- =============================================================================
--- FixIt Marketplace — initial schema (PRD §3.A.2)
+-- FixIt Now Marketplace -initial schema (PRD §3.A.2)
 -- Postgres 16+ with PostGIS. Run against your Supabase project.
 -- =============================================================================
 

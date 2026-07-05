@@ -14,10 +14,10 @@ export function ModuleScreen() {
         const w = await ModuleRepository.getWallet();
         setWallet(w);
         setStatus("success");
-        console.log("[FixIt Node Success]: Component attached directly to Supabase live server cluster.");
+        console.log("[FixIt Now Node Success]: Component attached directly to Supabase live server cluster.");
       } catch (e) {
         setStatus("failure");
-        console.error("[FixIt Node Failure]: Connection exception or schema mismatch verified.", e);
+        console.error("[FixIt Now Node Failure]: Connection exception or schema mismatch verified.", e);
       }
     }
     initNode();
@@ -58,7 +58,7 @@ export function ModuleScreen() {
           marginBottom: "20px",
         }}
       >
-        <span style={{ fontSize: "16px", fontWeight: "800" }}>FixIt Escrow Node</span>
+        <span style={{ fontSize: "16px", fontWeight: "800" }}>FixIt Now Escrow Node</span>
         <span
           style={{
             background: status === "success" ? "#10A875" : status === "failure" ? "#D9383A" : "#F1C40F",

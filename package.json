@@ -1,38 +1,12 @@
 {
-  "name": "fixit-marketplace",
+  "name": "fixit-one-marketplace",
   "version": "0.1.0",
   "private": true,
-  "description": "FixIt — trust-first service-on-demand marketplace (Oman/GCC). Monorepo.",
-  "workspaces": [
-    "apps/backend",
-    "apps/admin-web",
-    "apps/consumer-web",
-    "apps/vendor-web",
-    "apps/mobile",
-    "apps/vendor-mobile"
-  ],
+  "description": "FixIt Now - Hyper-local Labor Marketplace Platform",
   "scripts": {
-    "dev": "concurrently -k -n api,admin,consumer,vendor -c green,cyan,yellow,magenta \"npm:dev:backend\" \"npm:dev:admin-web\" \"npm:dev:consumer-web\" \"npm:dev:vendor-web\"",
-    "dev:backend": "npm --workspace apps/backend run start:dev",
-    "dev:admin-web": "npm --workspace apps/admin-web run dev",
-    "dev:consumer-web": "npm --workspace apps/consumer-web run dev",
-    "dev:vendor-web": "npm --workspace apps/vendor-web run dev",
-    "dev:mobile": "npm --workspace apps/mobile run start",
-    "dev:vendor-mobile": "npm --workspace apps/vendor-mobile run start",
-    "build": "concurrently -n backend,admin,consumer,vendor -c green,cyan,yellow,magenta \"npm:build:backend\" \"npm:build:admin-web\" \"npm:build:consumer-web\" \"npm:build:vendor-web\"",
-    "build:backend": "npm --workspace apps/backend run build",
-    "build:admin-web": "npm --workspace apps/admin-web run build",
-    "build:consumer-web": "npm --workspace apps/consumer-web run build",
-    "build:vendor-web": "npm --workspace apps/vendor-web run build",
-    "db:migrate": "node scripts/migrate.mjs"
-  },
-  "engines": {
-    "node": ">=20"
-  },
-  "dependencies": {
-    "pg": "^8.22.0"
-  },
-  "devDependencies": {
-    "concurrently": "^9.1.0"
+    "dev:backend": "cd apps/backend && npm run start:dev",
+    "dev:consumer": "cd apps/consumer-web && npm run dev",
+    "build:backend": "cd apps/backend && npm run build",
+    "build:consumer": "cd apps/consumer-web && npm run build"
   }
 }

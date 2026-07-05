@@ -1,5 +1,5 @@
 -- =============================================================================
--- FixIt Marketplace — extended schema (PRD §1, §2). Builds on 0001_init.sql.
+-- FixIt Now Marketplace -extended schema (PRD §1, §2). Builds on 0001_init.sql.
 -- Adds the surfaces the PRD describes beyond the 6 core entities: auth/OTP,
 -- categories, milestones, Q&A, chat, notifications, subscriptions, reviews,
 -- insurance, moderation violations, and devices.

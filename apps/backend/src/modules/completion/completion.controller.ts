@@ -4,7 +4,7 @@ import { CompletionService } from './completion.service';
 import { JwtAuthGuard, type AuthedRequest } from '../auth/jwt.guard';
 
 class PhotoDto {
-  @IsIn(['BEFORE', 'VENDOR_AFTER', 'CONSUMER_AFTER']) phase!: 'BEFORE' | 'VENDOR_AFTER' | 'CONSUMER_AFTER';
+  @IsIn(['BEFORE', 'VENDOR_AFTER', 'CONSUMER_BEFORE', 'CONSUMER_AFTER']) phase!: 'BEFORE' | 'VENDOR_AFTER' | 'CONSUMER_BEFORE' | 'CONSUMER_AFTER';
   @IsString() url!: string;
   @IsOptional() @IsBoolean() capturedInApp?: boolean;
 }

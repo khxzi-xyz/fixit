@@ -1,11 +1,11 @@
 -- =============================================================================
 -- 0010: FULL SPEC BUILD-OUT
 -- Implements every remaining module from master_specs_URGENTLY_ADD.MD (v1.0 +
--- v2.0 audit revision). Builds on 0001–0009. Additive only — no destructive
+-- v2.0 audit revision). Builds on 0001–0009. Additive only -no destructive
 -- drops of existing tables. Run AFTER 0009.
 --
 -- Sections:
---   A. Dual-Wallet System (Module 04)            — wallets + ledger + payouts
+--   A. Dual-Wallet System (Module 04)            -wallets + ledger + payouts
 --   B. Manual Payment Verification gate (Mod 04)
 --   C. Live Map / Availability / Tracking (Mod 08/09)
 --   D. Per-skill Vendor Tagging (Module 02)
@@ -14,10 +14,10 @@
 --   G. Triple-Verify job photos (Module 06)
 --   H. Voice notes on chat (Module 06)
 --   I. Contact masking state (Module 08)
---   J. Module 18 — Workshop Diagnostics (rolling pass)
---   K. Module 19 — Open Marketplace (goods, fixed + auction)
---   L. Module 20 — High-Ticket Lead-Lock
---   M. Module 22 — Reverse Junk Auctions
+--   J. Module 18 -Workshop Diagnostics (rolling pass)
+--   K. Module 19 -Open Marketplace (goods, fixed + auction)
+--   L. Module 20 -High-Ticket Lead-Lock
+--   M. Module 22 -Reverse Junk Auctions
 --   N. Subscription tiers reconciliation (Plus/Pro 3 OMR, Elite 7 OMR)
 --   O. Realtime publication + grants
 -- =============================================================================
@@ -343,7 +343,7 @@ ALTER TABLE chat_messages ALTER COLUMN body DROP NOT NULL;
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS contact_unmasked_at TIMESTAMPTZ;
 
 -- =============================================================================
--- J. MODULE 18 — WORKSHOP DIAGNOSTICS (rolling diagnostic pass)
+-- J. MODULE 18 -WORKSHOP DIAGNOSTICS (rolling diagnostic pass)
 -- User buys ONE 3 OMR pass; shops that can't diagnose release it untouched; the
 -- shop that solves it gets 1 OMR now, 2 OMR rolls into the repair as discount.
 -- =============================================================================
@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS diagnostic_visits (
 CREATE INDEX IF NOT EXISTS idx_diag_visits_pass ON diagnostic_visits (pass_id, created_at);
 
 -- =============================================================================
--- K. MODULE 19 — OPEN MARKETPLACE (peer goods, fixed price or auction)
+-- K. MODULE 19 -OPEN MARKETPLACE (peer goods, fixed price or auction)
 -- Flat 5% transaction fee. QR handoff releases escrowed funds.
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS marketplace_listings (
@@ -427,8 +427,8 @@ END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 -- =============================================================================
--- L. MODULE 20 — HIGH-TICKET LEAD-LOCK
--- Bargain in-app, deal in person. Platform never holds the sale price — just a
+-- L. MODULE 20 -HIGH-TICKET LEAD-LOCK
+-- Bargain in-app, deal in person. Platform never holds the sale price -just a
 -- flat lead fee + a small refundable Lead-Lock deposit that unlocks contact.
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS high_ticket_listings (
@@ -467,7 +467,7 @@ CREATE TABLE IF NOT EXISTS high_ticket_offers (
 CREATE INDEX IF NOT EXISTS idx_highticket_offers_listing ON high_ticket_offers (listing_id, created_at);
 
 -- =============================================================================
--- M. MODULE 22 — REVERSE JUNK AUCTIONS
+-- M. MODULE 22 -REVERSE JUNK AUCTIONS
 -- User posts junk; geofenced Pro/Elite buyers bid cash to buy it; highest wins;
 -- QR pickup releases payment. Reuses a flat fee on confirmation.
 -- =============================================================================
@@ -509,11 +509,11 @@ ALTER TABLE subscription_plans ADD COLUMN IF NOT EXISTS audience VARCHAR(20) NOT
 ALTER TABLE subscription_plans ADD COLUMN IF NOT EXISTS perks JSONB;
 
 INSERT INTO subscription_plans (plan_id, display_name, monthly_fee_omr, take_rate_pct, priority_placement, audience, perks) VALUES
-  ('PLUS','FixIt Plus',3.000,20.00,false,'CONSUMER',
+  ('PLUS','FixIt Now Plus',3.000,20.00,false,'CONSUMER',
     '{"media":"10img/5vid","ai_uses":"20/week","coupon_drops":true,"verified_badge":true}'),
-  ('PRO','FixIt Pro',3.000,20.00,true,'VENDOR',
+  ('PRO','FixIt Now Pro',3.000,20.00,true,'VENDOR',
     '{"unlimited_bids":true,"featured_bids":true,"rich_profile":true,"blue_tick":true}'),
-  ('ELITE','FixIt Elite',7.000,8.00,true,'VENDOR',
+  ('ELITE','FixIt Now Elite',7.000,8.00,true,'VENDOR',
     '{"bulk_inventory":true,"reduced_high_ticket_fees":true,"top_of_feed":true}')
 ON CONFLICT (plan_id) DO UPDATE
   SET monthly_fee_omr = EXCLUDED.monthly_fee_omr,
@@ -545,7 +545,7 @@ CREATE TABLE IF NOT EXISTS job_price_estimates (
 ALTER TABLE bids ADD COLUMN IF NOT EXISTS below_floor BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE bids ADD COLUMN IF NOT EXISTS flagged_reason TEXT;
 
--- AI job-ticket rewrite audit (Module 01) — keep the original + rewritten text.
+-- AI job-ticket rewrite audit (Module 01) -keep the original + rewritten text.
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS original_description TEXT;
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS ai_rewritten BOOLEAN NOT NULL DEFAULT false;
 

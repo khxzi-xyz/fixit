@@ -21,7 +21,7 @@ export class RedisIoAdapter extends IoAdapter {
 
   async connect(): Promise<void> {
     if (!this.redisUrl) {
-      this.logger.warn('REDIS_URL unset — using in-memory Socket.IO adapter (single instance only)');
+      this.logger.warn('REDIS_URL unset -using in-memory Socket.IO adapter (single instance only)');
       return;
     }
     const pub = new Redis(this.redisUrl);

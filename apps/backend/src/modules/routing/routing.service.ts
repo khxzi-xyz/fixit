@@ -21,7 +21,7 @@ export class RoutingService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
 
   /** Enqueue routing without blocking the caller. */
   publish(jobId: string): void {
@@ -32,7 +32,7 @@ export class RoutingService {
     });
   }
 
-  /** The worker handler — idempotent enough to retry. */
+  /** The worker handler -idempotent enough to retry. */
   async dispatch(jobId: string): Promise<{ notified: number }> {
     const db = requireDb(this.db);
 

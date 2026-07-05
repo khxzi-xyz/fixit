@@ -90,7 +90,7 @@ export function EarningsScreen({ userId }: { userId?: string }) {
         <SectionTitle>Activity</SectionTitle>
         <View style={{ marginTop: 12, gap: 10 }}>
           {loading ? <><Skeleton h={56} /><Skeleton h={56} /></> : txns.length === 0 ? (
-            <EmptyState icon="cash-outline" title="No earnings yet" body="Win a job and complete it — 60% lands instantly, the rest as the warranty clears." />
+            <EmptyState icon="cash-outline" title="No earnings yet" body="Win a job and complete it -60% lands instantly, the rest as the warranty clears." />
           ) : txns.map((tx) => (
             <View key={tx.txn_id} style={s.rowCardFlex}>
               <View style={[s.dot, { backgroundColor: tx.amount >= 0 ? t.primarySoft : t.dangerSoft }]}>
@@ -190,7 +190,7 @@ export function AvailabilityScreen({ userId }: { userId?: string }) {
 }
 
 // =============================================================================
-// SKILLS (Module 02) — with real proof upload
+// SKILLS (Module 02) -with real proof upload
 // =============================================================================
 const SKILL_CATS = [
   { id: "AC", label: "AC & Cooling" },
@@ -225,7 +225,7 @@ export function SkillsScreen() {
     <ScrollView contentContainerStyle={{ gap: 14, padding: 18, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
       <Rise>
         <Text style={s.h1}>My skills</Text>
-        <Text style={[s.muted, { marginTop: 4 }]}>Add a skill with a proof photo. Admin approves per-skill — you only see jobs you're cleared for.</Text>
+        <Text style={[s.muted, { marginTop: 4 }]}>Add a skill with a proof photo. Admin approves per-skill -you only see jobs you're cleared for.</Text>
       </Rise>
       <Rise delay={60}>
         <View style={{ gap: 10 }}>
@@ -251,7 +251,7 @@ export function SkillsScreen() {
 }
 
 // =============================================================================
-// SERVICES — vendor actions on new modules (Junk / Cars / Market)
+// SERVICES -vendor actions on new modules (Junk / Cars / Market)
 // =============================================================================
 type Seg = "junk" | "cars" | "market" | "diag";
 export function ServicesScreen() {
@@ -301,8 +301,8 @@ function VendorDiag() {
       <Card style={{ gap: 10 }}>
         <TextInput style={s.input} placeholder="Diagnostic Pass ID (QR)" placeholderTextColor={t.fgFaint} value={passId} onChangeText={setPassId} autoCapitalize="none" />
         <TextInput style={s.input} placeholder="Diagnosis note (optional)" placeholderTextColor={t.fgFaint} value={note} onChangeText={setNote} />
-        <GradientButton label="Diagnosed — claim 1 OMR" busy={busy} onPress={() => log("DIAGNOSED")} />
-        <GhostButton label="Cannot diagnose — release pass" onPress={() => log("CANNOT_DIAGNOSE")} />
+        <GradientButton label="Diagnosed -claim 1 OMR" busy={busy} onPress={() => log("DIAGNOSED")} />
+        <GhostButton label="Cannot diagnose -release pass" onPress={() => log("CANNOT_DIAGNOSE")} />
       </Card>
     </View>
   );
@@ -382,7 +382,7 @@ function VendorMarket() {
 }
 
 // =============================================================================
-// SETTINGS — theme + Pro/Elite subscription
+// SETTINGS -theme + Pro/Elite subscription
 // =============================================================================
 export function SettingsScreen({ userName, onLogout }: { userName?: string; onLogout: () => void }) {
   const t = useTheme();

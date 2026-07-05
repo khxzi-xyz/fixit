@@ -1,11 +1,11 @@
-# Secrets — NEVER commit these
+# Secrets -NEVER commit these
 .env
 .env.local
 .env.*.local
 *.pem
 *.key
 
-# Firebase — contains API keys
+# Firebase -contains API keys
 google-services.json
 google-services.json.example
 
@@ -38,4 +38,4 @@ Thumbs.db
 !.vscode/extensions.json
 
 # Temp / scratch directories
-temp_fixit_repo/
+temp_FixIt One_repo/

@@ -6,7 +6,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
  * LocalAuth, and OTP / order messages send from the owner's own WhatsApp.
  *
  * The library is loaded dynamically so the backend builds/runs even before
- * `npm i whatsapp-web.js qrcode` is run — until then, sendMessage() returns
+ * `npm i whatsapp-web.js qrcode` is run -until then, sendMessage() returns
  * false and callers fall back to the dev code.
  */
 @Injectable()
@@ -28,7 +28,7 @@ export class WhatsAppService implements OnModuleInit {
         authStrategy: new LocalAuth({ dataPath: process.env.WHATSAPP_SESSION_DIR ?? '.wwebjs_auth' }),
         puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] },
       });
-      this.client.on('qr', (qr: string) => { this.qr = qr; this.ready = false; this.logger.warn('WhatsApp QR ready — scan it at GET /api/auth/whatsapp/qr'); });
+      this.client.on('qr', (qr: string) => { this.qr = qr; this.ready = false; this.logger.warn('WhatsApp QR ready -scan it at GET /api/auth/whatsapp/qr'); });
       this.client.on('ready', () => { this.ready = true; this.qr = null; this.logger.log('WhatsApp client READY.'); });
       this.client.on('disconnected', () => { this.ready = false; });
       await this.client.initialize();
@@ -71,6 +71,7 @@ export class WhatsAppService implements OnModuleInit {
   }
 
   async sendOtp(phone: string, code: string): Promise<boolean> {
-    return this.sendMessage(phone, `Your FixIt verification code is *${code}*. It expires in 5 minutes.`);
+    const msg = `*FixIt Now Security* 🛠️\n\nYour verification code is: *${code}*\n\n_This code expires in 5 minutes. Please do not share it with anyone._`;
+    return this.sendMessage(phone, msg);
   }
 }

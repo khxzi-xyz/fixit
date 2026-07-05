@@ -1,8 +1,8 @@
 Remove-Item -Recurse -Force apps\consumer-web, apps\vendor-web, apps\admin-web -ErrorAction SilentlyContinue
 
-Copy-Item -Recurse temp_fixit_repo\artifacts\fixit apps\consumer-web
-Copy-Item -Recurse temp_fixit_repo\artifacts\fixit apps\vendor-web
-Copy-Item -Recurse temp_fixit_repo\artifacts\fixit apps\admin-web
+Copy-Item -Recurse temp_FixIt One_repo\artifacts\FixIt One apps\consumer-web
+Copy-Item -Recurse temp_FixIt One_repo\artifacts\FixIt One apps\vendor-web
+Copy-Item -Recurse temp_FixIt One_repo\artifacts\FixIt One apps\admin-web
 
 # Give them unique names to avoid EDUPLICATEWORKSPACE
 (Get-Content apps\consumer-web\package.json) -replace '"name": ".*"', '"name": "consumer-web"' | Set-Content apps\consumer-web\package.json

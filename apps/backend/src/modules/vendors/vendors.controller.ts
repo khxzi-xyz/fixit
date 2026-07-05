@@ -47,4 +47,9 @@ export class VendorsController {
   verify(@Param('vendorId') vendorId: string, @Body() dto: VerificationDto) {
     return this.vendors.setVerification(vendorId, dto.status);
   }
+
+  @Get(':vendorId/public')
+  publicProfile(@Param('vendorId') vendorId: string) {
+    return this.vendors.getPublicProfile(vendorId);
+  }
 }

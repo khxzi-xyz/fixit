@@ -1,0 +1,75 @@
+# Hive Board — recent full-file rewrites (auto-logged by Hivecode).
+# READ THIS before editing a file someone just rewrote, then re-read that file.
+
+- 15:10:43  user-9532 rewrote `apps/consumer-web/src/pages/consumer/ConsumerUpgrade.tsx` (154/288 lines) — touched: UpgradeSuccessShow, FALLBACK_PERKS, CONFETTI_COLORS, timers, until, daysLeft
+- 15:00:11  user-9532 rewrote `apps/backend/src/modules/onboarding/onboarding.module.ts` (9/16 lines) — touched: n/a
+- 14:58:55  user-9532 rewrote `apps/backend/src/modules/billing/billing.module.ts` (10/16 lines) — touched: n/a
+- 14:57:00  user-9532 rewrote `apps/backend/src/modules/admin/admin.controller.ts` (51/81 lines) — touched: CreateCouponDto, AdminController
+- 14:55:59  user-9532 rewrote `apps/backend/src/modules/rewards/rewards.module.ts` (9/15 lines) — touched: n/a
+- 14:55:58  user-9532 rewrote `apps/backend/src/modules/rewards/rewards.controller.ts` (60/65 lines) — touched: RedeemDto, CodeDto, RewardsController
+- 14:55:09  user-9532 rewrote `apps/backend/src/modules/rewards/rewards.service.ts` (191/194 lines) — touched: tableMissing, RewardsService, APP_URL, m, MIGRATION_HINT, row, balance, take
+- 14:11:43  user-9532 rewrote `apps/backend/src/app.module.ts` (42/80 lines) — touched: n/a
+- 13:54:59  user-9532 rewrote `apps/consumer-web/src/pages/consumer/JobBids.tsx` (120/127 lines) — touched: JobBids, jobId, load, accept, m, labelsOf, warrantyOf, etaOf
+- 13:54:54  user-9532 rewrote `apps/consumer-web/src/pages/consumer/ConsumerChats.tsx` (12/24 lines) — touched: n/a
+- 13:54:30  user-9532 rewrote `apps/consumer-web/src/pages/consumer/ConsumerMyJobs.tsx` (118/125 lines) — touched: ConsumerMyJobs, filtered, status, Icon, isActionable
+- 13:54:26  user-9532 rewrote `apps/consumer-web/src/pages/consumer/ConsumerSearch.tsx` (163/171 lines) — touched: ConsumerSearch, MUSCAT, filtered, q, cat, name, catOk, qOk
+- 13:53:51  user-9532 rewrote `apps/consumer-web/src/pages/consumer/ConsumerWallet.tsx` (128/139 lines) — touched: ConsumerWallet, load, totalBalance, credit
+- 13:53:29  user-9532 rewrote `apps/consumer-web/src/pages/consumer/ConsumerCategories.tsx` (89/99 lines) — touched: ConsumerCategories, mapping, Icon
+- 13:52:12  user-9532 rewrote `scripts/seed-demo.mjs` (77/110 lines) — touched: call, main, BASE, res, text, json, login, ok
+- 13:51:43  user-9532 rewrote `apps/consumer-web/src/pages/consumer/ConsumerSettings.tsx` (94/185 lines) — touched: changeLang, enablePush, perm, toggleSound, next
+- 13:51:38  user-9532 rewrote `apps/consumer-web/src/src/pages/consumer/ConsumerUpgrade.tsx` (128/146 lines) — touched: ConsumerUpgrade, loadWallet, loadUser, consumerPlans, targetPlanId, consumerPlan, price, planId
+- 13:51:37  user-9532 rewrote `apps/consumer-web/src/src/pages/consumer/ConsumerPostJob.tsx` (129/205 lines) — touched: handleAiRewrite, r, selectedCat, isTransport, isRoutine, handleSubmit, loc, isVideo
+- 13:51:36  user-9532 rewrote `apps/consumer-web/src/src/pages/vendor/VendorWallet.tsx` (63/112 lines) — touched: payouts, day, isPayoutDay, nextDay
+- 13:51:28  user-9532 rewrote `apps/consumer-web/src/src/pages/vendor/VendorProfile.tsx` (82/143 lines) — touched: avgRating, name, initials, isPro, tier, signOut, stars
+- 13:51:23  user-9532 rewrote `apps/consumer-web/src/lib/useT.tsx` (49/73 lines) — touched: useT, t, langRef, id, newLang, lang, cached
+- 13:51:22  user-9532 rewrote `apps/consumer-web/src/lib/realtime-translate.ts` (113/131 lines) — touched: setTranslationLang, getCurrentLang, flushQueue, translate, GEMINI_KEY, CACHE, _lang, batch
+- 13:51:08  user-9532 rewrote `apps/vendor-web/src/src/pages/consumer/ConsumerUpgrade.tsx` (128/146 lines) — touched: ConsumerUpgrade, loadWallet, loadUser, consumerPlans, targetPlanId, consumerPlan, price, planId
+- 13:51:07  user-9532 rewrote `apps/vendor-web/src/src/pages/consumer/ConsumerPostJob.tsx` (129/205 lines) — touched: handleAiRewrite, r, selectedCat, isTransport, isRoutine, handleSubmit, loc, isVideo
+- 13:51:06  user-9532 rewrote `apps/vendor-web/src/src/pages/vendor/VendorWallet.tsx` (63/112 lines) — touched: payouts, day, isPayoutDay, nextDay
+- 13:51:03  user-9532 rewrote `apps/vendor-web/src/src/pages/vendor/VendorProfile.tsx` (82/143 lines) — touched: avgRating, name, initials, isPro, tier, signOut, stars
+- 13:50:51  user-9532 rewrote `apps/vendor-web/src/pages/vendor/VendorWallet.tsx` (63/112 lines) — touched: payouts, day, isPayoutDay, nextDay
+- 13:50:49  user-9532 rewrote `apps/vendor-web/src/pages/vendor/VendorProfile.tsx` (82/143 lines) — touched: avgRating, name, initials, isPro, tier, signOut, stars
+- 13:50:44  user-9532 rewrote `apps/vendor-mobile/screens.tsx` (293/501 lines) — touched: AvailabilityScreen, SkillsScreen, ServicesScreen, VendorDiag, VendorJunk, VendorCars, VendorMarket, t
+- 13:50:44  user-9532 rewrote `apps/vendor-mobile/theme.ts` (163/210 lines) — touched: tokens
+- 13:50:31  user-9532 rewrote `apps/admin-web/src/src/pages/vendor/VendorProfile.tsx` (82/143 lines) — touched: avgRating, name, initials, isPro, tier, signOut, stars
+- 13:50:30  user-9532 rewrote `apps/admin-web/src/src/pages/vendor/VendorWallet.tsx` (63/112 lines) — touched: payouts, day, isPayoutDay, nextDay
+- 13:50:24  user-9532 rewrote `apps/admin-web/src/src/pages/consumer/ConsumerUpgrade.tsx` (128/146 lines) — touched: ConsumerUpgrade, loadWallet, loadUser, consumerPlans, targetPlanId, consumerPlan, price, planId
+- 13:50:16  user-9532 rewrote `apps/admin-web/src/src/pages/consumer/ConsumerPostJob.tsx` (129/205 lines) — touched: handleAiRewrite, r, selectedCat, isTransport, isRoutine, handleSubmit, loc, isVideo
+- 13:50:14  user-9532 rewrote `apps/backend/src/modules/auth/auth.service.ts` (158/250 lines) — touched: placeholder, ins, accessToken, db, expected, now, limitRecord, code
+- 13:50:12  user-9532 rewrote `apps/backend/src/modules/escrow/refund-math.ts` (44/63 lines) — touched: and, computeRefund, consumerRefund, remainder, vendorPayout
+- 13:50:00  user-9532 rewrote `apps/backend/src/modules/livemap/livemap.service.ts` (164/259 lines) — touched: db, rpc, at, now
+- 13:49:57  user-9532 rewrote `apps/backend/src/modules/moderation/gemini.client.ts` (210/269 lines) — touched: GeminiClient, convo, parsed, lang, prompt, cleaned, apiKey, url
+- 13:49:55  user-9532 rewrote `apps/backend/src/modules/billing/billing.service.ts` (75/98 lines) — touched: BillingService, plans, db, allPlans, plan, fee, balance, durationDays
+- 13:49:46  user-9532 rewrote `apps/backend/src/modules/jobs/jobs.service.ts` (108/160 lines) — touched: db, hasVideo, insert, job, outcome
+- 13:49:41  user-9532 rewrote `apps/backend/src/modules/realtime/realtime.gateway.ts` (98/152 lines) — touched: RealtimeGateway
+- 13:49:39  user-9532 rewrote `apps/backend/scripts/whatsapp-login.js` (45/66 lines) — touched: getBrowserPath, path, fs, paths, dataPath, client
+- 13:49:27  user-9532 rewrote `apps/mobile/theme.ts` (163/210 lines) — touched: tokens
+- 13:49:20  user-9532 rewrote `apps/web/src/pages/consumer/ConsumerUpgrade.tsx` (128/146 lines) — touched: ConsumerUpgrade, loadWallet, loadUser, consumerPlans, targetPlanId, consumerPlan, price, planId
+- 13:49:19  user-9532 rewrote `apps/web/src/pages/consumer/ConsumerPostJob.tsx` (129/205 lines) — touched: handleAiRewrite, r, selectedCat, isTransport, isRoutine, handleSubmit, loc, isVideo
+- 13:49:09  user-9532 rewrote `apps/web/src/pages/vendor/VendorProfile.tsx` (82/143 lines) — touched: avgRating, name, initials, isPro, tier, signOut, stars
+- 13:49:07  user-9532 rewrote `apps/web/src/pages/vendor/VendorWallet.tsx` (63/112 lines) — touched: payouts, day, isPayoutDay, nextDay
+- 13:48:41  user-9532 rewrote `temp_fixit_repo/artifacts/mobile/app/welcome.tsx` (223/281 lines) — touched: WelcomeScreen, handleContinue, colors, router, insets, bot, top, active
+- 13:48:33  user-9532 rewrote `temp_fixit_repo/artifacts/mobile/lib/api/users.ts` (114/177 lines) — touched: sendOtp, verifyOtp, createOrGetProfile, fetchProfile, updateProfile, is
+- 13:48:31  user-9532 rewrote `temp_fixit_repo/artifacts/mobile/lib/supabase.ts` (43/64 lines) — touched: SUPABASE_URL, SUPABASE_ANON, isSupabaseEnabled
+- 13:45:47  user-9532 rewrote `temp_fixit_repo/artifacts/fixit/index.html` (25/27 lines) — touched: n/a
+- 13:45:47  user-9532 rewrote `package.json` (38/42 lines) — touched: n/a
+- 13:45:47  user-9532 rewrote `apps/web/index.html` (25/27 lines) — touched: n/a
+- 13:45:47  user-9532 rewrote `apps/vendor-web/index.html` (25/27 lines) — touched: n/a
+- 13:45:47  user-9532 rewrote `apps/consumer-web/index.html` (39/41 lines) — touched: n/a
+- 13:45:46  user-9532 rewrote `apps/admin-web/index.html` (25/27 lines) — touched: n/a
+- 13:45:45  user-9532 rewrote `temp_fixit_repo/replit.md` (35/46 lines) — touched: n/a
+- 13:45:44  user-9532 rewrote `temp_fixit_repo/artifacts/mobile/SUPABASE_SCHEMA.sql` (267/269 lines) — touched: n/a
+- 13:45:44  user-9532 rewrote `prd.txt` (360/368 lines) — touched: n/a
+- 13:45:44  user-9532 rewrote `db/migrations/0012_kyc_addresses_support.sql` (47/69 lines) — touched: n/a
+- 13:45:44  user-9532 rewrote `db/migrations/0010_full_spec_buildout.sql` (545/583 lines) — touched: n/a
+- 13:45:44  user-9532 rewrote `BUILD_LOG.md` (48/54 lines) — touched: n/a
+- 13:09:32  user-8002 rewrote `apps/consumer-web/src/App.tsx` (150/166 lines) — touched: Router, App, queryClient, savedLang, savedTheme
+- 13:08:22  user-8002 rewrote `apps/consumer-web/src/pages/consumer/ConsumerProfile.tsx` (169/175 lines) — touched: MenuRow, ConsumerProfile, claims, name, phone, initials, logout
+- 13:07:40  user-8002 rewrote `apps/consumer-web/src/pages/consumer/ConsumerAddresses.tsx` (257/265 lines) — touched: ConsumerAddresses, LABELS, loadAddresses, locateMe, lat, lng, r, d
+- 13:04:59  user-8002 rewrote `apps/consumer-web/src/pages/consumer/ConsumerRewards.tsx` (275/283 lines) — touched: ConsumerRewards, copyCode, shareReferral, text, applyCoupon, TXNS_DEMO, displayTxns, cfg
+- 13:04:00  user-8002 rewrote `apps/consumer-web/src/pages/consumer/ConsumerNotifications.tsx` (206/211 lines) — touched: timeAgo, ConsumerNotifications, diff, mins, hours, days, markAllRead, markOne
+- 13:03:07  user-8002 rewrote `apps/consumer-web/src/pages/consumer/ConsumerHome.tsx` (288/292 lines) — touched: ConsumerHome, SERVICE_GRID, adTimer, load, n, a, v, activeJobs
+- 13:01:26  user-8002 rewrote `apps/vendor-web/src/lib/api.ts` (216/222 lines) — touched: tokenClaims, req, BASE, TOKEN_KEY, getToken, setToken, t, payload
+- 13:01:26  user-8002 rewrote `apps/admin-web/src/lib/api.ts` (216/222 lines) — touched: tokenClaims, req, BASE, TOKEN_KEY, getToken, setToken, t, payload
+- 13:01:12  user-8002 rewrote `apps/consumer-web/src/lib/api.ts` (216/222 lines) — touched: tokenClaims, req, BASE, TOKEN_KEY, getToken, setToken, t, payload
+- 13:00:09  user-8002 rewrote `apps/backend/src/modules/ai/ai.controller.ts` (103/138 lines) — touched: provider

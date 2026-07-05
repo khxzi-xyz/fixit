@@ -66,4 +66,21 @@ export class VendorsService {
     if (error) throw new BadRequestException(error.message);
     return data;
   }
+
+  async getPublicProfile(vendorId: string) {
+    const db = requireDb(this.db);
+    const { data: profile, error } = await db.from('vendor_profiles').select('*').eq('vendor_id', vendorId).maybeSingle();
+    if (error) throw new BadRequestException(error.message);
+    if (!profile) throw new NotFoundException('vendor profile not found');
+    
+    const { data: user } = await db.from('users').select('full_name, avatar_url').eq('user_id', vendorId).maybeSingle();
+    
+    let categories: any[] = [];
+    if (profile.category_ids?.length) {
+      const { data: cats } = await db.from('categories').select('category_id, display_name').in('category_id', profile.category_ids);
+      categories = cats || [];
+    }
+
+    return { ...profile, full_name: user?.full_name, avatar_url: user?.avatar_url, categories };
+  }
 }

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "FixIt Vendor",
+    "name": "FixIt Now Vendor",
     "slug": "vendor-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.Khxzi.FixIt",
+      "package": "com.Khxzi.FixIt Now",
       "googleServicesFile": "./google-services.json",
       "predictiveBackGestureEnabled": false
     },

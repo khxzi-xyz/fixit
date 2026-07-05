@@ -11,14 +11,14 @@ export function AuthLayout({ children, backTo, title, subtitle }: { children: Re
             <span className="text-sm font-medium">Back</span>
           </Link>
         )}
-        
+
         <div className="bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-xl">
           <div className="flex flex-col items-center mb-8">
-            <img src={import.meta.env.BASE_URL + "logo.png"} alt="FixIt" className="w-16 h-16 object-contain mb-4" />
+            <img src={import.meta.env.BASE_URL + "logo.png"} alt="FixIt Now" className="w-16 h-16 object-contain mb-4" />
             {title && <h1 className="text-2xl font-bold tracking-tight text-foreground text-center">{title}</h1>}
             {subtitle && <p className="text-muted-foreground text-center mt-2 text-sm">{subtitle}</p>}
           </div>
-          
+
           {children}
         </div>
       </div>

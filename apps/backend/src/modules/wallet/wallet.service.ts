@@ -29,7 +29,7 @@ export function topupBonus(amount: number): number {
  * request payouts on fixed windows. Every balance change is an append-only
  * `wallet_transactions` row; the running balance is cached on `wallets`.
  *
- * This service is the single money primitive — escrow, parts funding, payouts,
+ * This service is the single money primitive -escrow, parts funding, payouts,
  * marketplace, diagnostics all call credit()/debit()/hold()/release() here.
  */
 @Injectable()
@@ -37,7 +37,7 @@ export class WalletService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
-  ) {}
+  ) { }
 
   /** Get (or lazily create) the user's wallet row. */
   async ensureWallet(userId: string) {
@@ -286,6 +286,12 @@ export class WalletService {
 
   async requestPayout(vendorId: string, input: { amount: number; bankAccountName?: string; bankAccountRef?: string }) {
     const db = requireDb(this.db);
+    // Settlement window: vendors can only cash out on Monday(1) or Thursday(4).
+    // Override for testing with PAYOUT_ANY_DAY=true.
+    const day = new Date().getDay();
+    if (process.env.PAYOUT_ANY_DAY !== 'true' && day !== 1 && day !== 4) {
+      throw new BadRequestException('Payouts are only processed on Mondays and Thursdays. Please request again on the next settlement day.');
+    }
     const wallet = await this.ensureWallet(vendorId);
     if (Number(wallet.balance) < input.amount) {
       throw new BadRequestException('payout exceeds available balance');
