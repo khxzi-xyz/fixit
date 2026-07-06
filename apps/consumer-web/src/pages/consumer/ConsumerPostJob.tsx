@@ -147,7 +147,7 @@ export default function ConsumerPostJob() {
         photos.map((p) => api.uploadImage(p, "jobs").then((r) => r.url).catch(() => ""))
       ).then((urls) => urls.filter(Boolean));
 
-      await renderApi.post("/api/jobs/create", {
+      await renderApi.post("/jobs", {
         categoryId: selectedCat,
         urgency,
         description,

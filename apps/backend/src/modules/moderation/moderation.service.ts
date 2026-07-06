@@ -76,7 +76,7 @@ export class ModerationService {
     }
 
     // Tier 1 clean → optimistically OPEN, run Tier 2 async (don't block caller).
-    setImmediate(() => {
+    setTimeout(() => {
       this.runTier2(params).catch((err) =>
         this.logger.warn(`tier2 failed for ${params.contentRefId}: ${err.message}`),
       );

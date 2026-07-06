@@ -25,7 +25,7 @@ export class RoutingService {
 
   /** Enqueue routing without blocking the caller. */
   publish(jobId: string): void {
-    setImmediate(() => {
+    setTimeout(() => {
       this.dispatch(jobId).catch((err) =>
         this.logger.error(`routing dispatch failed for ${jobId}: ${err.message}`),
       );

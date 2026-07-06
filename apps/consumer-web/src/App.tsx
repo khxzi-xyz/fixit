@@ -177,7 +177,7 @@ function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.access_token) setToken(session.access_token);
     });
-    
+
     // Biometric Auth Hook
     loginWithFingerprint().then(async (result) => {
       if (result?.token) {
@@ -206,15 +206,43 @@ function App() {
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
 
     // Permissions are handled by PermissionsPrompt on startup
-    // Firebase Push Notifications removed as per user request (Huawei compatibility)
+    // Initialize Capacitor Push Notifications
+    import("@capacitor/push-notifications").then(({ PushNotifications }) => {
+      PushNotifications.requestPermissions().then(result => {
+        if (result.receive === 'granted') {
+          PushNotifications.register();
+        }
+      });
+      PushNotifications.addListener('registration', (token) => {
+        console.log('Push registration success, token: ' + token.value);
+        import("@/lib/api").then(({ api }) => {
+          api.updateFcmToken(token.value).catch(() => {});
+        });
+      });
+      PushNotifications.addListener('registrationError', (error: any) => {
+        console.error('Error on push registration: ' + JSON.stringify(error));
+      });
+      PushNotifications.addListener('pushNotificationReceived', (notification) => {
+        console.log('Push received: ' + JSON.stringify(notification));
+      });
+      PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+        console.log('Push action performed: ' + JSON.stringify(notification));
+      });
+    }).catch(e => console.warn('PushNotifications plugin not available', e));
 
     // Hardware Back Button Interception
     import("@capacitor/app").then(({ App: CapApp }) => {
       CapApp.addListener("backButton", ({ canGoBack }) => {
         const path = window.location.pathname;
-        if (path === "/home" || path === "/auth/user/login" || path === "/") {
+        if (path === "/home" || path === "/" || (!canGoBack && path !== "/auth/user/login")) {
           if (window.confirm("Are you sure you want to exit the app?")) {
             CapApp.exitApp();
+          }
+        } else if (path.includes("/auth/")) {
+          if (sessionStorage.getItem("fixit_guest") || localStorage.getItem("fixit_bio_enabled")) {
+             window.location.replace("/home");
+          } else {
+             window.history.back();
           }
         } else {
           window.history.back();

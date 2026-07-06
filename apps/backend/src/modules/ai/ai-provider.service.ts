@@ -27,12 +27,12 @@ export class AiProviderService {
   }
 
   /** Get active AI provider from DB settings */
-  async getProvider(): Promise<'groq'> {
+  async getProvider(): Promise<'groq' | 'gemini'> {
     return 'groq';
   }
 
   /** Set AI provider in DB */
-  async setProvider(provider: 'groq'): Promise<void> {
+  async setProvider(provider: 'groq' | 'gemini'): Promise<void> {
     if (!this.db) return;
     await this.db
       .from('app_settings')

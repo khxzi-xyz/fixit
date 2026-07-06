@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { api, getToken } from "@/lib/api";
 import { Bell, MapPin, Search, ChevronRight, Zap, Star, Shield, Clock, TrendingUp, Gift, ShoppingCart, Siren, Calendar, Sparkles, Heart } from "lucide-react";
@@ -31,17 +32,22 @@ import { ServiceIcon } from "@/components/ServiceIcon";
 
 export default function ConsumerHome() {
   const [, navigate] = useLocation();
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [ads, setAds] = useState<any[]>([]);
   const [unread, setUnread] = useState(0);
   const [address, setAddress] = useState("Muscat, Oman");
-  const [vendors, setVendors] = useState<any[]>([]);
   const [adIdx, setAdIdx] = useState(0);
   const adTimer = useRef<ReturnType<typeof setInterval>>();
 
-  const load = useCallback(async () => {
-    try { setJobs(await api.myJobs()); } catch { /**/ }
-    try { setAds(await api.getAds("HOME")); } catch { /**/ }
+  const { data: jobs = [] } = useQuery({ queryKey: ["myJobs"], queryFn: api.myJobs });
+  const { data: ads = [] } = useQuery({ queryKey: ["ads", "HOME"], queryFn: () => api.getAds("HOME") });
+  const { data: vendors = [] } = useQuery({
+    queryKey: ["nearbyVendors"],
+    queryFn: async () => {
+      const v = await api.nearbyVendors(23.588, 58.3829);
+      return Array.isArray(v) ? v.slice(0, 6) : [];
+    }
+  });
+
+  const loadExtra = useCallback(async () => {
     try {
       const n = await api.notifications();
       setUnread(Array.isArray(n) ? n.filter((x: any) => !x.read_at).length : 0);
@@ -49,10 +55,6 @@ export default function ConsumerHome() {
     try {
       const a = await api.addresses();
       if (Array.isArray(a) && a.length > 0) setAddress(a[0].label || "Muscat, Oman");
-    } catch { /**/ }
-    try {
-      const v = await api.nearbyVendors(23.588, 58.3829);
-      setVendors(Array.isArray(v) ? v.slice(0, 6) : []);
     } catch { /**/ }
   }, []);
 
@@ -62,8 +64,8 @@ export default function ConsumerHome() {
       return;
     }
     api.registerPushNotifications().catch(() => {});
-    load();
-  }, [load, navigate]);
+    loadExtra();
+  }, [loadExtra, navigate]);
 
   // Auto-rotate ads
   useEffect(() => {

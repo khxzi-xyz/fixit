@@ -4,7 +4,7 @@ import { Geolocation } from "@capacitor/geolocation";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { Preferences } from "@capacitor/preferences";
 import { Capacitor } from "@capacitor/core";
-import { ShieldCheck, MapPin, Camera as CameraIcon, Bell, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, MapPin, Camera as CameraIcon, Bell, ArrowRight, CheckCircle2, Phone } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
@@ -130,6 +130,17 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
               {perms.push === "idle" ? "Allow" : "Denied"}
             </Button>
           )}
+        </div>
+
+        <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-2xl text-left border border-border">
+          <Phone className="w-6 h-6 text-primary shrink-0" />
+          <div className="flex-1">
+            <p className="font-bold text-sm">Calls & Phone</p>
+            <p className="text-xs text-muted-foreground">To securely detect offline vendor fraud and enable quick dial.</p>
+          </div>
+          <Button variant="outline" size="sm" className="shrink-0 rounded-xl pointer-events-none">
+            Will Ask
+          </Button>
         </div>
       </div>
 

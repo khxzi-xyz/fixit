@@ -341,11 +341,6 @@ export function UserLogin() {
           <span className="text-sm text-muted-foreground">New to FixIt One? </span>
           <a href="/auth/user/register" className="text-primary font-bold hover:underline">Create account</a>
         </div>
-        <div className="text-center -mt-2">
-          <a href="/auth/vendor/login" className="text-xs text-muted-foreground hover:text-primary font-semibold">
-            Are you a service provider? <span className="text-primary font-bold">Vendor login →</span>
-          </a>
-        </div>
       </div>
 
       {showBioPrompt && (

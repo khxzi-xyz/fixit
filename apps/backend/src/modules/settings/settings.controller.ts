@@ -2,6 +2,7 @@ import { Body, Controller, Get, Put, Post, Req, UseGuards, UseInterceptors, Uplo
 import { IsOptional, IsString } from 'class-validator';
 import { SettingsService } from './settings.service';
 import { JwtAuthGuard, type AuthedRequest } from '../auth/jwt.guard';
+// @ts-ignore
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SUPABASE_CLIENT } from '../../supabase/supabase.module';
 import { SupabaseClient } from '@supabase/supabase-js';

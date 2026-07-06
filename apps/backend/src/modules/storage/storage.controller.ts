@@ -1,4 +1,5 @@
 import { Body, Controller, Post, Req, UseGuards, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+// @ts-ignore
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IsOptional, IsString } from 'class-validator';
 import { StorageService } from './storage.service';
