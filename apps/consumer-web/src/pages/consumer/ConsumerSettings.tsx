@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
-import { api } from "@/lib/api";
+import { api, setToken } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { setTranslationLang } from "@/lib/realtime-translate";
 import {
   ChevronLeft, Sun, Moon, Bell, ChevronRight, Check,
-  Volume2, Smartphone, Shield, CreditCard, Headset, Ticket, Fingerprint
+  Volume2, Smartphone, Shield, CreditCard, Headset, Ticket, Fingerprint, LogOut
 } from "lucide-react";
 import { isFingerprintAvailable, removeSecureToken } from "@/lib/biometrics";
 
@@ -241,6 +242,22 @@ export default function ConsumerSettings() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Logout */}
+        <div className="pt-4">
+          <button 
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setToken(null);
+              localStorage.removeItem("fixit_bio_enabled");
+              sessionStorage.removeItem("fixit_guest");
+              navigate("/auth/user/login");
+            }} 
+            className="w-full bg-destructive/10 text-destructive font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-destructive/20 transition-colors"
+          >
+            <LogOut className="w-5 h-5" /> Logout
+          </button>
         </div>
       </div>
     </ConsumerLayout>

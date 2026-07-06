@@ -175,7 +175,12 @@ function App() {
   useEffect(() => {
     // Restore auth token
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.access_token) setToken(session.access_token);
+      if (session?.access_token) {
+        setToken(session.access_token);
+        if (window.location.pathname.includes("/auth/")) {
+           window.location.replace("/home");
+        }
+      }
     });
 
     // Biometric Auth Hook
@@ -194,6 +199,9 @@ function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setToken(session?.access_token ?? null);
+      if (session?.access_token && window.location.pathname.includes("/auth/")) {
+         window.location.replace("/home");
+      }
     });
 
     // Restore language + translation
