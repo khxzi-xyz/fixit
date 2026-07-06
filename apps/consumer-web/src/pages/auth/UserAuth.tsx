@@ -147,6 +147,10 @@ export function UserLogin() {
     setBusy(true);
     try {
       const full = countryCode + num;
+
+
+
+      
       const { error } = await supabase.auth.signInWithOtp({ phone: full });
       if (error) throw error;
 
@@ -448,15 +452,18 @@ export function UserOTP() {
       const isLinking = sessionStorage.getItem("fixit_link_only") === "true";
       
       let tokenStr = "";
+      let sessionData = null;
       if (isLinking) {
         // Just verify the phone number with Supabase
         const { data, error } = await supabase.auth.verifyOtp({ phone, token: code, type: 'sms' });
-        if (error || !data.session) throw error || new Error("OTP verified but no session returned");
+        if (error || !data?.session) throw error || new Error("OTP verified but no session returned");
         tokenStr = data.session.access_token;
+        sessionData = data.session;
       } else {
         const { data, error } = await supabase.auth.verifyOtp({ phone, token: code, type: 'sms' });
-        if (error || !data.session) throw error || new Error("Verification failed");
+        if (error || !data?.session) throw error || new Error("Verification failed");
         tokenStr = data.session.access_token;
+        sessionData = data.session;
         // Optionally update full name if provided during registration
         if (name) {
           await supabase.auth.updateUser({ data: { full_name: name, role } });
@@ -465,7 +472,7 @@ export function UserOTP() {
       
       const intent = sessionStorage.getItem("fixit_otp_intent");
       if (intent === "reset_password") {
-        setTempSession(data.session);
+        setTempSession(sessionData);
         setShowResetPassword(true);
         return;
       }
@@ -491,10 +498,10 @@ export function UserOTP() {
       }
       
       if (bioAvailable && localStorage.getItem("fixit_bio_enabled") !== "true") {
-        setTempSession(data.session);
+        setTempSession(sessionData);
         setShowBioPrompt(true);
       } else {
-        finalizeLogin(data.session);
+        finalizeLogin(sessionData);
       }
     } catch (e: any) {
       toast({ title: "Wrong code", description: e.message, variant: "destructive" });
