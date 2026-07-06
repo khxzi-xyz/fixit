@@ -105,7 +105,7 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
 
   return (
     <Layout>
-      <div className="hero-blue text-white px-4 pt-5 pb-5 rounded-b-3xl shadow-md flex items-center gap-3">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-5 pb-5 rounded-b-3xl shadow-md flex items-center gap-3">
         <button onClick={() => navigate(back)}><ChevronLeft className="w-6 h-6" /></button>
         <h1 className="text-xl font-extrabold">Settings</h1>
       </div>

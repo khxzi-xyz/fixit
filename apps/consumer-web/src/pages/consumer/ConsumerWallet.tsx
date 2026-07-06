@@ -27,7 +27,7 @@ export default function ConsumerWallet() {
 
   return (
     <ConsumerLayout>
-      <div className="hero-blue text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md sticky top-0 z-40">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md sticky top-0 z-40">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate("/profile")}><ChevronLeft className="w-6 h-6" /></button>
           <h1 className="text-xl font-extrabold">My Wallet</h1>
@@ -82,9 +82,9 @@ export default function ConsumerWallet() {
         )}
 
         {!!wallet?.lockedBalance && wallet.lockedBalance > 0 && (
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
-            <p className="text-xs text-blue-500/90 leading-relaxed font-medium">
+          <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-start gap-3">
+            <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-primary/90 leading-relaxed font-medium">
               You have funds held securely in escrow for active jobs. They will be released to the vendor only when you mark the job as completed.
             </p>
           </div>

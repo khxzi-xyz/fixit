@@ -34,7 +34,7 @@ export default function PublicVendorProfile() {
   if (!profile) {
     return (
       <ConsumerLayout>
-        <div className="hero-blue text-white px-4 pt-5 pb-5 rounded-b-3xl shadow-md flex items-center gap-3">
+        <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-5 pb-5 rounded-b-3xl shadow-md flex items-center gap-3">
           <button onClick={() => window.history.back()}><ChevronLeft className="w-6 h-6" /></button>
           <h1 className="text-xl font-extrabold">Vendor Not Found</h1>
         </div>
@@ -50,7 +50,7 @@ export default function PublicVendorProfile() {
 
   return (
     <ConsumerLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-16 rounded-b-3xl shadow-md">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-5 pb-16 rounded-b-3xl shadow-md">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => window.history.back()}><ChevronLeft className="w-6 h-6" /></button>
           <h1 className="text-xl font-extrabold">Shop Profile</h1>

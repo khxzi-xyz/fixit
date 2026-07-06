@@ -5,10 +5,9 @@ import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft, Send, Headset, Sparkles, Ticket } from "lucide-react";
 
 const QUICK = [
+  "How does FixIt Work?",
   "Where is my refund?",
   "My vendor didn't show up",
-  "How does escrow work?",
-  "Cancel my plan",
 ];
 
 /** Permanent FixIt Support conversation — AI answers instantly, with human escalation. */
@@ -75,7 +74,7 @@ export default function SupportChat() {
           <p className="text-white font-black text-sm flex items-center gap-1.5">
             FixIt Support <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
           </p>
-          <p className="text-blue-200 text-[11px]">AI assistant · replies instantly · agents available</p>
+          <p className="text-primary-foreground/70 text-[11px]">AI assistant · replies instantly · agents available</p>
         </div>
         <button
           onClick={escalate}

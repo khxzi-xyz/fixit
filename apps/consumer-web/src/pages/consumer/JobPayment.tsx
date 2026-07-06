@@ -44,7 +44,7 @@ export default function JobPayment() {
 
   return (
     <ConsumerLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-12 rounded-b-3xl shadow-md">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-5 pb-12 rounded-b-3xl shadow-md">
         <h1 className="text-xl font-extrabold">Escrow Lock</h1>
         <p className="text-white/75 text-sm mt-1">Funds held safely until the job completes and warranty clears.</p>
       </div>

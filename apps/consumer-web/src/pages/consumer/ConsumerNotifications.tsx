@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 const NOTIF_CONFIG: Record<string, { icon: any; color: string; bg: string }> = {
-  JOB_UPDATE: { icon: Briefcase, color: "text-blue-400", bg: "bg-blue-500/15" },
+  JOB_UPDATE: { icon: Briefcase, color: "text-primary", bg: "bg-blue-500/15" },
   BID_RECEIVED: { icon: Zap, color: "text-yellow-400", bg: "bg-yellow-500/15" },
   BID_SELECTED: { icon: CheckCheck, color: "text-green-400", bg: "bg-green-500/15" },
   MESSAGE: { icon: MessageCircle, color: "text-purple-400", bg: "bg-purple-500/15" },
@@ -71,21 +71,12 @@ export default function ConsumerNotifications() {
 
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
-  // ── Demo notifications when DB is empty ──
-  const DEMO: any[] = [
-    { notification_id: "d1", kind: "BID_RECEIVED", title: "New Bid Received", body: "Ahmed Al-Balushi submitted a bid of 15 OMR on your AC repair job.", created_at: new Date(Date.now() - 300000).toISOString(), read_at: null, action_url: "/my-jobs" },
-    { notification_id: "d2", kind: "REWARD", title: "Cashback Earned! 🎉", body: "You earned 0.300 OMR cashback from your last completed job.", created_at: new Date(Date.now() - 3600000).toISOString(), read_at: new Date().toISOString(), action_url: "/profile/rewards" },
-    { notification_id: "d3", kind: "JOB_UPDATE", title: "Job Accepted", body: "Your plumbing job has been accepted. The vendor is on the way.", created_at: new Date(Date.now() - 86400000).toISOString(), read_at: new Date().toISOString(), action_url: "/my-jobs" },
-    { notification_id: "d4", kind: "PAYMENT", title: "Payment Released", body: "15 OMR has been released from escrow to your vendor.", created_at: new Date(Date.now() - 172800000).toISOString(), read_at: new Date().toISOString(), action_url: "/wallet" },
-    { notification_id: "d5", kind: "SYSTEM", title: "Welcome to FixIt Now!", body: "Your account is set up. Post your first job and get bids in minutes.", created_at: new Date(Date.now() - 259200000).toISOString(), read_at: new Date().toISOString() },
-  ];
-
-  const items = displayed.length > 0 ? displayed : (loading ? [] : DEMO);
+  const items = displayed;
 
   return (
     <ConsumerLayout>
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-14">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-14">
         <div className="flex items-center justify-between mb-1">
           <button onClick={() => navigate("/profile")} className="flex items-center gap-2 text-white/80 hover:text-white">
             <ChevronLeft className="w-5 h-5" />

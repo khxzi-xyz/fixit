@@ -1,4 +1,4 @@
-const BASE = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000/api");
+const BASE = (process.env.EXPO_PUBLIC_API_URL ?? "https://backend.fixit-now.xyz/api");
 let TOKEN: string | null = null;
 let USER_ID: string | null = null;
 

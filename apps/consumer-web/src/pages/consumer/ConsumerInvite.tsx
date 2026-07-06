@@ -76,11 +76,11 @@ export default function ConsumerInvite() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-y-auto">
       {/* Hero */}
-      <div className="relative bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-6 pt-14 pb-16 text-center overflow-hidden">
+      <div className="relative bg-primary text-primary-foreground border-b border-border px-6 pt-14 pb-16 text-center overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, white 1px, transparent 1px)", backgroundSize: "26px 26px" }} />
         <img src="/logo.png" alt="FixIt" className="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-xl relative z-10" />
         <h1 className="text-2xl font-black text-white relative z-10">You're invited to FixIt Now! 🎉</h1>
-        <p className="text-blue-200 text-sm mt-2 relative z-10">
+        <p className="text-primary-foreground/70 text-sm mt-2 relative z-10">
           A friend shared code <span className="font-black text-white tracking-widest">{code || "…"}</span> with you
         </p>
         <div className="relative z-10 inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/15 border border-white/25 rounded-full">

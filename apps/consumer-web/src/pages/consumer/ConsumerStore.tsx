@@ -65,7 +65,7 @@ export default function ConsumerStore() {
   return (
     <ConsumerLayout>
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-14 text-white relative">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-14 text-white relative">
         <div className="flex items-center justify-between mb-4">
           <button onClick={() => navigate("/home")} className="flex items-center gap-2 text-white/80 hover:text-white">
             <ChevronLeft className="w-5 h-5" /> Home
@@ -76,7 +76,7 @@ export default function ConsumerStore() {
           </div>
         </div>
         <h1 className="text-2xl font-black">FixIt Hardware Store 🛠️</h1>
-        <p className="text-blue-200 text-sm mt-1">Genuine spare parts & equipment delivered to your door</p>
+        <p className="text-primary-foreground/70 text-sm mt-1">Genuine spare parts & equipment delivered to your door</p>
 
         {/* Search */}
         <div className="relative mt-4">

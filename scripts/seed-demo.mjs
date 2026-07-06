@@ -3,10 +3,10 @@
  * has something to show on first load. Idempotent-ish: safe to run repeatedly
  * (it just adds more listings). Talks to the running API, no direct DB access.
  *
- *   node scripts/seed-demo.mjs            # against http://localhost:3000/api
+ *   node scripts/seed-demo.mjs            # against https://backend.fixit-now.xyz/api
  *   API=http://host:3000/api node scripts/seed-demo.mjs
  */
-const BASE = process.env.API ?? "http://localhost:3000/api";
+const BASE = process.env.API ?? "https://backend.fixit-now.xyz/api";
 
 async function call(path, { method = "GET", token, body } = {}) {
   const res = await fetch(`${BASE}${path}`, {

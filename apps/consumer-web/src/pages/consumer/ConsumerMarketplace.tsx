@@ -21,7 +21,7 @@ export default function ConsumerMarketplace() {
 
   return (
     <ConsumerLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-8 rounded-b-3xl shadow-md">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-5 pb-8 rounded-b-3xl shadow-md">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-xl font-extrabold flex items-center gap-2">

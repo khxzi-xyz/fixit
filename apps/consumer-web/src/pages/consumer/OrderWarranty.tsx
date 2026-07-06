@@ -42,7 +42,7 @@ export default function OrderWarranty() {
 
   return (
     <ConsumerLayout>
-      <div className="hero-blue text-white px-4 pt-8 pb-16 rounded-b-3xl shadow-md text-center">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-8 pb-16 rounded-b-3xl shadow-md text-center">
         <div className="w-20 h-20 bg-white/15 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4">
           <ShieldCheck className="w-10 h-10" />
         </div>

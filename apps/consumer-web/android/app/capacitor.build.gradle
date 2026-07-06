@@ -21,9 +21,6 @@ dependencies {
     implementation project(':capacitor-share')
     implementation project(':capacitor-splash-screen')
     implementation project(':capacitor-status-bar')
-    implementation project(':capgo-capacitor-native-biometric')
-    implementation project(':transistorsoft-capacitor-background-fetch')
-    implementation project(':transistorsoft-capacitor-background-geolocation')
 
 }
 

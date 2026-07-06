@@ -4,7 +4,7 @@
  */
 import { io, Socket } from "socket.io-client";
 
-const BASE = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000/api").replace(/\/api$/, "");
+const BASE = (process.env.EXPO_PUBLIC_API_URL ?? "https://backend.fixit-now.xyz/api").replace(/\/api$/, "");
 
 let socket: Socket | null = null;
 

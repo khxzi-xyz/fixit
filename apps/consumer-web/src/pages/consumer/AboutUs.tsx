@@ -21,7 +21,7 @@ export default function AboutUs() {
   return (
     <ConsumerLayout>
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-16 text-center relative overflow-hidden">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-16 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 50% 50%, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
         <button onClick={() => navigate("/settings")} className="flex items-center gap-2 text-white/70 hover:text-white mb-6 relative z-10">
           <ChevronLeft className="w-5 h-5" />
@@ -29,7 +29,7 @@ export default function AboutUs() {
         <div className="relative z-10">
           <img src="/logo.png" alt="FixIt Now" className="w-20 h-20 rounded-2xl mx-auto mb-4 shadow-xl" />
           <h1 className="text-3xl font-black text-white">FixIt Now</h1>
-          <p className="text-blue-200 mt-2 text-sm max-w-xs mx-auto leading-relaxed">
+          <p className="text-primary-foreground/70 mt-2 text-sm max-w-xs mx-auto leading-relaxed">
             Oman's most trusted platform for home services, vehicle care, and professional help -on demand.
           </p>
         </div>

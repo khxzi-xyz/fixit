@@ -6,8 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { setTranslationLang } from "@/lib/realtime-translate";
 import {
   ChevronLeft, Sun, Moon, Bell, ChevronRight, Check,
-  Volume2, Smartphone, Shield, CreditCard, Headset, Ticket,
+  Volume2, Smartphone, Shield, CreditCard, Headset, Ticket, Fingerprint
 } from "lucide-react";
+import { isFingerprintAvailable, removeSecureToken } from "@/lib/biometrics";
 
 const LANGS = [
   { code: "en", label: "English", native: "English", flag: "🇬🇧" },
@@ -24,12 +25,16 @@ export default function ConsumerSettings() {
   const [lang, setLang] = useState(() => localStorage.getItem("fixit_lang") || "en");
   const [pushEnabled, setPushEnabled] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem("fixit_sound") !== "false");
+  const [bioAvailable, setBioAvailable] = useState(false);
+  const [bioEnabled, setBioEnabled] = useState(() => localStorage.getItem("fixit_bio_enabled") === "true");
 
   useEffect(() => {
     // Check push permission
     if ("Notification" in window) {
       setPushEnabled(Notification.permission === "granted");
     }
+    // Check biometrics
+    isFingerprintAvailable().then(setBioAvailable).catch(() => {});
   }, []);
 
   const toggleTheme = (t: "light" | "dark") => {
@@ -66,15 +71,30 @@ export default function ConsumerSettings() {
     localStorage.setItem("fixit_sound", String(next));
   };
 
+  const toggleBio = async () => {
+    const next = !bioEnabled;
+    if (!next) {
+      // Disable
+      await removeSecureToken();
+      localStorage.removeItem("fixit_bio_enabled");
+    } else {
+      // It must be enabled during login where the token is available
+      toast({ title: "Please logout and login again to enable Biometrics", variant: "default" });
+      return;
+    }
+    setBioEnabled(next);
+    toast({ title: `Biometric login ${next ? "enabled" : "disabled"} ✅` });
+  };
+
   return (
     <ConsumerLayout>
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-14">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-14">
         <button onClick={() => navigate("/profile")} className="flex items-center gap-2 text-white/80 hover:text-white mb-4">
           <ChevronLeft className="w-5 h-5" /> Back
         </button>
         <h1 className="text-2xl font-black text-white">Settings</h1>
-        <p className="text-blue-200 text-sm mt-1">Customize your experience</p>
+        <p className="text-primary-foreground/70 text-sm mt-1">Customize your experience</p>
       </div>
 
       <div className="relative z-10 px-4 -mt-6 pb-10 space-y-4">
@@ -87,7 +107,7 @@ export default function ConsumerSettings() {
                 <button
                   key={t}
                   onClick={() => toggleTheme(t)}
-                  className={`flex items-center gap-3 p-3.5 border-2 rounded-xl transition-all ${theme === t ? "border-primary bg-slate-100 dark:bg-slate-800" : "border-border"}`}
+                  className={`flex items-center gap-3 p-3.5 border-2 rounded-full transition-all ${theme === t ? "border-primary bg-primary/5" : "border-border"}`}
                 >
                   {t === "dark" ? <Moon className={`w-4 h-4 ${theme === t ? "text-primary" : "text-muted-foreground"}`} /> : <Sun className={`w-4 h-4 ${theme === t ? "text-primary" : "text-muted-foreground"}`} />}
                   <span className={`text-sm font-bold capitalize ${theme === t ? "text-primary" : "text-muted-foreground"}`}>{t}</span>
@@ -124,7 +144,7 @@ export default function ConsumerSettings() {
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Notifications</p>
           <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-              <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 border border-border rounded-full flex items-center justify-center shrink-0">
                 <Smartphone className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1">
@@ -140,7 +160,7 @@ export default function ConsumerSettings() {
               )}
             </div>
             <div className="flex items-center gap-3 px-4 py-3.5">
-              <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 border border-border rounded-full flex items-center justify-center shrink-0">
                 <Volume2 className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1">
@@ -154,6 +174,23 @@ export default function ConsumerSettings() {
                 <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${soundEnabled ? "left-6" : "left-0.5"}`} />
               </button>
             </div>
+            {bioAvailable && (
+              <div className="flex items-center gap-3 px-4 py-3.5 border-t border-border">
+                <div className="w-10 h-10 border border-border rounded-full flex items-center justify-center shrink-0">
+                  <Fingerprint className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">Biometric Login</p>
+                  <p className="text-xs text-muted-foreground">Sign in quickly and securely</p>
+                </div>
+                <button
+                  onClick={toggleBio}
+                  className={`w-12 h-6 rounded-full transition-all relative ${bioEnabled ? "bg-primary" : "bg-muted-foreground/30"}`}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${bioEnabled ? "left-6" : "left-0.5"}`} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -171,7 +208,7 @@ export default function ConsumerSettings() {
                 onClick={() => navigate(href)}
                 className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/30 transition-colors ${i !== 2 ? "border-b border-border" : ""}`}
               >
-                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 border border-border rounded-full flex items-center justify-center shrink-0">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1 text-left">

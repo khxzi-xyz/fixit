@@ -20,7 +20,7 @@ export default function ConsumerCategories() {
 
   return (
     <ConsumerLayout>
-      <div className="sticky top-0 z-40 hero-blue text-white px-4 pt-4 pb-5 rounded-b-3xl shadow-md">
+      <div className="sticky top-0 z-40 bg-primary text-primary-foreground border-b border-border text-white px-4 pt-4 pb-5 rounded-b-3xl shadow-md">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/home")}><ChevronLeft className="w-6 h-6" /></button>
           <div>

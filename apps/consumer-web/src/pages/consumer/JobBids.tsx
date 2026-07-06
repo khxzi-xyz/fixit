@@ -40,7 +40,7 @@ export default function JobBids() {
 
   return (
     <ConsumerLayout>
-      <div className="sticky top-0 z-40 hero-blue text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
+      <div className="sticky top-0 z-40 bg-primary text-primary-foreground border-b border-border text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
         <div className="flex items-center gap-3 mb-2">
           <button onClick={() => navigate("/my-jobs")} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10">
             <ChevronLeft className="w-6 h-6" />

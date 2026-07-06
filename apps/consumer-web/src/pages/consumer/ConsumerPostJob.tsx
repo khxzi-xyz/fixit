@@ -57,7 +57,7 @@ type ServiceId = typeof SERVICE_CATEGORIES[number]["id"];
 const URGENCY = [
   { id: "EMERGENCY", label: "Emergency", sub: "Right now", icon: <Siren className="w-5 h-5 mb-1" />, color: "border-red-500 bg-red-500/10 text-red-400" },
   { id: "THIS_WEEK", label: "This Week", sub: "Within days", icon: <Zap className="w-5 h-5 mb-1" />, color: "border-orange-400 bg-orange-400/10 text-orange-400" },
-  { id: "FLEXIBLE", label: "Flexible", sub: "Anytime", icon: <Calendar className="w-5 h-5 mb-1" />, color: "border-blue-400 bg-blue-400/10 text-blue-400" },
+  { id: "FLEXIBLE", label: "Flexible", sub: "Anytime", icon: <Calendar className="w-5 h-5 mb-1" />, color: "border-primary/30 bg-blue-400/10 text-primary" },
 ] as const;
 
 const GROUPS = ["Home", "Vehicles", "Tech", "Professional", "Other"];
@@ -193,7 +193,7 @@ export default function ConsumerPostJob() {
   return (
     <ConsumerLayout>
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-5 pt-[calc(env(safe-area-inset-top,1rem)+1.5rem)] pb-14 rounded-b-[2rem] shadow-lg relative overflow-hidden">
+      <div className="bg-primary text-primary-foreground border-b border-border px-5 pt-[calc(env(safe-area-inset-top,1rem)+1.5rem)] pb-14 rounded-b-[2rem] shadow-lg relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
         
@@ -207,7 +207,7 @@ export default function ConsumerPostJob() {
             <h1 className="text-2xl font-black text-white flex items-center gap-2 drop-shadow-sm">
               {step === "category" ? "What do you need?" : step === "details" ? cat?.label : "Review & Post"}
             </h1>
-            <p className="text-blue-100/90 text-xs mt-1 font-medium">
+            <p className="text-primary-foreground/80/90 text-xs mt-1 font-medium">
               {step === "category" ? "Pick a service" : step === "details" ? "Describe your job" : "Confirm your job details"}
             </p>
           </div>
@@ -426,7 +426,7 @@ export default function ConsumerPostJob() {
               )}
             </div>
 
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-3 text-sm text-blue-400 flex gap-2">
+            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-3 text-sm text-primary flex gap-2">
               <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
               <span>Using your current location. Vendors near you will be notified automatically.</span>
             </div>

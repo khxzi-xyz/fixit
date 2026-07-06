@@ -32,7 +32,7 @@ export function VendorLayout({ children }: { children: React.ReactNode }) {
           {left.map((i) => <Item key={i.href} {...i} />)}
           <div className="flex-1 flex justify-center">
             <Link href="/vendor/jobs" className="relative -mt-8">
-              <div className="w-14 h-14 rounded-full hero-blue text-white flex items-center justify-center shadow-lg ring-4 ring-background">
+              <div className="w-14 h-14 rounded-full bg-primary text-primary-foreground border-b border-border text-white flex items-center justify-center shadow-lg ring-4 ring-background">
                 <Search className="w-7 h-7" strokeWidth={2.5} />
               </div>
             </Link>

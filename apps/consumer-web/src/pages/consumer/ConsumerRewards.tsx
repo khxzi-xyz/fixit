@@ -51,13 +51,13 @@ export default function ConsumerRewards() {
       { coupon_id: "c1", code: "WELCOME10", discount_type: "PERCENT", discount_value: 10, expires_at: "2026-12-31" },
       { coupon_id: "c2", code: "FIXIT2026", discount_type: "FLAT", discount_value: 2, expires_at: "2026-08-15" },
     ]));
-    api.myReferralCode().then(setReferral).catch(() =>
-      setReferral({ code: "KHUZA-7X9K", referral_url: "https://fixit-now.xyz/invite/KHUZA-7X9K" })
-    );
-    api.referralStats().then(setRefStats).catch(() =>
-      setRefStats({ total_referred: 0, pending: 0, rewarded: 0 })
-    );
+    api.myReferralCode().then(setReferral).catch(console.error);
+    api.referralStats().then(setRefStats).catch(console.error);
   }, []);
+
+  const rawCode = referral?.code ?? "";
+  const displayCode = rawCode ? (rawCode.startsWith("FixIt-") ? rawCode : `FixIt-${rawCode}`) : "";
+  const displayUrl = displayCode ? `https://backend.fixit-now.xyz/invite/${displayCode}` : "";
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -67,12 +67,11 @@ export default function ConsumerRewards() {
   };
 
   const shareReferral = () => {
-    if (!referral) return;
-    const text = `Join FixIt Now! Book trusted home services in Oman. Use my code ${referral.code} when signing up and we both get rewards! ${referral.referral_url}`;
+    const text = `🎉 Get 1 OMR off your first home service with FixIt Now! 🛠️\n\nUse my promo code *${displayCode}* to sign up and let's get fixing! 🚀\n\nTap here to claim: ${displayUrl}`;
     if (navigator.share) {
-      navigator.share({ title: "FixIt Now Invite", text, url: referral.referral_url }).catch(() => { });
+      navigator.share({ title: "FixIt Now Invite", text, url: displayUrl }).catch(() => { });
     } else {
-      copyCode(referral.referral_url);
+      copyCode(displayUrl);
     }
   };
 
@@ -102,7 +101,7 @@ export default function ConsumerRewards() {
     CASHBACK: { icon: TrendingUp, color: "text-green-400", sign: "+" },
     REFERRAL: { icon: Gift, color: "text-purple-400", sign: "+" },
     BONUS: { icon: Star, color: "text-yellow-400", sign: "+" },
-    REDEEMED: { icon: ArrowDownCircle, color: "text-blue-400", sign: "-" },
+    REDEEMED: { icon: ArrowDownCircle, color: "text-primary", sign: "-" },
     WITHDRAWN: { icon: ArrowDownCircle, color: "text-orange-400", sign: "-" },
     COUPON_USED: { icon: Tag, color: "text-pink-400", sign: "+" },
   };
@@ -218,10 +217,10 @@ export default function ConsumerRewards() {
               <p className="text-xs font-bold text-purple-300 uppercase tracking-wide mb-2">Your Referral Code</p>
               <div className="flex items-center gap-2">
                 <div className="flex-1 bg-black/30 border border-white/10 rounded-xl px-4 py-3 font-black text-xl tracking-widest text-white text-center">
-                  {referral?.code ?? "KHUZA-7X9K"}
+                  {displayCode}
                 </div>
                 <button
-                  onClick={() => copyCode(referral?.code ?? "KHUZA-7X9K")}
+                  onClick={() => copyCode(displayCode)}
                   className="w-12 h-12 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center hover:bg-purple-500/30 transition-colors"
                 >
                   {copied ? <Check className="w-5 h-5 text-green-400" /> : <Copy className="w-5 h-5 text-purple-300" />}

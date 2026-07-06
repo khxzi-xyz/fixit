@@ -17,7 +17,7 @@ export default function ConsumerChats() {
 
   return (
     <ConsumerLayout>
-      <div className="sticky top-0 z-40 hero-blue text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
+      <div className="sticky top-0 z-40 bg-primary text-primary-foreground border-b border-border text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
         <h1 className="text-xl font-extrabold flex items-center gap-2"><MessageCircle className="w-5 h-5"/> Chats</h1>
         <p className="text-white/75 mt-1 text-sm">Your active conversations</p>
       </div>

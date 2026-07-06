@@ -30,7 +30,7 @@ export default function ConsumerFeed() {
   return (
     <ConsumerLayout>
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-14 text-white">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-14 text-white">
         <button onClick={() => navigate("/home")} className="flex items-center gap-2 text-white/80 hover:text-white mb-3">
           <ChevronLeft className="w-5 h-5" /> Home
         </button>
@@ -38,7 +38,7 @@ export default function ConsumerFeed() {
           <Flame className="w-7 h-7 text-orange-400" />
           <h1 className="text-2xl font-black">Pro Transformations Feed</h1>
         </div>
-        <p className="text-blue-200 text-sm">Real before & after proof of work from verified FixIt pros</p>
+        <p className="text-primary-foreground/70 text-sm">Real before & after proof of work from verified FixIt pros</p>
       </div>
 
       <div className="px-4 -mt-6 pb-28 space-y-5 relative z-10 max-w-lg mx-auto">

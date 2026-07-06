@@ -106,7 +106,7 @@ export default function ConsumerAddresses() {
   return (
     <ConsumerLayout>
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-14">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-14">
         <div className="flex items-center justify-between mb-1">
           <button onClick={() => navigate("/profile")} className="flex items-center gap-2 text-white/80 hover:text-white">
             <ChevronLeft className="w-5 h-5" /> Back
@@ -119,7 +119,7 @@ export default function ConsumerAddresses() {
           </button>
         </div>
         <h1 className="text-2xl font-black text-white mt-3">My Addresses</h1>
-        <p className="text-blue-200 text-sm mt-1">{addresses.length} saved location{addresses.length !== 1 ? "s" : ""}</p>
+        <p className="text-primary-foreground/70 text-sm mt-1">{addresses.length} saved location{addresses.length !== 1 ? "s" : ""}</p>
       </div>
 
       <div className="px-4 -mt-6 pb-10 space-y-4">

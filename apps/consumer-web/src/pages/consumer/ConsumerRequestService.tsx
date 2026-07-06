@@ -35,7 +35,7 @@ export default function ConsumerRequestService() {
 
   return (
     <ConsumerLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-6 rounded-b-3xl shadow-md">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-5 pb-6 rounded-b-3xl shadow-md">
         <h1 className="text-xl font-extrabold">Request a Service</h1>
         <p className="text-white/75 mt-1 text-sm">Can't find what you need? Tell us.</p>
       </div>

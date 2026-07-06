@@ -53,12 +53,12 @@ export default function ConsumerSupport() {
   return (
     <ConsumerLayout>
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-14">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-14">
         <button onClick={() => navigate("/profile")} className="flex items-center gap-2 text-white/80 hover:text-white mb-4">
           <ChevronLeft className="w-5 h-5" /> Back
         </button>
         <h1 className="text-2xl font-black text-white">Help & Support</h1>
-        <p className="text-blue-200 text-sm mt-1">We're here for you 24/7</p>
+        <p className="text-primary-foreground/70 text-sm mt-1">We're here for you 24/7</p>
       </div>
 
       <div className="px-4 -mt-6 pb-10 space-y-4">

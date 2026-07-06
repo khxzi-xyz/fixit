@@ -76,7 +76,7 @@ export default function ConsumerProfile() {
   return (
     <ConsumerLayout>
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0d1b2a] via-[#1b3d6e] to-[#1B6EF3] px-4 pt-10 pb-20 relative overflow-hidden">
+      <div className="bg-primary text-primary-foreground border-b border-border px-4 pt-10 pb-20 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
         <div className="relative z-10 flex items-center justify-between mb-4">
           <img src="/logo.png" className="w-8 h-8 rounded-lg" alt="FixIt" />
@@ -94,7 +94,7 @@ export default function ConsumerProfile() {
           </button>
           <div>
             <h1 className="text-xl font-black text-white">{name}</h1>
-            {phone && <p className="text-blue-200 text-sm">{phone}</p>}
+            {phone && <p className="text-primary-foreground/70 text-sm">{phone}</p>}
             <div className="flex items-center gap-1.5 mt-1">
               <span className="px-2 py-0.5 bg-white/10 rounded-full text-white text-[10px] font-bold border border-white/20">
                 Consumer

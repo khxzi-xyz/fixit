@@ -1,6 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_CLIENT } from '../../supabase/supabase.module';
+import Groq from 'groq-sdk';
 
 export interface AIMessage {
   role: 'user' | 'assistant' | 'system';
@@ -9,7 +10,7 @@ export interface AIMessage {
 
 export interface AIResponse {
   text: string;
-  provider: 'gemini' | 'groq';
+  provider: 'groq';
   model: string;
   tokens?: number;
 }
@@ -17,49 +18,33 @@ export interface AIResponse {
 @Injectable()
 export class AiProviderService {
   private readonly logger = new Logger(AiProviderService.name);
+  private groqClient: Groq;
 
-  // keys come from .env only — never hardcode (GEMINI_API_KEY falls back to the
-  // shared GOOGLE_AI_API_KEY used by GeminiClient)
-  private readonly GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || '';
-  private readonly GROQ_KEY = process.env.GROQ_API_KEY || '';
+  private readonly GROQ_KEY = process.env.GROQ_API_KEY ;
 
-  constructor(@Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null) { }
+  constructor(@Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null) {
+    this.groqClient = new Groq({ apiKey: this.GROQ_KEY });
+  }
 
   /** Get active AI provider from DB settings */
-  async getProvider(): Promise<'gemini' | 'groq'> {
-    if (!this.db) return 'groq';
-    try {
-      const { data } = await this.db
-        .from('app_settings')
-        .select('value')
-        .eq('key', 'ai_provider')
-        .single();
-      return (data?.value as 'gemini' | 'groq') || 'groq';
-    } catch {
-      return 'groq'; // default
-    }
+  async getProvider(): Promise<'groq'> {
+    return 'groq';
   }
 
   /** Set AI provider in DB */
-  async setProvider(provider: 'gemini' | 'groq'): Promise<void> {
+  async setProvider(provider: 'groq'): Promise<void> {
     if (!this.db) return;
     await this.db
       .from('app_settings')
       .upsert({ key: 'ai_provider', value: provider, updated_at: new Date().toISOString() });
   }
 
-  /** Main generate method -routes to whichever provider is active */
+  /** Main generate method */
   async generate(
     messages: AIMessage[],
     options?: { temperature?: number; maxTokens?: number; systemPrompt?: string }
   ): Promise<AIResponse> {
-    const provider = await this.getProvider();
-
-    if (provider === 'groq') {
-      return this.generateGroq(messages, options);
-    } else {
-      return this.generateGemini(messages, options);
-    }
+    return this.generateGroq(messages, options);
   }
 
   /** Quick single prompt shorthand */
@@ -81,83 +66,20 @@ export class AiProviderService {
       ? [{ role: 'system', content: options.systemPrompt }, ...messages]
       : messages;
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.GROQ_KEY}`,
-      },
-      body: JSON.stringify({
+    try {
+      const response = await this.groqClient.chat.completions.create({
         model,
-        messages: groqMessages,
+        messages: groqMessages as any[],
         temperature: options?.temperature ?? 0.7,
         max_tokens: options?.maxTokens ?? 1024,
-      }),
-    });
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      this.logger.error(`Groq error: ${err}`);
-      throw new Error(`Groq API error: ${res.status}`);
+      const text = response.choices?.[0]?.message?.content ?? '';
+      return { text, provider: 'groq', model, tokens: response.usage?.total_tokens };
+    } catch (e: any) {
+      this.logger.error(`Groq error: ${e.message}`);
+      throw new Error(`Groq API error`);
     }
-
-    const data = await res.json();
-    const text = data.choices?.[0]?.message?.content ?? '';
-
-    return { text, provider: 'groq', model, tokens: data.usage?.total_tokens };
-  }
-
-  // ── Gemini ───────────────────────────────────────────────────────
-  private async generateGemini(
-    messages: AIMessage[],
-    options?: { temperature?: number; maxTokens?: number; systemPrompt?: string }
-  ): Promise<AIResponse> {
-    const model = 'gemini-1.5-flash';
-    const isBearer = this.GEMINI_KEY.startsWith('ya29.') || this.GEMINI_KEY.startsWith('AQ.');
-
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (isBearer) {
-      headers['Authorization'] = `Bearer ${this.GEMINI_KEY}`;
-    } else {
-      headers['x-goog-api-key'] = this.GEMINI_KEY;
-    }
-
-    // Convert to Gemini format
-    const contents = messages
-      .filter((m) => m.role !== 'system')
-      .map((m) => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      }));
-
-    const systemInstruction = options?.systemPrompt ||
-      messages.find((m) => m.role === 'system')?.content;
-
-    const body: any = {
-      contents,
-      generationConfig: {
-        temperature: options?.temperature ?? 0.7,
-        maxOutputTokens: options?.maxTokens ?? 1024,
-      },
-    };
-
-    if (systemInstruction) {
-      body.systemInstruction = { parts: [{ text: systemInstruction }] };
-    }
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-    const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
-
-    if (!res.ok) {
-      const err = await res.text();
-      this.logger.error(`Gemini error: ${err}`);
-      throw new Error(`Gemini API error: ${res.status}`);
-    }
-
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-
-    return { text, provider: 'gemini', model };
   }
 
   /** Test connectivity to the current provider */

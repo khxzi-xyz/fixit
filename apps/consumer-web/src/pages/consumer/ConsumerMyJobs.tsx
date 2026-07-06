@@ -6,7 +6,7 @@ import { ChevronLeft, Clock, CheckCircle2, ShieldAlert, Wrench, XCircle, Zap, Ma
 import { formatDistanceToNow } from "date-fns";
 
 const STATUS_MAP: Record<string, { label: string, color: string, bg: string, icon: any }> = {
-  OPEN: { label: "Bidding", color: "text-blue-500", bg: "bg-blue-500/10", icon: Zap },
+  OPEN: { label: "Bidding", color: "text-primary", bg: "bg-primary/10", icon: Zap },
   ASSIGNED: { label: "Assigned", color: "text-yellow-500", bg: "bg-yellow-500/10", icon: Clock },
   IN_PROGRESS: { label: "In Progress", color: "text-orange-500", bg: "bg-orange-500/10", icon: Wrench },
   COMPLETED: { label: "Completed", color: "text-green-500", bg: "bg-green-500/10", icon: CheckCircle2 },
@@ -35,7 +35,7 @@ export default function ConsumerMyJobs() {
 
   return (
     <ConsumerLayout>
-      <div className="sticky top-0 z-40 hero-blue text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
+      <div className="sticky top-0 z-40 bg-primary text-primary-foreground border-b border-border text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
         <div className="flex items-center gap-3 mb-2">
           <button onClick={() => navigate("/home")} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10">
             <ChevronLeft className="w-6 h-6" />

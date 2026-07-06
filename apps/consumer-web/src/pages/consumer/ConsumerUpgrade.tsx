@@ -78,7 +78,7 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
             <img src="/logo.png" alt="FixIt" className="relative w-28 h-28 rounded-3xl shadow-2xl" />
           </div>
           <h2 className="text-3xl font-black text-white">Payment Successful!</h2>
-          <p className="text-blue-200 text-sm mt-2">Preparing your premium experience…</p>
+          <p className="text-primary-foreground/70 text-sm mt-2">Preparing your premium experience…</p>
         </div>
       )}
 
@@ -98,7 +98,7 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">{p.title}</p>
-                  <p className="text-blue-200 text-xs">{p.body}</p>
+                  <p className="text-primary-foreground/70 text-xs">{p.body}</p>
                 </div>
                 <CheckCircle2 className="w-5 h-5 text-green-400 ml-auto shrink-0" />
               </div>
@@ -120,12 +120,12 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
             </h3>
             {daysLeft != null ? (
               <>
-                <p className="text-blue-100 text-sm mt-2">Active for the next</p>
-                <p className="text-5xl font-black text-white mt-1">{daysLeft}<span className="text-lg font-bold text-blue-200 ml-1">days</span></p>
-                <p className="text-blue-200/70 text-xs mt-2">until {until!.toLocaleDateString()}</p>
+                <p className="text-primary-foreground/80 text-sm mt-2">Active for the next</p>
+                <p className="text-5xl font-black text-white mt-1">{daysLeft}<span className="text-lg font-bold text-primary-foreground/70 ml-1">days</span></p>
+                <p className="text-primary-foreground/70/70 text-xs mt-2">until {until!.toLocaleDateString()}</p>
               </>
             ) : (
-              <p className="text-blue-100 text-sm mt-2">Yours forever ✨</p>
+              <p className="text-primary-foreground/80 text-sm mt-2">Yours forever ✨</p>
             )}
             {typeof result?.charged === "number" && (
               <p className="text-white/60 text-xs mt-4">Paid from wallet: {Number(result.charged).toFixed(3)} OMR</p>
@@ -139,7 +139,7 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
         <div className="text-center px-8" style={{ animation: "fx-pop 0.5s ease-out both" }}>
           <img src="/logo.png" alt="" className="w-20 h-20 rounded-2xl mx-auto mb-5 shadow-2xl" />
           <h2 className="text-3xl font-black text-white">Welcome to {planLabel}! 🎉</h2>
-          <p className="text-blue-200 text-sm mt-2 max-w-xs mx-auto">Your perks are live right now. Post a job and feel the difference.</p>
+          <p className="text-primary-foreground/70 text-sm mt-2 max-w-xs mx-auto">Your perks are live right now. Post a job and feel the difference.</p>
           <button onClick={onDone}
             className="mt-7 px-8 h-13 py-3.5 bg-white text-[#0d1b2a] font-black rounded-2xl inline-flex items-center gap-2 shadow-xl hover:scale-[1.03] transition-transform">
             Start exploring <ArrowRight className="w-5 h-5" />
@@ -203,7 +203,7 @@ export default function ConsumerUpgrade() {
 
   return (
     <ConsumerLayout>
-      <div className="hero-blue text-white px-4 pt-10 pb-16 rounded-b-3xl shadow-md text-center">
+      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-10 pb-16 rounded-b-3xl shadow-md text-center">
         <div className="w-20 h-20 bg-white/15 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4">
           <Crown className="w-10 h-10 text-yellow-300" />
         </div>

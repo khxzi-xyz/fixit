@@ -20,7 +20,7 @@ const SERVICE_GRID = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  OPEN: "bg-blue-500/15 text-blue-400",
+  OPEN: "bg-blue-500/15 text-primary",
   ASSIGNED: "bg-yellow-500/15 text-yellow-400",
   IN_PROGRESS: "bg-orange-500/15 text-orange-400",
   COMPLETED: "bg-green-500/15 text-green-400",
@@ -76,20 +76,23 @@ export default function ConsumerHome() {
 
   return (
     <ConsumerLayout>
-      <div className="sticky top-0 z-40 hero-blue text-white rounded-b-[2rem] shadow-xl pt-[env(safe-area-inset-top,1rem)] backdrop-blur-md bg-opacity-90">
-        <div className="flex items-center gap-3 px-5 pt-4 pb-3">
-          <img src="/logo.png" className="w-10 h-10 rounded-xl bg-white/10 p-1.5 backdrop-blur-sm border border-white/20" alt="FixIt Now" />
-          <button onClick={() => navigate("/profile/addresses")} className="flex-1 flex flex-col justify-center text-left min-w-0 ml-1">
-            <span className="text-[10px] text-white/70 uppercase tracking-widest font-bold">Current Location</span>
-            <div className="flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-white shrink-0" />
-              <span className="text-sm font-black text-white truncate">{address}</span>
+      <div className="sticky top-0 z-40 bg-background/90 text-foreground border-b border-border shadow-sm pt-[env(safe-area-inset-top,2rem)] pb-2 backdrop-blur-xl transition-all">
+        <div className="flex items-center gap-3 px-5 pt-2 pb-3">
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" className="w-9 h-9 rounded-xl bg-primary/10 p-1.5" alt="FixIt Now" />
+            <span className="text-xl font-black tracking-tight">FixIt</span>
+          </div>
+          <button onClick={() => navigate("/profile/addresses")} className="flex-1 flex flex-col justify-center items-end text-right min-w-0 ml-1">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Location</span>
+            <div className="flex items-center gap-1 justify-end">
+              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="text-sm font-black truncate">{address}</span>
             </div>
           </button>
-          <button onClick={() => navigate("/notifications")} className="relative w-10 h-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors">
-            <Bell className="w-5 h-5 text-white" />
+          <button onClick={() => navigate("/notifications")} className="relative w-10 h-10 bg-muted/50 rounded-2xl flex items-center justify-center hover:bg-muted transition-colors ml-2">
+            <Bell className="w-5 h-5 text-foreground" />
             {unread > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-[#1B6EF3] shadow-sm">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-black rounded-full flex items-center justify-center border-2 border-background shadow-sm">
                 {unread > 9 ? "9+" : unread}
               </span>
             )}
@@ -97,13 +100,13 @@ export default function ConsumerHome() {
         </div>
 
         {/* Search bar */}
-        <div className="px-5 pb-6">
+        <div className="px-5 pb-2">
           <button
             onClick={() => navigate("/search")}
-            className="w-full flex items-center gap-3 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 text-white text-sm shadow-inner hover:bg-white/20 transition-all"
+            className="w-full flex items-center gap-3 h-12 bg-muted/50 border border-border rounded-2xl px-4 text-foreground text-sm hover:bg-muted transition-all"
           >
-            <Search className="w-4 h-4 text-white/80" />
-            <span className="text-white/80 font-medium">Search for a service…</span>
+            <Search className="w-4 h-4 text-muted-foreground" />
+            <span className="text-muted-foreground font-medium flex-1 text-left">Search for a service…</span>
           </button>
         </div>
       </div>
@@ -193,7 +196,7 @@ export default function ConsumerHome() {
           <div className="grid grid-cols-3 gap-2">
             {[
               { label: "Parts Store", sub: "30m delivery", icon: <ShoppingCart />, href: "/store", bg: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
-              { label: "Home Care", sub: "Regular plans", icon: <Calendar />, href: "/maintenance", bg: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+              { label: "Home Care", sub: "Regular plans", icon: <Calendar />, href: "/maintenance", bg: "bg-primary/10 text-primary border-primary/20" },
               { label: "Pro Feed", sub: "Before/After", icon: <Sparkles />, href: "/feed", bg: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
             ].map((f) => (
               <Link key={f.label} href={f.href}>
@@ -212,7 +215,7 @@ export default function ConsumerHome() {
           {[
             { icon: Shield, label: "Secure Pay", sub: "Escrow-protected", color: "text-green-400" },
             { icon: Star, label: "Verified Pros", sub: "ID-checked", color: "text-yellow-400" },
-            { icon: Clock, label: "Fast Match", sub: "Avg 8 mins", color: "text-blue-400" },
+            { icon: Clock, label: "Fast Match", sub: "Avg 8 mins", color: "text-primary" },
           ].map((b) => (
             <div key={b.label} className="bg-card border border-border rounded-2xl p-3 text-center">
               <b.icon className={`w-5 h-5 ${b.color} mx-auto mb-1`} />

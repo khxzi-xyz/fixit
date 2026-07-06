@@ -7,7 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { api, setToken } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { googleSignIn, isGoogleConfigured } from "@/lib/google";
-import { Phone, Mail, Eye, EyeOff, ArrowRight, MessageSquare, Lock } from "lucide-react";
+import { Phone, Mail, Eye, EyeOff, ArrowRight, MessageSquare, Lock, Fingerprint } from "lucide-react";
+import { isFingerprintAvailable, loginWithFingerprint, saveSecureToken } from "@/lib/biometrics";
 
 // Country codes shown in picker
 const CODES = [
@@ -60,6 +61,68 @@ export function UserLogin() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
+  
+  // Biometric state
+  const [bioAvailable, setBioAvailable] = useState(false);
+  const [showBioPrompt, setShowBioPrompt] = useState(false);
+  const [tempSession, setTempSession] = useState<any>(null);
+
+  useEffect(() => {
+    isFingerprintAvailable().then(avail => {
+      setBioAvailable(avail);
+      if (avail && localStorage.getItem("fixit_bio_enabled") === "true") {
+        doBioLogin();
+      }
+    }).catch(() => {});
+  }, []);
+
+  const doBioLogin = async () => {
+    const creds = await loginWithFingerprint();
+    if (creds && creds.token) {
+      setBusy(true);
+      // creds.token is stored as the supabase access_token
+      // We can restore session directly
+      const { data, error } = await supabase.auth.setSession({ access_token: creds.token, refresh_token: "" });
+      setBusy(false);
+      if (!error && data.session) {
+        setToken(data.session.access_token);
+        sessionStorage.removeItem("fixit_guest");
+        navigate("/home");
+      }
+    }
+  };
+
+  const handleSuccessfulLogin = async (data: any) => {
+    if (bioAvailable && localStorage.getItem("fixit_bio_enabled") !== "true") {
+      // First time login, prompt for biometrics
+      setTempSession(data.session);
+      setShowBioPrompt(true);
+    } else {
+      finalizeLogin(data.session);
+    }
+  };
+
+  const finalizeLogin = (session: any) => {
+    if (session) {
+      setToken(session.access_token);
+      sessionStorage.removeItem("fixit_guest");
+      const redirect = sessionStorage.getItem("fixit_post_auth");
+      sessionStorage.removeItem("fixit_post_auth");
+      navigate(redirect || "/home");
+    }
+  };
+
+  const enableBio = async () => {
+    if (tempSession) {
+      await saveSecureToken(tempSession.user.id, tempSession.access_token);
+      localStorage.setItem("fixit_bio_enabled", "true");
+      finalizeLogin(tempSession);
+    }
+  };
+
+  const skipBio = () => {
+    finalizeLogin(tempSession);
+  };
 
   const sendOtp = async () => {
     const num = phone.trim().replace(/\D/g, "");
@@ -78,6 +141,24 @@ export function UserLogin() {
     } finally { setBusy(false); }
   };
 
+  const forgotPasswordPhone = async () => {
+    const num = phone.trim().replace(/\D/g, "");
+    if (num.length < 7) { toast({ title: "Enter a valid phone number" }); return; }
+    setBusy(true);
+    try {
+      const full = countryCode + num;
+      const { error } = await supabase.auth.signInWithOtp({ phone: full });
+      if (error) throw error;
+
+      sessionStorage.setItem("fixit_otp_phone", full);
+      sessionStorage.setItem("fixit_otp_role", "CONSUMER");
+      sessionStorage.setItem("fixit_otp_intent", "reset_password");
+      navigate("/auth/user/otp");
+    } catch (e: any) {
+      toast({ title: "Couldn't send OTP", description: e.message, variant: "destructive" });
+    } finally { setBusy(false); }
+  };
+
   const loginPhone = async () => {
     const num = phone.trim().replace(/\D/g, "");
     if (num.length < 7) { toast({ title: "Enter a valid phone number" }); return; }
@@ -87,11 +168,7 @@ export function UserLogin() {
     setBusy(false);
     if (error) { toast({ title: "Login failed", description: error.message, variant: "destructive" }); return; }
     if (data.session) {
-      setToken(data.session.access_token);
-      sessionStorage.removeItem("fixit_guest");
-      const redirect = sessionStorage.getItem("fixit_post_auth");
-      sessionStorage.removeItem("fixit_post_auth");
-      navigate(redirect || "/home");
+      handleSuccessfulLogin(data);
     }
   };
 
@@ -116,9 +193,7 @@ export function UserLogin() {
     setBusy(false);
     if (error) { toast({ title: "Login failed", description: error.message, variant: "destructive" }); return; }
     if (data.session) {
-      setToken(data.session.access_token);
-      sessionStorage.removeItem("fixit_guest");
-      navigate("/home");
+      handleSuccessfulLogin(data);
     }
   };
 
@@ -185,7 +260,7 @@ export function UserLogin() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-sm font-semibold text-foreground">Password <span className="text-red-400">*</span></label>
-                <button type="button" onClick={sendOtp} className="text-xs font-bold text-primary hover:underline">Forgot password?</button>
+                <button type="button" onClick={forgotPasswordPhone} className="text-xs font-bold text-primary hover:underline">Forgot password?</button>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -268,6 +343,28 @@ export function UserLogin() {
           </a>
         </div>
       </div>
+
+      {showBioPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Fingerprint className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-black text-center mb-2">Enable Biometric Login</h3>
+            <p className="text-sm text-muted-foreground text-center mb-6">
+              Use your fingerprint or face to sign in quickly and securely next time.
+            </p>
+            <div className="space-y-3">
+              <Button onClick={enableBio} className="w-full h-12 rounded-xl text-base font-bold">
+                Enable Biometrics
+              </Button>
+              <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-xl text-sm font-bold text-muted-foreground">
+                Not now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </AuthLayout>
   );
 }
@@ -286,6 +383,19 @@ export function UserOTP() {
   const [busy, setBusy] = useState(false);
   const [resendCd, setResendCd] = useState(60);
   const refs = Array.from({ length: 6 }, () => useRef<HTMLInputElement>(null));
+
+  // Biometric state
+  const [bioAvailable, setBioAvailable] = useState(false);
+  const [showBioPrompt, setShowBioPrompt] = useState(false);
+  const [tempSession, setTempSession] = useState<any>(null);
+
+  // Reset Password State
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+
+  useEffect(() => {
+    isFingerprintAvailable().then(setBioAvailable).catch(() => {});
+  }, []);
 
   // Countdown
   useEffect(() => {
@@ -353,12 +463,20 @@ export function UserOTP() {
         }
       }
       
+      const intent = sessionStorage.getItem("fixit_otp_intent");
+      if (intent === "reset_password") {
+        setTempSession(data.session);
+        setShowResetPassword(true);
+        return;
+      }
+
       setToken(tokenStr);
       sessionStorage.removeItem("fixit_otp_role");
       sessionStorage.removeItem("fixit_otp_name");
       sessionStorage.removeItem("fixit_otp_phone");
       sessionStorage.removeItem("fixit_guest");
       sessionStorage.removeItem("fixit_link_only");
+      sessionStorage.removeItem("fixit_otp_intent");
 
       // Referral attribution: if the user arrived via /invite/:code, record it.
       const refCode = localStorage.getItem("fixit_ref_code");
@@ -371,15 +489,41 @@ export function UserOTP() {
         window.location.href = VENDOR_APP_URL;
         return;
       }
-      const redirect = sessionStorage.getItem("fixit_post_auth");
-      sessionStorage.removeItem("fixit_post_auth");
-      navigate(redirect || "/home");
+      
+      if (bioAvailable && localStorage.getItem("fixit_bio_enabled") !== "true") {
+        setTempSession(data.session);
+        setShowBioPrompt(true);
+      } else {
+        finalizeLogin(data.session);
+      }
     } catch (e: any) {
       toast({ title: "Wrong code", description: e.message, variant: "destructive" });
       setDigits(["", "", "", "", "", ""]);
       refs[0].current?.focus();
       setBusy(false);
     }
+  };
+
+  const finalizeLogin = (session: any) => {
+    if (session) {
+      setToken(session.access_token);
+      sessionStorage.removeItem("fixit_guest");
+      const redirect = sessionStorage.getItem("fixit_post_auth");
+      sessionStorage.removeItem("fixit_post_auth");
+      navigate(redirect || "/home");
+    }
+  };
+
+  const enableBio = async () => {
+    if (tempSession) {
+      await saveSecureToken(tempSession.user.id, tempSession.access_token);
+      localStorage.setItem("fixit_bio_enabled", "true");
+      finalizeLogin(tempSession);
+    }
+  };
+
+  const skipBio = () => {
+    finalizeLogin(tempSession);
   };
 
   const resend = async () => {
@@ -397,6 +541,52 @@ export function UserOTP() {
   };
 
   const filled = digits.filter(Boolean).length;
+
+  if (showResetPassword) {
+    return (
+      <AuthLayout title="Reset Password" subtitle="Enter your new password" backTo="/auth/user/login">
+        <div className="space-y-4">
+          <Input type="password" placeholder="New Password (min 6 chars)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-14 rounded-xl bg-muted/60 text-base" />
+          <Button onClick={async () => {
+            if (newPassword.length < 6) return toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+            setBusy(true);
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            setBusy(false);
+            if (error) return toast({ title: "Failed to update", description: error.message, variant: "destructive" });
+            
+            toast({ title: "Password Updated!" });
+            sessionStorage.removeItem("fixit_otp_intent");
+            
+            if (bioAvailable && localStorage.getItem("fixit_bio_enabled") !== "true") {
+              setShowBioPrompt(true);
+            } else {
+              finalizeLogin(tempSession);
+            }
+          }} disabled={busy} className="w-full h-14 rounded-xl text-base font-bold">
+            {busy ? "Updating..." : "Update Password"}
+          </Button>
+        </div>
+        
+        {showBioPrompt && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+            <div className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Fingerprint className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-black text-center mb-2">Enable Biometric Login</h3>
+              <p className="text-sm text-muted-foreground text-center mb-6">
+                Use your fingerprint or face to sign in quickly next time.
+              </p>
+              <div className="space-y-3">
+                <Button onClick={enableBio} className="w-full h-12 rounded-xl text-base font-bold">Enable Biometrics</Button>
+                <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-xl text-sm font-bold text-muted-foreground">Not now</Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout title="Enter code" subtitle={`Sent to ${phone}`} backTo={otpRole === "VENDOR" ? "/auth/vendor/login" : "/auth/user/login"}>
@@ -449,6 +639,28 @@ export function UserOTP() {
           <MessageSquare className="w-3 h-3" /> OTP delivered via SMS
         </p>
       </div>
+
+      {showBioPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Fingerprint className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-black text-center mb-2">Enable Biometric Login</h3>
+            <p className="text-sm text-muted-foreground text-center mb-6">
+              Use your fingerprint or face to sign in quickly and securely next time.
+            </p>
+            <div className="space-y-3">
+              <Button onClick={enableBio} className="w-full h-12 rounded-xl text-base font-bold">
+                Enable Biometrics
+              </Button>
+              <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-xl text-sm font-bold text-muted-foreground">
+                Not now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </AuthLayout>
   );
 }
