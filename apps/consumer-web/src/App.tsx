@@ -202,7 +202,7 @@ function App() {
     document.documentElement.setAttribute("dir", savedLang === "ar" || savedLang === "ur" ? "rtl" : "ltr");
 
     // Restore theme
-    const savedTheme = localStorage.getItem("fixit_theme") || "dark";
+    const savedTheme = localStorage.getItem("fixit_theme") || "light";
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
 
     // Permissions are handled by PermissionsPrompt on startup

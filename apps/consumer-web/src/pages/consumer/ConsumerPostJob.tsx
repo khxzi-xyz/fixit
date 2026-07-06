@@ -147,13 +147,12 @@ export default function ConsumerPostJob() {
         photos.map((p) => api.uploadImage(p, "jobs").then((r) => r.url).catch(() => ""))
       ).then((urls) => urls.filter(Boolean));
 
-      await renderApi.post("/jobs", {
+      await api.createJob({
         categoryId: selectedCat,
         urgency,
         description,
         lat: 23.5938,
         lng: 58.1456,
-        // DB posting_kind check allows STANDARD | BOUNTY (AUCTION needs migration 0016)
         postingKind: useBounty ? "BOUNTY" : "STANDARD",
         bountyPrice: useBounty && bounty ? parseFloat(bounty) : undefined,
         mediaUrls,

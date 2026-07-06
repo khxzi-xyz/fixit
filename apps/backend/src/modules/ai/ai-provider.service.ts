@@ -23,7 +23,8 @@ export class AiProviderService {
   private readonly GROQ_KEY = process.env.GROQ_API_KEY ;
 
   constructor(@Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null) {
-    this.groqClient = new Groq({ apiKey: this.GROQ_KEY });
+    const apiKey = this.GROQ_KEY || 'dummy_key_prevent_crash';
+    this.groqClient = new Groq({ apiKey });
   }
 
   /** Get active AI provider from DB settings */

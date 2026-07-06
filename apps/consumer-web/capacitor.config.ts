@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.khxzi.fixit',
-  appName: 'FixIt',
+  appName: 'FixIt 1.0',
   webDir: 'dist',
   plugins: {
     StatusBar: {
