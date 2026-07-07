@@ -78,14 +78,14 @@ export function OrderMapTracker({ jobId }: { jobId: string }) {
 
   if (!riderPosition) {
     return (
-      <div className="w-full h-64 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl flex items-center justify-center">
+      <div className="w-full h-64 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-full flex items-center justify-center">
         <p className="text-muted-foreground font-medium">Waiting for rider location...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-64 rounded-2xl overflow-hidden relative border border-border shadow-sm">
+    <div className="w-full h-64 rounded-full overflow-hidden relative border border-border shadow-sm">
       <MapContainer
         center={[riderPosition.lat, riderPosition.lng]}
         zoom={15}

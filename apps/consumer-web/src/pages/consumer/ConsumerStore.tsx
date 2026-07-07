@@ -85,7 +85,7 @@ export default function ConsumerStore() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search AC capacitors, breakers, oil..."
-            className="w-full h-12 bg-white rounded-xl pl-10 pr-4 text-sm font-semibold text-foreground outline-none shadow-md"
+            className="w-full h-12 bg-white rounded-full pl-10 pr-4 text-sm font-semibold text-foreground outline-none shadow-md"
           />
         </div>
       </div>
@@ -112,11 +112,11 @@ export default function ConsumerStore() {
         {loading ? (
           <div className="grid grid-cols-2 gap-3">
             {[1, 2, 4].map((i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-4 h-48 animate-pulse" />
+              <div key={i} className="bg-card border border-border rounded-full p-4 h-48 animate-pulse" />
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="bg-card border border-border rounded-2xl p-8 text-center">
+          <div className="bg-card border border-border rounded-full p-8 text-center">
             <ShoppingBag className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
             <p className="font-bold text-base">No parts found</p>
             <p className="text-xs text-muted-foreground mt-1">Try searching for another spare part.</p>
@@ -124,7 +124,7 @@ export default function ConsumerStore() {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {products.map((p) => (
-              <div key={p.product_id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
+              <div key={p.product_id} className="bg-card border border-border rounded-full overflow-hidden shadow-sm flex flex-col justify-between">
                 <div>
                   <div className="relative h-32 bg-muted overflow-hidden">
                     <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
@@ -153,7 +153,7 @@ export default function ConsumerStore() {
                   </div>
                   <button
                     onClick={() => addToCart(p.product_id, p.name)}
-                    className="w-8 h-8 bg-slate-100 dark:bg-slate-800 hover:bg-primary text-primary hover:text-white rounded-xl flex items-center justify-center transition-colors"
+                    className="w-8 h-8 bg-slate-100 dark:bg-slate-800 hover:bg-primary text-primary hover:text-white rounded-full flex items-center justify-center transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -166,9 +166,9 @@ export default function ConsumerStore() {
 
       {/* Floating Cart Drawer */}
       {cartCount > 0 && (
-        <div className="fixed bottom-16 left-4 right-4 z-40 bg-card border border-border rounded-2xl p-4 shadow-2xl flex items-center justify-between animate-in slide-in-from-bottom-4">
+        <div className="fixed bottom-16 left-4 right-4 z-40 bg-card border border-border rounded-full p-4 shadow-2xl flex items-center justify-between animate-in slide-in-from-bottom-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center font-black">
+            <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-black">
               {cartCount}
             </div>
             <div>
@@ -179,7 +179,7 @@ export default function ConsumerStore() {
           <button
             onClick={checkout}
             disabled={ordering}
-            className="px-6 py-3 bg-primary text-white font-bold rounded-xl flex items-center gap-2 shadow-md hover:bg-primary/90 transition-colors"
+            className="px-6 py-3 bg-primary text-white font-bold rounded-full flex items-center gap-2 shadow-md hover:bg-primary/90 transition-colors"
           >
             {ordering ? "Dispatched…" : <><span>Checkout</span> <Truck className="w-4 h-4" /></>}
           </button>

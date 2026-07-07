@@ -108,8 +108,20 @@ export class CouponsService {
   async redeem(userId: string, role: string, rawCode: string) {
     const db = requireDb(this.db);
     const code = rawCode.trim().toUpperCase();
-    const { data: coupon, error } = await db.from('coupons').select('*').eq('code', code).maybeSingle();
-    if (error && tableMissing(error)) throw new BadRequestException(MIGRATION_HINT);
+    
+    let coupon: any;
+    try {
+      const { data, error } = await db.from('coupons').select('*').eq('code', code).maybeSingle();
+      if (error) {
+        if (tableMissing(error)) throw new BadRequestException(MIGRATION_HINT);
+        throw new BadRequestException(`Coupon lookup failed: ${error.message}`);
+      }
+      coupon = data;
+    } catch (e) {
+      if (e instanceof BadRequestException) throw e;
+      throw new BadRequestException(`Coupon system unavailable: ${(e as Error).message}`);
+    }
+    
     if (!coupon || !coupon.is_active) throw new NotFoundException('Invalid coupon code');
     if (coupon.expires_at && new Date(coupon.expires_at).getTime() < Date.now()) {
       throw new BadRequestException('This coupon has expired');
@@ -126,7 +138,8 @@ export class CouponsService {
       .insert({ coupon_id: coupon.coupon_id, user_id: userId });
     if (redErr) {
       if (/duplicate|unique/i.test(redErr.message)) throw new BadRequestException('You already used this coupon');
-      throw new BadRequestException(redErr.message);
+      if (tableMissing(redErr)) throw new BadRequestException(MIGRATION_HINT);
+      throw new BadRequestException(`Redemption failed: ${redErr.message}`);
     }
     await db.from('coupons').update({ use_count: coupon.use_count + 1 }).eq('coupon_id', coupon.coupon_id);
 

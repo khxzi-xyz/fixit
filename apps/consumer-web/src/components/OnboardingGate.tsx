@@ -39,7 +39,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
             <div className="grid grid-cols-2 gap-3">
               {COUNTRIES.map((c) => (
                 <button key={c.code} onClick={() => setCountry(c.code)}
-                  className={`flex items-center gap-3 p-3 rounded-2xl border text-start transition-colors ${country === c.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-border bg-card"}`}>
+                  className={`flex items-center gap-3 p-3 rounded-full border text-start transition-colors ${country === c.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-border bg-card"}`}>
                   <img src={flagUrl(c.code)} alt="" className="w-9 h-6 rounded object-cover shadow-sm" />
                   <div className="min-w-0">
                     <p className="font-bold text-sm truncate">{c.name}</p>
@@ -56,7 +56,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
             <div className="grid grid-cols-2 gap-3">
               {LANGUAGES.map((l) => (
                 <button key={l.code} onClick={() => setLang(l.code as Lang)}
-                  className={`flex items-center justify-between p-3 rounded-2xl border transition-colors ${lang === l.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-border bg-card"}`}>
+                  className={`flex items-center justify-between p-3 rounded-full border transition-colors ${lang === l.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-border bg-card"}`}>
                   <div className="text-start">
                     <p className="font-bold text-base">{l.native}</p>
                     <p className="text-[11px] text-muted-foreground">{l.label}</p>
@@ -75,7 +75,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
           </div>
           <p className="text-sm text-muted-foreground">{t("legal.intro")}</p>
 
-          <div className="bg-card border border-border rounded-2xl p-4 max-h-[34vh] overflow-y-auto text-sm leading-relaxed space-y-3">
+          <div className="bg-card border border-border rounded-full p-4 max-h-[34vh] overflow-y-auto text-sm leading-relaxed space-y-3">
             <h3 className="font-bold">{t("legal.tosHeading")}</h3>
             <p className="text-muted-foreground">FixIt Now connects consumers with independent, verified service professionals ("Pros") in your region. FixIt Now is a marketplace and escrow facilitator; Pros are not employees of FixIt Now. By creating an account you agree to provide accurate information, fund jobs through the in-app wallet/escrow, and resolve disputes through the in-app process. Service fees, bid tokens, warranty terms and payouts are shown in-app before you commit. Fraud, abuse, or attempts to transact off-platform may result in suspension and forfeiture of held funds per the dispute policy.</p>
             <h3 className="font-bold pt-2">{t("legal.privacyHeading")}</h3>
@@ -94,13 +94,13 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
       {/* Sticky action */}
       <div className="px-5 py-4 border-t border-border bg-background safe-area-bottom">
         {step === "locale" ? (
-          <button onClick={() => setStep("legal")} className="w-full h-13 py-4 rounded-xl bg-primary text-primary-foreground border-b border-border text-white font-bold flex items-center justify-center gap-2">
+          <button onClick={() => setStep("legal")} className="w-full h-13 py-4 rounded-full bg-primary text-primary-foreground border-b border-border text-white font-bold flex items-center justify-center gap-2">
             {t("onboarding.continue")} <ChevronRight className="w-5 h-5 rtl:rotate-180" />
           </button>
         ) : (
           <>
             <button onClick={accept} disabled={!checked}
-              className={`w-full py-4 rounded-xl font-bold transition-opacity ${checked ? "bg-primary text-primary-foreground border-b border-border text-white" : "bg-muted text-muted-foreground cursor-not-allowed"}`}>
+              className={`w-full py-4 rounded-full font-bold transition-opacity ${checked ? "bg-primary text-primary-foreground border-b border-border text-white" : "bg-muted text-muted-foreground cursor-not-allowed"}`}>
               {t("legal.accept")}
             </button>
             {!checked && <p className="text-center text-[11px] text-muted-foreground mt-2">{t("legal.mustAccept")}</p>}

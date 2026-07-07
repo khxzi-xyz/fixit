@@ -40,7 +40,7 @@ export default function OrderReview() {
           <p className="text-muted-foreground text-sm mt-2">Funds released to the pro. The warranty timer has started.</p>
         </div>
 
-        <Card className="bg-card border-border w-full shadow-lg rounded-2xl">
+        <Card className="bg-card border-border w-full shadow-lg rounded-full">
           <CardContent className="p-6 text-center">
             <h2 className="text-lg font-extrabold mb-6">Rate the work</h2>
             <div className="flex justify-center gap-2 mb-6">
@@ -51,8 +51,8 @@ export default function OrderReview() {
               ))}
             </div>
             <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Leave a review (optional)…"
-              className="bg-muted border-border rounded-xl min-h-[100px] mb-6 resize-none" />
-            <Button onClick={submit} disabled={busy} className="w-full h-14 rounded-xl text-lg font-bold">
+              className="bg-muted border-border rounded-full min-h-[100px] mb-6 resize-none" />
+            <Button onClick={submit} disabled={busy} className="w-full h-14 rounded-full text-lg font-bold">
               {busy ? "Submitting…" : "Submit Review"}
             </Button>
           </CardContent>

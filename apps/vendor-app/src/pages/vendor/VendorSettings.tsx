@@ -94,7 +94,7 @@ export default function VendorSettings() {
       <div className="px-4 py-5 space-y-6 -mt-6">
       
         {/* Profile Info */}
-        <Card className="bg-card border-none shadow-lg rounded-2xl overflow-hidden">
+        <Card className="bg-card border-none shadow-lg rounded-full overflow-hidden">
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center gap-4">
               <div className="relative group">
@@ -114,8 +114,8 @@ export default function VendorSettings() {
               <div className="w-full">
                 {editingProfile ? (
                   <div className="flex items-center gap-2">
-                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-12 bg-muted/50 rounded-xl flex-1 font-bold text-center" />
-                    <Button onClick={saveProfile} disabled={avatarUploading} className="h-12 px-6 rounded-xl font-bold shadow-md">{avatarUploading ? "Saving..." : "Save"}</Button>
+                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-12 bg-muted/50 rounded-full flex-1 font-bold text-center" />
+                    <Button onClick={saveProfile} disabled={avatarUploading} className="h-12 px-6 rounded-full font-bold shadow-md">{avatarUploading ? "Saving..." : "Save"}</Button>
                   </div>
                 ) : (
                   <div>
@@ -142,20 +142,20 @@ export default function VendorSettings() {
         {/* My Skills */}
         <div className="space-y-4">
           <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">Approved Skills</h2>
-          <Card className="bg-card border border-border/50 shadow-sm rounded-2xl overflow-hidden">
+          <Card className="bg-card border border-border/50 shadow-sm rounded-full overflow-hidden">
             <CardContent className="p-4">
               {mySkills.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">No skills registered yet.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {mySkills.map(s => (
-                    <div key={s.tag_id} className="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2">
+                    <div key={s.tag_id} className="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4" /> {s.categories?.display_name || s.category_id}
                     </div>
                   ))}
                 </div>
               )}
-              <Button variant="outline" className="w-full mt-4 h-12 rounded-xl font-bold border-dashed border-2 hover:bg-muted" onClick={() => navigate("/auth/vendor/register")}>
+              <Button variant="outline" className="w-full mt-4 h-12 rounded-full font-bold border-dashed border-2 hover:bg-muted" onClick={() => navigate("/auth/vendor/register")}>
                 Add More Skills
               </Button>
             </CardContent>
@@ -165,9 +165,9 @@ export default function VendorSettings() {
         {/* Support */}
         <div className="space-y-4">
           <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">Vendor Support</h2>
-          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-sm rounded-2xl cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/support")}>
+          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-sm rounded-full cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/support")}>
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-white/50 backdrop-blur-sm flex items-center justify-center text-primary shadow-sm">
+              <div className="w-14 h-14 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center text-primary shadow-sm">
                 <MessageSquare className="w-7 h-7" />
               </div>
               <div className="flex-1">
@@ -182,7 +182,7 @@ export default function VendorSettings() {
         {/* Preferences */}
         <div className="space-y-4">
           <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">App Preferences</h2>
-          <Card className="bg-card border border-border/50 shadow-sm rounded-2xl overflow-hidden">
+          <Card className="bg-card border border-border/50 shadow-sm rounded-full overflow-hidden">
             <CardContent className="p-0 divide-y divide-border/50">
               <div className="flex items-center justify-between p-5 hover:bg-muted/20 transition-colors">
                 <div className="flex items-center gap-4">
@@ -209,7 +209,7 @@ export default function VendorSettings() {
             <span className="w-1 h-1 rounded-full bg-muted-foreground/30"></span>
             <button className="text-xs font-bold text-muted-foreground hover:text-foreground hover:underline">Terms of Service</button>
           </div>
-          <Button variant="outline" onClick={signOut} className="w-full h-14 rounded-2xl border-destructive/30 text-destructive bg-destructive/5 hover:bg-destructive hover:text-destructive-foreground font-extrabold shadow-sm hover:shadow-md transition-all">
+          <Button variant="outline" onClick={signOut} className="w-full h-14 rounded-full border-destructive/30 text-destructive bg-destructive/5 hover:bg-destructive hover:text-destructive-foreground font-extrabold shadow-sm hover:shadow-md transition-all">
             <LogOut className="w-5 h-5 mr-2" /> Log Out
           </Button>
         </div>

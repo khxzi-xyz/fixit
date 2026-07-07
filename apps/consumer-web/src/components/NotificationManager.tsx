@@ -8,6 +8,16 @@ export function NotificationManager() {
     const token = getToken();
     if (!token) return;
 
+    const setupNotifications = async () => {
+      try {
+        const p = await LocalNotifications.requestPermissions();
+        if (p.display !== 'granted') console.log('Notification permissions not granted');
+      } catch (e) {
+        console.warn('Failed to request permissions', e);
+      }
+    };
+    setupNotifications();
+
     // Connect to the NestJS backend
     const socket = io("https://backend.fixit-now.xyz", {
       auth: { token },

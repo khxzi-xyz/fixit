@@ -15,9 +15,11 @@ export default function VendorWallet() {
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const load = useCallback(async () => {
-    try { setWallet(await api.wallet()); } catch { /**/ }
-    try { setTxns(await api.walletTxns()); } catch { /**/ }
+  const load = useCallback(() => {
+    import("@/lib/api").then(({ swr }) => {
+      swr("wallet", api.wallet, setWallet).catch(() => {});
+      swr("wallet_txns", api.walletTxns, setTxns).catch(() => {});
+    });
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -51,17 +53,17 @@ export default function VendorWallet() {
       </div>
 
       <div className="px-4 -mt-6 space-y-6">
-        <Card className="bg-card border-border shadow-md rounded-2xl">
+        <Card className="bg-card border-border shadow-md rounded-full">
           <CardContent className="p-4 space-y-3">
             <p className="text-sm font-bold">Request a payout</p>
             {!isPayoutDay && (
-              <div className="p-3 rounded-xl bg-warning/10 border border-warning/30 text-warning-foreground text-xs">
+              <div className="p-3 rounded-full bg-warning/10 border border-warning/30 text-warning-foreground text-xs">
                 <strong className="text-warning">Settlement window closed.</strong> Withdrawals are processed on <b>Monday</b> &amp; <b>Thursday</b>. Next window: <b>{nextDay}</b>.
               </div>
             )}
             <div className="flex gap-2">
-              <Input value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} placeholder={balance.toFixed(2)} inputMode="decimal" className="h-12 w-28 rounded-xl bg-muted" disabled={!isPayoutDay} />
-              <Button onClick={payout} disabled={busy || !isPayoutDay} className="flex-1 h-12 rounded-xl font-bold">
+              <Input value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} placeholder={balance.toFixed(2)} inputMode="decimal" className="h-12 w-28 rounded-full bg-muted" disabled={!isPayoutDay} />
+              <Button onClick={payout} disabled={busy || !isPayoutDay} className="flex-1 h-12 rounded-full font-bold">
                 <ArrowDownRight className="w-5 h-5 mr-2" /> {busy ? "Requesting…" : isPayoutDay ? "Withdraw" : "Locked until " + nextDay}
               </Button>
             </div>
@@ -70,14 +72,14 @@ export default function VendorWallet() {
         </Card>
 
         <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-card border-border shadow-sm rounded-2xl">
+          <Card className="bg-card border-border shadow-sm rounded-full">
             <CardContent className="p-4">
               <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-1">In Escrow</p>
               <div className="flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-primary" /><h3 className="text-xl font-black">{escrow.toFixed(2)} <span className="text-xs text-muted-foreground font-medium">OMR</span></h3></div>
               <p className="text-[10px] text-muted-foreground mt-1">Awaiting warranty clearance</p>
             </CardContent>
           </Card>
-          <Card className="bg-card border-border shadow-sm rounded-2xl">
+          <Card className="bg-card border-border shadow-sm rounded-full">
             <CardContent className="p-4">
               <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Strikes</p>
               <div className="flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-success" /><h3 className="text-xl font-black text-success">0/3</h3></div>
@@ -92,7 +94,7 @@ export default function VendorWallet() {
             {payouts.length === 0 ? (
               <p className="text-sm text-muted-foreground">No payouts yet -complete jobs to start earning.</p>
             ) : payouts.map((tx) => (
-              <div key={tx.txn_id} className="flex items-center justify-between p-4 bg-card border border-border rounded-2xl shadow-sm">
+              <div key={tx.txn_id} className="flex items-center justify-between p-4 bg-card border border-border rounded-full shadow-sm">
                 <div>
                   <p className="font-bold">{Math.abs(tx.amount).toFixed(2)} OMR</p>
                   {tx.note && <p className="text-xs text-muted-foreground">{tx.note}</p>}

@@ -94,7 +94,7 @@ export default function ConsumerMyAccount() {
 
       <div className="px-4 -mt-6 pb-10 space-y-4">
         {/* Account info */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
           <div className="px-4 py-3 border-b border-border bg-muted/30">
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Account Info</p>
           </div>
@@ -113,19 +113,19 @@ export default function ConsumerMyAccount() {
         </div>
 
         {/* Edit display name */}
-        <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+        <div className="bg-card border border-border rounded-full p-4 shadow-sm space-y-3">
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Display Name</p>
           <div className="flex gap-2">
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your full name"
-              className="flex-1 h-11 bg-muted/60 border border-border rounded-xl px-3 text-sm font-medium outline-none focus:border-primary"
+              className="flex-1 h-11 bg-muted/60 border border-border rounded-full px-3 text-sm font-medium outline-none focus:border-primary"
             />
             <button
               onClick={saveName}
               disabled={savingName || !fullName.trim()}
-              className="px-4 h-11 bg-primary text-white font-bold rounded-xl disabled:opacity-40 hover:bg-primary/90 transition-colors flex items-center gap-2"
+              className="px-4 h-11 bg-primary text-white font-bold rounded-full disabled:opacity-40 hover:bg-primary/90 transition-colors flex items-center gap-2"
             >
               {savingName ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
               Save
@@ -134,7 +134,7 @@ export default function ConsumerMyAccount() {
         </div>
 
         {/* Change Password */}
-        <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+        <div className="bg-card border border-border rounded-full p-4 shadow-sm space-y-3">
           <div className="flex items-center gap-2">
             <Lock className="w-4 h-4 text-muted-foreground" />
             <p className="text-sm font-bold">Change Password</p>
@@ -152,7 +152,7 @@ export default function ConsumerMyAccount() {
                   value={value}
                   onChange={(e) => onChange(e.target.value)}
                   placeholder={placeholder}
-                  className="w-full h-11 bg-muted/60 border border-border rounded-xl px-3 pr-10 text-sm font-medium outline-none focus:border-primary"
+                  className="w-full h-11 bg-muted/60 border border-border rounded-full px-3 pr-10 text-sm font-medium outline-none focus:border-primary"
                 />
                 <button
                   type="button"
@@ -170,7 +170,7 @@ export default function ConsumerMyAccount() {
           <button
             onClick={changePassword}
             disabled={changingPw || !currentPw || !newPw || !confirmPw || newPw !== confirmPw}
-            className="w-full h-11 bg-primary text-white font-bold rounded-xl disabled:opacity-40 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            className="w-full h-11 bg-primary text-white font-bold rounded-full disabled:opacity-40 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
           >
             {changingPw ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
             Change Password
@@ -178,7 +178,7 @@ export default function ConsumerMyAccount() {
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 space-y-3">
+        <div className="bg-red-500/5 border border-red-500/20 rounded-full p-4 space-y-3">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-red-400" />
             <p className="text-sm font-bold text-red-400">Danger Zone</p>
@@ -187,29 +187,29 @@ export default function ConsumerMyAccount() {
           {!showDelete ? (
             <button
               onClick={() => setShowDelete(true)}
-              className="w-full h-11 border border-red-500/40 text-red-400 font-bold rounded-xl hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2"
+              className="w-full h-11 border border-red-500/40 text-red-400 font-bold rounded-full hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2"
             >
               <Trash2 className="w-4 h-4" /> Delete Account
             </button>
           ) : (
             <div className="space-y-3 animate-in slide-in-from-top-2">
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+              <div className="bg-red-500/10 border border-red-500/20 rounded-full p-3">
                 <p className="text-xs text-red-400 font-bold">⚠️ This will permanently delete your account, wallet balance, job history, and all data.</p>
               </div>
               <input
                 value={deleteConfirm}
                 onChange={(e) => setDeleteConfirm(e.target.value)}
                 placeholder='Type "DELETE" to confirm'
-                className="w-full h-11 bg-muted/60 border border-red-500/30 rounded-xl px-3 text-sm font-bold outline-none focus:border-red-500 text-red-400 placeholder:text-red-400/40"
+                className="w-full h-11 bg-muted/60 border border-red-500/30 rounded-full px-3 text-sm font-bold outline-none focus:border-red-500 text-red-400 placeholder:text-red-400/40"
               />
               <div className="flex gap-2">
-                <button onClick={() => setShowDelete(false)} className="flex-1 h-11 border border-border rounded-xl font-bold text-muted-foreground hover:bg-muted/40">
+                <button onClick={() => setShowDelete(false)} className="flex-1 h-11 border border-border rounded-full font-bold text-muted-foreground hover:bg-muted/40">
                   Cancel
                 </button>
                 <button
                   onClick={deleteAccount}
                   disabled={deleting || deleteConfirm !== "DELETE"}
-                  className="flex-1 h-11 bg-red-500 text-white font-bold rounded-xl disabled:opacity-40 hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 h-11 bg-red-500 text-white font-bold rounded-full disabled:opacity-40 hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
                 >
                   {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                   Delete

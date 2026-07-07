@@ -89,7 +89,7 @@ export function LocationPickerMap({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-border ${className}`}>
+    <div className={`relative overflow-hidden rounded-full border border-border ${className}`}>
       <div ref={elRef} className="w-full h-full" />
       <div className="absolute top-3 left-3 right-3 z-[1000] drop-shadow-md">
         <form onSubmit={searchLocation} className="flex gap-2">
@@ -97,9 +97,9 @@ export function LocationPickerMap({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search city, neighborhood..."
-            className="flex-1 h-12 px-4 rounded-xl text-sm border-none shadow-sm focus:ring-2 focus:ring-primary text-black outline-none"
+            className="flex-1 h-12 px-4 rounded-full text-sm border-none shadow-sm focus:ring-2 focus:ring-primary text-black outline-none"
           />
-          <button type="submit" className="h-12 px-4 rounded-xl bg-primary text-white font-bold shadow-sm">
+          <button type="submit" className="h-12 px-4 rounded-full bg-primary text-white font-bold shadow-sm">
             Search
           </button>
         </form>
@@ -109,7 +109,7 @@ export function LocationPickerMap({
           Locating...
         </div>
       )}
-      <div className="absolute bottom-4 left-4 right-4 z-[400] bg-white/95 backdrop-blur p-3 rounded-xl shadow-lg border border-border flex items-center gap-2 pointer-events-none">
+      <div className="absolute bottom-4 left-4 right-4 z-[400] bg-white/95 backdrop-blur p-3 rounded-full shadow-lg border border-border flex items-center gap-2 pointer-events-none">
         <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary"><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-12 0a4 4 0 108 0 4 4 0 10-8 0"/></svg>
         </div>

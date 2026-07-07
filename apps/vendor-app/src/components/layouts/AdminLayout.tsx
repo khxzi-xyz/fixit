@@ -44,7 +44,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             const isActive = location === item.href;
             const Icon = item.icon;
             return (
-              <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive ? "bg-primary text-primary-foreground font-medium shadow-md" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
+              <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-3 rounded-full transition-colors ${isActive ? "bg-primary text-primary-foreground font-medium shadow-md" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
                 <Icon className="w-5 h-5" />
                 <span>{item.label}</span>
               </Link>
@@ -53,7 +53,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="p-4 border-t border-border">
           <button onClick={() => { localStorage.removeItem("FixIt One_token"); window.location.href = "/admin/login"; }}
-            className="flex items-center gap-3 px-3 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-colors w-full">
+            className="flex items-center gap-3 px-3 py-3 rounded-full text-destructive hover:bg-destructive/10 transition-colors w-full">
             <LogOut className="w-5 h-5" />
             <span>Sign Out</span>
           </button>

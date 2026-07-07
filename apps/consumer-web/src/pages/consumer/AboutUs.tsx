@@ -27,7 +27,7 @@ export default function AboutUs() {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div className="relative z-10">
-          <img src="/logo.png" alt="FixIt Now" className="w-20 h-20 rounded-2xl mx-auto mb-4 shadow-xl" />
+          <img src="/logo.png" alt="FixIt Now" className="w-20 h-20 rounded-full mx-auto mb-4 shadow-xl" />
           <h1 className="text-3xl font-black text-white">FixIt Now</h1>
           <p className="text-primary-foreground/70 mt-2 text-sm max-w-xs mx-auto leading-relaxed">
             Oman's most trusted platform for home services, vehicle care, and professional help -on demand.
@@ -39,7 +39,7 @@ export default function AboutUs() {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-2">
           {STATS.map((s) => (
-            <div key={s.label} className="bg-card border border-border rounded-2xl p-4 text-center shadow-sm">
+            <div key={s.label} className="bg-card border border-border rounded-full p-4 text-center shadow-sm">
               <p className="text-2xl font-black text-primary">{s.value}</p>
               <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
             </div>
@@ -47,7 +47,7 @@ export default function AboutUs() {
         </div>
 
         {/* Mission */}
-        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+        <div className="bg-card border border-border rounded-full p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <Heart className="w-5 h-5 text-red-400" />
             <h3 className="font-black text-base">Our Mission</h3>
@@ -65,10 +65,10 @@ export default function AboutUs() {
         {/* Team */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">The Team</p>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             {TEAM.map((m, i) => (
               <div key={m.name} className={`flex items-center gap-3 px-4 py-3.5 ${i !== TEAM.length - 1 ? "border-b border-border" : ""}`}>
-                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-xl shrink-0">{m.emoji}</div>
+                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-xl shrink-0">{m.emoji}</div>
                 <div>
                   <p className="text-sm font-bold">{m.name}</p>
                   <p className="text-xs text-muted-foreground">{m.role}</p>
@@ -81,14 +81,14 @@ export default function AboutUs() {
         {/* Contact / Links */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Get in Touch</p>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             {[
               { icon: MessageCircle, label: "WhatsApp Support", sub: "+968 95956361", action: () => window.open("https://wa.me/96895956361", "_blank") },
               { icon: Globe, label: "Website", sub: "fixit-now.xyz", action: () => window.open("https://fixit-now.xyz", "_blank") },
               { icon: ExternalLink, label: "Advertise with Us", sub: "Reach thousands of users", action: () => navigate("/advertise") },
             ].map(({ icon: Icon, label, sub, action }, i) => (
               <button key={label} onClick={action} className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/30 transition-colors text-left ${i !== 2 ? "border-b border-border" : ""}`}>
-                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center shrink-0">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">

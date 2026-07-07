@@ -29,7 +29,7 @@ export default function ConsumerMarketplace() {
             </h1>
             <p className="text-white/75 mt-1 text-sm">Peer-to-peer goods & materials.</p>
           </div>
-          <Button variant="secondary" size="sm" className="rounded-xl font-bold bg-white/20 hover:bg-white/30 border-0 text-white" onClick={() => alert('Post listing coming soon!')}>
+          <Button variant="secondary" size="sm" className="rounded-full font-bold bg-white/20 hover:bg-white/30 border-0 text-white" onClick={() => alert('Post listing coming soon!')}>
             <Plus className="w-4 h-4 mr-1" /> Sell
           </Button>
         </div>
@@ -39,20 +39,20 @@ export default function ConsumerMarketplace() {
         {loading ? (
           <div className="flex items-center justify-center h-32 text-muted-foreground">Loading listings...</div>
         ) : listings.length === 0 ? (
-          <Card className="bg-card border-border shadow-sm rounded-2xl">
+          <Card className="bg-card border-border shadow-sm rounded-full">
             <CardContent className="p-8 text-center space-y-3 flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-2">
                 <Tag className="w-8 h-8 text-primary" />
               </div>
               <h3 className="font-bold text-lg">Marketplace is Empty</h3>
               <p className="text-sm text-muted-foreground">Be the first to list spare parts, tools, or upcycled goods for sale.</p>
-              <Button className="mt-2 rounded-xl font-bold shadow-[0_0_20px_rgba(27,110,243,0.3)]">Post an Item</Button>
+              <Button className="mt-2 rounded-full font-bold shadow-[0_0_20px_rgba(27,110,243,0.3)]">Post an Item</Button>
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {listings.map((item, i) => (
-              <Card key={i} className="bg-card border-border shadow-sm rounded-2xl overflow-hidden cursor-pointer hover:border-primary/50 transition-colors">
+              <Card key={i} className="bg-card border-border shadow-sm rounded-full overflow-hidden cursor-pointer hover:border-primary/50 transition-colors">
                 <div className="aspect-square bg-muted relative">
                   {item.images?.[0] ? (
                     <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />

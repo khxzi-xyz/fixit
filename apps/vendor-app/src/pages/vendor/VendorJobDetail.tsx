@@ -66,11 +66,11 @@ export default function VendorJobDetail() {
       </div>
 
       <div className="p-4 space-y-6 pb-36">
-        <p className="text-muted-foreground leading-relaxed bg-card p-4 rounded-2xl border border-border shadow-sm">
+        <p className="text-muted-foreground leading-relaxed bg-card p-4 rounded-full border border-border shadow-sm">
           {job?.description || "Loading job details…"}
         </p>
 
-        <div className="flex items-center gap-2 text-sm font-medium bg-card border border-border p-3 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-2 text-sm font-medium bg-card border border-border p-3 rounded-full shadow-sm">
           <MapPin className="w-5 h-5 text-primary" />
           <span>Muscat{job?.distance_km ? ` · ~${Number(job.distance_km).toFixed(1)} km away` : ""}</span>
         </div>
@@ -80,7 +80,7 @@ export default function VendorJobDetail() {
             <h3 className="font-bold mb-3">Client media</h3>
             <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
               {media.map((url, i) => (
-                <img key={i} src={url} alt="" className="w-24 h-24 rounded-xl border border-border object-cover shrink-0" />
+                <img key={i} src={url} alt="" className="w-24 h-24 rounded-full border border-border object-cover shrink-0" />
               ))}
             </div>
           </div>
@@ -92,16 +92,16 @@ export default function VendorJobDetail() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Labor (OMR)</Label>
-                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="15" className="h-14 text-lg bg-card border-border rounded-xl" />
+                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="15" className="h-14 text-lg bg-card border-border rounded-full" />
               </div>
               <div className="space-y-2">
                 <Label>ETA (mins)</Label>
-                <Input type="number" value={eta} onChange={(e) => setEta(e.target.value)} placeholder="30" className="h-14 text-lg bg-card border-border rounded-xl" />
+                <Input type="number" value={eta} onChange={(e) => setEta(e.target.value)} placeholder="30" className="h-14 text-lg bg-card border-border rounded-full" />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Warranty offer (days)</Label>
-              <select value={warranty} onChange={(e) => setWarranty(e.target.value)} className="w-full h-14 px-3 rounded-xl border border-border bg-card text-foreground focus:ring-2 focus:ring-primary outline-none">
+              <select value={warranty} onChange={(e) => setWarranty(e.target.value)} className="w-full h-14 px-3 rounded-full border border-border bg-card text-foreground focus:ring-2 focus:ring-primary outline-none">
                 <option value="7">7 Days</option>
                 <option value="14">14 Days</option>
                 <option value="30">30 Days</option>
@@ -113,7 +113,7 @@ export default function VendorJobDetail() {
       </div>
 
       <div className="fixed bottom-[68px] left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border z-40">
-        <Button onClick={submit} disabled={busy} className="w-full h-14 rounded-xl text-lg font-bold">
+        <Button onClick={submit} disabled={busy} className="w-full h-14 rounded-full text-lg font-bold">
           <Zap className="w-5 h-5 mr-2" /> {busy ? "Placing bid…" : "Place Bid (1 Token)"}
         </Button>
       </div>

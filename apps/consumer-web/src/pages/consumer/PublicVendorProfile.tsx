@@ -4,11 +4,11 @@ import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, ChevronLeft, MapPin } from "lucide-react";
-import { api } from "@/lib/api";
+import { api, tokenClaims } from "@/lib/api";
 
 export default function PublicVendorProfile() {
   const [, navigate] = useLocation();
-  const [match, params] = useRoute("/vendor/:id");
+  const [match, params] = useRoute("/profile/:id");
   const vendorId = params?.id;
   const [profile, setProfile] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -16,17 +16,31 @@ export default function PublicVendorProfile() {
 
   useEffect(() => {
     if (!vendorId) return;
+    const claims = tokenClaims();
+    const isMe = vendorId === "me" || vendorId === claims?.id || vendorId === claims?.sub;
+    
     Promise.all([
       api.vendorReviews(vendorId).then((r) => setReviews(Array.isArray(r) ? r : [])).catch(() => {}),
-      // We will add publicProfile endpoint soon
-      api.publicVendorProfile(vendorId).then(setProfile).catch(() => {})
+      api.publicVendorProfile(vendorId).then(setProfile).catch(() => {
+        // If vendor profile fails (consumer user viewing own), build from claims
+        if (isMe && claims) {
+          setProfile({
+            full_name: claims.full_name || "FixIt User",
+            avatar_url: claims.user_metadata?.avatar_url,
+            bio: "Consumer account",
+            categories: [],
+            verification_status: "VERIFIED",
+            is_pro: claims.user_metadata?.plan_id === "PRO" || claims.user_metadata?.is_lifetime,
+          });
+        }
+      })
     ]).finally(() => setLoading(false));
   }, [vendorId]);
 
   if (loading) {
     return (
       <ConsumerLayout>
-        <div className="flex items-center justify-center h-64 text-muted-foreground">Loading vendor...</div>
+        <div className="flex items-center justify-center h-64 text-muted-foreground">Loading profile...</div>
       </ConsumerLayout>
     );
   }
@@ -62,7 +76,11 @@ export default function PublicVendorProfile() {
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-extrabold truncate">{name}</h2>
-              {isVerified && <img src="/bluetickverifiedbadge.png" className="w-5 h-5 object-contain shrink-0" title="Verified Professional" alt="Verified" />}
+              {profile.is_pro ? (
+                <img src="/goldenverifiedbadgepro.png" className="w-6 h-6 object-contain shrink-0 drop-shadow-sm" title="Pro Verified" alt="Pro" />
+              ) : isVerified ? (
+                <img src="/bluetickverifiedbadge.png" className="w-5 h-5 object-contain shrink-0 drop-shadow-md" title="Verified Professional" alt="Verified" />
+              ) : null}
             </div>
             <div className="flex items-center gap-2 text-sm text-white/80 mt-1">
               <Star className="w-4 h-4 fill-current" /><span className="font-bold">{avgRating != null ? avgRating.toFixed(1) : "—"}</span>
@@ -75,7 +93,7 @@ export default function PublicVendorProfile() {
       <div className="px-4 -mt-10 space-y-6">
         <div>
           <h3 className="font-extrabold text-base mb-3 text-foreground">About</h3>
-          <Card className="bg-card border-border shadow-sm rounded-2xl">
+          <Card className="bg-card border-border shadow-sm rounded-full">
             <CardContent className="p-4 space-y-3">
               <p className="text-sm text-muted-foreground">{profile.bio || "No description provided."}</p>
               {profile.radius_meters > 0 && (
@@ -108,7 +126,7 @@ export default function PublicVendorProfile() {
           ) : (
             <div className="space-y-3">
               {reviews.map((r, i) => (
-                <Card key={i} className="bg-card border-border shadow-sm rounded-2xl">
+                <Card key={i} className="bg-card border-border shadow-sm rounded-full">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-1 mb-2 text-primary">
                       {Array.from({ length: 5 }).map((_, idx) => (

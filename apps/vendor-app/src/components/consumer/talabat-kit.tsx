@@ -60,7 +60,7 @@ export function StickyHeader({
               <div className="p-4 bg-background rounded-t-[20px] flex-1 flex flex-col">
                 <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-muted mb-6" />
                 <Drawer.Title className="text-xl font-extrabold mb-4">Set exact location</Drawer.Title>
-                <div className="flex-1 overflow-hidden rounded-2xl mb-4 relative">
+                <div className="flex-1 overflow-hidden rounded-full mb-4 relative">
                   <LocationPickerMap 
                     className="w-full h-full"
                     onLocationChange={(l) => {
@@ -81,7 +81,7 @@ export function StickyHeader({
                           <button key={a.id} onClick={() => {
                             setLocName(a.label || "Saved Location");
                             setOpen(false);
-                          }} className="shrink-0 bg-muted px-4 py-2 rounded-xl text-sm font-bold text-foreground border border-border whitespace-nowrap">
+                          }} className="shrink-0 bg-muted px-4 py-2 rounded-full text-sm font-bold text-foreground border border-border whitespace-nowrap">
                             {a.label || "Saved"}
                           </button>
                         ))}
@@ -94,7 +94,7 @@ export function StickyHeader({
                     if (l) {
                       api.addAddress(locName, l.address, l.lat, l.lng).catch(() => {});
                     }
-                  }} className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-bold text-lg shadow-sm">
+                  }} className="w-full h-14 rounded-full bg-primary text-primary-foreground font-bold text-lg shadow-sm">
                     Confirm Location
                   </button>
                 </div>
@@ -115,13 +115,13 @@ export function StickyHeader({
 
       {searchTo ? (
         <Link href={searchTo}>
-          <div className="flex items-center gap-2 h-12 px-4 rounded-2xl bg-white text-muted-foreground shadow-sm cursor-text">
+          <div className="flex items-center gap-2 h-12 px-4 rounded-full bg-white text-muted-foreground shadow-sm cursor-text">
             <Search className="w-5 h-5 text-primary" />
             <span className="text-sm">Search services, pros, categories…</span>
           </div>
         </Link>
       ) : (
-        <button onClick={onSearchClick} className="w-full flex items-center gap-2 h-12 px-4 rounded-2xl bg-white text-muted-foreground shadow-sm">
+        <button onClick={onSearchClick} className="w-full flex items-center gap-2 h-12 px-4 rounded-full bg-white text-muted-foreground shadow-sm">
           <Search className="w-5 h-5 text-primary" />
           <span className="text-sm">Search services, pros, categories…</span>
         </button>
@@ -146,7 +146,7 @@ export function SectionHeader({ title, href, action = "See all" }: { title: stri
 export function PromoHero({ title, subtitle, cta, href }: { title: string; subtitle: string; cta: string; href: string }) {
   return (
     <Link href={href}>
-      <div className="relative overflow-hidden rounded-2xl p-5 bg-primary text-primary-foreground border-b border-border text-white shadow-md">
+      <div className="relative overflow-hidden rounded-full p-5 bg-primary text-primary-foreground border-b border-border text-white shadow-md">
         <div className="absolute -right-8 -top-8 w-36 h-36 bg-white/10 rounded-full blur-2xl" />
         <div className="absolute -right-4 bottom-0 opacity-20">
           <img src="/logo-with-name(long).png" alt="FixIt Now Logo" className="w-28 h-auto object-contain grayscale" />
@@ -168,7 +168,7 @@ export function CategoryTile({ label, Icon, href, color = "primary" }: { label: 
   const bg = { primary: "bg-slate-100 dark:bg-slate-800 text-primary", accent: "bg-accent/10 text-accent", success: "bg-success/10 text-success", warning: "bg-warning/10 text-warning" }[color];
   return (
     <Link href={href} className="flex-shrink-0 w-[76px] flex flex-col items-center gap-2">
-      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-sm ${bg}`}>
+      <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-sm ${bg}`}>
         {typeof Icon === "string" ? <span className="text-3xl">{Icon}</span> : <Icon className="w-7 h-7" />}
       </div>
       <span className="text-[11px] font-semibold text-center text-foreground leading-tight line-clamp-2">{label}</span>
@@ -200,7 +200,7 @@ export function ProCard({
 }) {
   return (
     <Link href={href}>
-      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+      <div className="bg-card rounded-full border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
         <div className="relative h-28 bg-primary text-primary-foreground border-b border-border flex items-center justify-center">
           <span className="text-3xl font-black text-white/90">{initials}</span>
           {verified && (
@@ -290,7 +290,7 @@ export function JobFeedCard({
   const hot = String(urgency).toUpperCase() === "EMERGENCY" || String(urgency).toUpperCase() === "HIGH";
   return (
     <Link href={href}>
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+      <div className="bg-card rounded-full border border-border shadow-sm p-4 relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
         {bounty && <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-[10px] font-bold px-3 py-1 rounded-bl-xl">BOUNTY · {bounty}</div>}
         <div className="flex items-center gap-2 mb-2">
           {hot && <span className="bg-destructive/10 text-destructive text-[10px] font-bold px-2 py-0.5 rounded uppercase">Urgent</span>}

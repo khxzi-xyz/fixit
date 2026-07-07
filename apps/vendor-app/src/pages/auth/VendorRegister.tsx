@@ -59,7 +59,7 @@ export default function VendorRegister() {
           <button
             type="button"
             onClick={() => setType("individual")}
-            className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-colors ${type === "individual" ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted"}`}
+            className={`p-4 rounded-full border-2 flex flex-col items-center gap-2 transition-colors ${type === "individual" ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted"}`}
           >
             <User className="w-6 h-6" />
             <span className="font-bold text-sm">Individual</span>
@@ -67,7 +67,7 @@ export default function VendorRegister() {
           <button
             type="button"
             onClick={() => setType("business")}
-            className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-colors ${type === "business" ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted"}`}
+            className={`p-4 rounded-full border-2 flex flex-col items-center gap-2 transition-colors ${type === "business" ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted"}`}
           >
             <Building2 className="w-6 h-6" />
             <span className="font-bold text-sm">Business</span>
@@ -76,7 +76,7 @@ export default function VendorRegister() {
 
         <div className="space-y-2">
           <Label>{type === "business" ? "Company Legal Name" : "Full Name"}</Label>
-          <Input value={name} onChange={e => setName(e.target.value)} placeholder={type === "business" ? "Acme Fix LLC" : "John Doe"} className="h-12 bg-muted/50 border-border rounded-xl" required />
+          <Input value={name} onChange={e => setName(e.target.value)} placeholder={type === "business" ? "Acme Fix LLC" : "John Doe"} className="h-12 bg-muted/50 border-border rounded-full" required />
         </div>
 
         <div className="space-y-2">
@@ -88,7 +88,7 @@ export default function VendorRegister() {
                 key={cat.category_id}
                 type="button"
                 onClick={() => toggleCat(cat.category_id)}
-                className={`p-3 text-left border rounded-xl flex items-center justify-between text-sm transition-colors ${selectedCats.includes(cat.category_id) ? "border-primary bg-primary/10 text-primary font-bold" : "border-border bg-card text-foreground"}`}
+                className={`p-3 text-left border rounded-full flex items-center justify-between text-sm transition-colors ${selectedCats.includes(cat.category_id) ? "border-primary bg-primary/10 text-primary font-bold" : "border-border bg-card text-foreground"}`}
               >
                 <span>{cat.display_name}</span>
                 {selectedCats.includes(cat.category_id) && <CheckCircle2 className="w-4 h-4 text-primary" />}
@@ -98,7 +98,7 @@ export default function VendorRegister() {
         </div>
 
         <div className="pt-4">
-          <Button disabled={busy} type="submit" className="w-full h-14 rounded-xl text-lg font-bold shadow-[0_0_20px_rgba(27,110,243,0.3)]">
+          <Button disabled={busy} type="submit" className="w-full h-14 rounded-full text-lg font-bold shadow-[0_0_20px_rgba(27,110,243,0.3)]">
             {busy ? "Creating Profile..." : "Continue to KYC"}
           </Button>
         </div>

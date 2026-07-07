@@ -69,8 +69,8 @@ export default function VendorChats() {
               const mine = m.sender_id === claims?.sub;
               return (
                 <div key={m.message_id ?? i} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${mine ? "bg-primary text-white rounded-br-sm" : "bg-card border border-border text-foreground rounded-bl-sm"}`}>
-                    {m.media_url && <img src={m.media_url} className="rounded-lg mb-2 max-h-40 object-cover" alt="" />}
+                  <div className={`max-w-[75%] rounded-full px-4 py-2.5 text-sm ${mine ? "bg-primary text-white rounded-br-sm" : "bg-card border border-border text-foreground rounded-bl-sm"}`}>
+                    {m.media_url && <img src={m.media_url} className="rounded-full mb-2 max-h-40 object-cover" alt="" />}
                     <p>{m.content}</p>
                     <p className={`text-[10px] mt-1 ${mine ? "text-white/60" : "text-muted-foreground"}`}>
                       {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -87,9 +87,9 @@ export default function VendorChats() {
               value={text} onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
               placeholder="Type a message…"
-              className="flex-1 h-11 rounded-xl border border-border bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-primary"
+              className="flex-1 h-11 rounded-full border border-border bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-primary"
             />
-            <Button onClick={send} disabled={sending || !text.trim()} size="icon" className="h-11 w-11 rounded-xl">
+            <Button onClick={send} disabled={sending || !text.trim()} size="icon" className="h-11 w-11 rounded-full">
               <Send className="w-5 h-5" />
             </Button>
           </div>
@@ -122,8 +122,8 @@ export default function VendorChats() {
           </div>
         ) : jobs.map((j) => (
           <button key={j.job_id} onClick={() => setActiveJob(j)}
-            className="w-full text-left bg-card border border-border rounded-2xl p-4 flex items-center gap-3 hover:bg-muted/40 transition-colors active:scale-[0.98]">
-            <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            className="w-full text-left bg-card border border-border rounded-full p-4 flex items-center gap-3 hover:bg-muted/40 transition-colors active:scale-[0.98]">
+            <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
               <MessageCircle className="w-5 h-5" />
             </div>
             <div className="min-w-0">

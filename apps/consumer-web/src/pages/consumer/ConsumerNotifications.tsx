@@ -85,7 +85,7 @@ export default function ConsumerNotifications() {
             <button
               onClick={markAllRead}
               disabled={markingAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 border border-white/20 rounded-xl text-white text-xs font-bold hover:bg-white/20 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-white text-xs font-bold hover:bg-white/20 transition-colors"
             >
               <CheckCheck className="w-3.5 h-3.5" />
               Mark all read
@@ -102,12 +102,12 @@ export default function ConsumerNotifications() {
 
       <div className="px-4 -mt-6 pb-10 space-y-3">
         {/* Filter tabs */}
-        <div className="flex bg-card border border-border rounded-2xl p-1 gap-1">
+        <div className="flex bg-card border border-border rounded-full p-1 gap-1">
           {(["all", "unread"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all capitalize ${filter === f ? "bg-primary text-white shadow" : "text-muted-foreground hover:text-foreground"}`}
+              className={`flex-1 py-2 text-sm font-bold rounded-full transition-all capitalize ${filter === f ? "bg-primary text-white shadow" : "text-muted-foreground hover:text-foreground"}`}
             >
               {f} {f === "unread" && unreadCount > 0 ? `(${unreadCount})` : ""}
             </button>
@@ -117,9 +117,9 @@ export default function ConsumerNotifications() {
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-4 animate-pulse">
+              <div key={i} className="bg-card border border-border rounded-full p-4 animate-pulse">
                 <div className="flex gap-3">
-                  <div className="w-10 h-10 bg-muted rounded-xl" />
+                  <div className="w-10 h-10 bg-muted rounded-full" />
                   <div className="flex-1 space-y-2">
                     <div className="h-3 bg-muted rounded w-3/4" />
                     <div className="h-3 bg-muted rounded w-full" />
@@ -155,13 +155,13 @@ export default function ConsumerNotifications() {
                     markOne(n.notification_id);
                     if (n.action_url) navigate(n.action_url);
                   }}
-                  className={`w-full flex items-start gap-3 p-4 rounded-2xl border transition-all text-left ${
+                  className={`w-full flex items-start gap-3 p-4 rounded-full border transition-all text-left ${
                     isUnread
                       ? "bg-slate-50 dark:bg-slate-900 border-primary/20 hover:bg-primary/10"
                       : "bg-card border-border hover:bg-muted/30"
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${cfg.bg}`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${cfg.bg}`}>
                     <Icon className={`w-5 h-5 ${cfg.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -180,8 +180,8 @@ export default function ConsumerNotifications() {
         )}
 
         {/* Push notification enable prompt */}
-        <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 bg-orange-500/15 rounded-xl flex items-center justify-center shrink-0">
+        <div className="bg-card border border-border rounded-full p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-orange-500/15 rounded-full flex items-center justify-center shrink-0">
             <Bell className="w-5 h-5 text-orange-400" />
           </div>
           <div className="flex-1">
@@ -190,7 +190,7 @@ export default function ConsumerNotifications() {
           </div>
           <button
             onClick={() => api.registerPushNotifications()}
-            className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary/90 transition-colors shrink-0"
+            className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-full hover:bg-primary/90 transition-colors shrink-0"
           >
             Enable
           </button>

@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { api, getToken } from "@/lib/api";
 import { Bell, MapPin, Search, ChevronRight, Zap, Star, Shield, Clock, TrendingUp, Gift, ShoppingCart, Siren, Calendar, Sparkles, Heart } from "lucide-react";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const SERVICE_GRID = [
   { id: "ELECTRICIAN", label: "Electrician" },
@@ -29,6 +30,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 import { ServiceIcon } from "@/components/ServiceIcon";
+import { Geolocation } from "@capacitor/geolocation";
 
 export default function ConsumerHome() {
   const [, navigate] = useLocation();
@@ -42,7 +44,30 @@ export default function ConsumerHome() {
   const { data: vendors = [] } = useQuery({
     queryKey: ["nearbyVendors"],
     queryFn: async () => {
-      const v = await api.nearbyVendors(23.588, 58.3829);
+      let lat = 23.588;
+      let lng = 58.3829;
+      try {
+        const cachedStr = localStorage.getItem("fixit_cached_location");
+        if (cachedStr) {
+          const c = JSON.parse(cachedStr);
+          lat = c.lat;
+          lng = c.lng;
+        } else {
+          // If not cached, attempt to get real coordinates and save them
+          try {
+            await Geolocation.requestPermissions();
+            const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 5000 });
+            lat = pos.coords.latitude;
+            lng = pos.coords.longitude;
+            localStorage.setItem("fixit_cached_location", JSON.stringify({ lat, lng }));
+          } catch (geoErr) {
+            console.warn("Geolocation failed, using default", geoErr);
+          }
+        }
+      } catch (e) {
+        console.warn("Location cache error", e);
+      }
+      const v = await api.nearbyVendors(lat, lng);
       return Array.isArray(v) ? v.slice(0, 6) : [];
     }
   });
@@ -78,23 +103,23 @@ export default function ConsumerHome() {
 
   return (
     <ConsumerLayout>
-      <div className="sticky top-0 z-40 bg-background/90 text-foreground border-b border-border shadow-sm pt-[env(safe-area-inset-top,2rem)] pb-2 backdrop-blur-xl transition-all">
+      <div className="sticky top-0 z-40 bg-primary text-primary-foreground text-white border-b border-primary/20 shadow-sm pt-[env(safe-area-inset-top,2rem)] pb-2 transition-all rounded-b-3xl">
         <div className="flex items-center gap-3 px-5 pt-2 pb-3">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" className="w-9 h-9 rounded-xl bg-primary/10 p-1.5" alt="FixIt Now" />
-            <span className="text-xl font-black tracking-tight">FixIt</span>
+            <img src="/logo.png" className="w-9 h-9 rounded-full bg-white/20 p-1.5 shadow-sm" alt="FixIt Now" />
+            <span className="text-xl font-black tracking-tight text-white">FixIt</span>
           </div>
           <button onClick={() => navigate("/profile/addresses")} className="flex-1 flex flex-col justify-center items-end text-right min-w-0 ml-1">
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Location</span>
+            <span className="text-[10px] text-white/70 uppercase tracking-widest font-bold">Location</span>
             <div className="flex items-center gap-1 justify-end">
-              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-              <span className="text-sm font-black truncate">{address}</span>
+              <MapPin className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
+              <span className="text-sm font-black text-white truncate">{address}</span>
             </div>
           </button>
-          <button onClick={() => navigate("/notifications")} className="relative w-10 h-10 bg-muted/50 rounded-2xl flex items-center justify-center hover:bg-muted transition-colors ml-2">
-            <Bell className="w-5 h-5 text-foreground" />
+          <button onClick={() => navigate("/notifications")} className="relative w-10 h-10 bg-white/10 border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors ml-2">
+            <Bell className="w-5 h-5 text-white" />
             {unread > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-black rounded-full flex items-center justify-center border-2 border-background shadow-sm">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-black rounded-full flex items-center justify-center border-2 border-primary shadow-sm">
                 {unread > 9 ? "9+" : unread}
               </span>
             )}
@@ -105,10 +130,10 @@ export default function ConsumerHome() {
         <div className="px-5 pb-2">
           <button
             onClick={() => navigate("/search")}
-            className="w-full flex items-center gap-3 h-12 bg-muted/50 border border-border rounded-2xl px-4 text-foreground text-sm hover:bg-muted transition-all"
+            className="w-full flex items-center gap-3 h-12 bg-white/20 border border-white/30 rounded-full px-4 text-white text-sm hover:bg-white/30 transition-all shadow-inner"
           >
-            <Search className="w-4 h-4 text-muted-foreground" />
-            <span className="text-muted-foreground font-medium flex-1 text-left">Search for a service…</span>
+            <Search className="w-5 h-5 text-white" />
+            <span className="text-white font-bold flex-1 text-left">Search for a service…</span>
           </button>
         </div>
       </div>
@@ -116,7 +141,7 @@ export default function ConsumerHome() {
       <div className="px-4 py-4 space-y-5 pb-28">
         {/* ── Ad Banner ── */}
         {ads.length > 0 && (
-          <div className="relative rounded-2xl overflow-hidden h-32 shadow-lg">
+          <div className="relative rounded-full overflow-hidden h-32 shadow-lg">
             <div
               className="absolute inset-0 flex items-center justify-between px-5"
               style={{ background: ads[adIdx]?.background_color || "linear-gradient(135deg, #1B6EF3, #0d3a8c)" }}
@@ -127,7 +152,7 @@ export default function ConsumerHome() {
                 {ads[adIdx]?.cta_url && (
                   <button
                     onClick={() => { api.trackAdClick(ads[adIdx].ad_id); if (ads[adIdx].cta_url?.startsWith("/")) navigate(ads[adIdx].cta_url); }}
-                    className="mt-2 px-3 py-1 bg-white/20 border border-white/30 rounded-xl text-white text-xs font-bold hover:bg-white/30 transition-colors"
+                    className="mt-2 px-3 py-1 bg-white/20 border border-white/30 rounded-full text-white text-xs font-bold hover:bg-white/30 transition-colors"
                   >
                     {ads[adIdx].cta_label || "Learn More"}
                   </button>
@@ -151,15 +176,15 @@ export default function ConsumerHome() {
         {/* ── Active Job Alert ── */}
         {activeJobs.length > 0 && (
           <Link href={activeJobs[0].status === "OPEN" ? `/job/${activeJobs[0].job_id}/bids` : `/order/${activeJobs[0].job_id}`}>
-            <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 border border-primary/20 rounded-2xl p-3.5 cursor-pointer hover:bg-primary/15 transition-colors">
-              <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 border border-primary/20 rounded-full p-3.5 cursor-pointer hover:bg-primary/15 transition-colors">
+              <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
                 <Zap className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-primary font-bold">Active Job</p>
                 <p className="text-sm font-semibold truncate">{activeJobs[0].description?.slice(0, 50) || activeJobs[0].category_id}</p>
               </div>
-              <div className={`px-2 py-1 rounded-lg text-xs font-bold ${STATUS_COLORS[activeJobs[0].status] || "bg-muted text-muted-foreground"}`}>
+              <div className={`px-2 py-1 rounded-full text-xs font-bold ${STATUS_COLORS[activeJobs[0].status] || "bg-muted text-muted-foreground"}`}>
                 {String(activeJobs[0].status).replace(/_/g, " ")}
               </div>
               <ChevronRight className="w-4 h-4 text-primary" />
@@ -170,7 +195,7 @@ export default function ConsumerHome() {
         {/* ── Service Grid ── */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-black">What do you need?</h2>
+            <h2 className="text-base font-black dark:text-white">What do you need?</h2>
             <Link href="/post-job"><span className="text-xs font-bold text-primary">See all →</span></Link>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
@@ -178,12 +203,12 @@ export default function ConsumerHome() {
               <button
                 key={s.id}
                 onClick={() => navigate(s.id === "OTHER" ? "/post-job" : `/post-job`)}
-                className="flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl hover:border-primary/40 active:scale-95 transition-all shadow-sm"
+                className="flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-full hover:border-primary/40 active:scale-95 transition-all shadow-sm"
               >
-                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-sm">
                   <ServiceIcon id={s.id} className="w-6 h-6" />
                 </div>
-                <span className="text-[11px] font-bold text-center leading-tight text-foreground/90">{s.label}</span>
+                <span className="text-[11px] font-bold text-center leading-tight text-foreground dark:text-white opacity-90">{s.label}</span>
               </button>
             ))}
           </div>
@@ -202,7 +227,7 @@ export default function ConsumerHome() {
               { label: "Pro Feed", sub: "Before/After", icon: <Sparkles />, href: "/feed", bg: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
             ].map((f) => (
               <Link key={f.label} href={f.href}>
-                <div className={`p-3 rounded-2xl border ${f.bg} flex flex-col items-center text-center cursor-pointer hover:scale-95 transition-all shadow-sm`}>
+                <div className={`p-3 rounded-full border ${f.bg} flex flex-col items-center text-center cursor-pointer hover:scale-95 transition-all shadow-sm`}>
                   <div className="mb-1 flex justify-center [&>svg]:w-6 [&>svg]:h-6">{f.icon}</div>
                   <p className="text-[11px] font-black leading-tight">{f.label}</p>
                   <p className="text-[9px] opacity-80 mt-0.5 font-semibold">{f.sub}</p>
@@ -219,7 +244,7 @@ export default function ConsumerHome() {
             { icon: Star, label: "Verified Pros", sub: "ID-checked", color: "text-yellow-400" },
             { icon: Clock, label: "Fast Match", sub: "Avg 8 mins", color: "text-primary" },
           ].map((b) => (
-            <div key={b.label} className="bg-card border border-border rounded-2xl p-3 text-center">
+            <div key={b.label} className="bg-card border border-border rounded-full p-3 text-center">
               <b.icon className={`w-5 h-5 ${b.color} mx-auto mb-1`} />
               <p className="text-xs font-bold">{b.label}</p>
               <p className="text-[10px] text-muted-foreground">{b.sub}</p>
@@ -237,15 +262,18 @@ export default function ConsumerHome() {
             <div className="space-y-2">
               {jobs.slice(0, 3).map((job) => (
                 <Link key={job.job_id} href={job.status === "OPEN" ? `/job/${job.job_id}/bids` : `/order/${job.job_id}`}>
-                  <div className="flex items-center gap-3 bg-card border border-border rounded-2xl p-3.5 hover:shadow-md transition-shadow cursor-pointer">
-                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="flex items-center gap-3 bg-card border border-border rounded-full p-3.5 hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center shrink-0">
                       <ServiceIcon id={job.category_id} className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate">{job.description?.slice(0, 48) || job.category_id}</p>
+                      <p className="text-sm font-semibold truncate">
+                        {job.tracking_id ? <span className="text-primary/70 font-mono text-[11px] mr-1">{job.tracking_id}</span> : null}
+                        {job.description?.slice(0, 48) || job.category_id}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-0.5">{new Date(job.created_at).toLocaleDateString()}</p>
                     </div>
-                    <div className={`px-2 py-1 rounded-lg text-xs font-bold shrink-0 ${STATUS_COLORS[job.status] || "bg-muted text-muted-foreground"}`}>
+                    <div className={`px-2 py-1 rounded-full text-xs font-bold shrink-0 ${STATUS_COLORS[job.status] || "bg-muted text-muted-foreground"}`}>
                       {String(job.status).replace(/_/g, " ")}
                     </div>
                   </div>
@@ -268,10 +296,14 @@ export default function ConsumerHome() {
                 const initials = name.slice(0, 2).toUpperCase();
                 return (
                   <Link key={v.vendor_id || i} href={`/vendor/${v.vendor_id || v.user_id}`}>
-                    <div className="flex-shrink-0 w-44 bg-card border border-border/50 rounded-2xl p-4 shadow-sm hover:shadow-md cursor-pointer hover:border-primary/40 transition-all">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center text-xl font-black text-primary mb-3 shadow-inner relative">
-                        {v.avatar_url ? <img src={v.avatar_url} className="w-full h-full object-cover rounded-2xl" /> : initials}
-                        <img src="/bluetickverifiedbadge.png" className="w-5 h-5 absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm" alt="Verified" />
+                    <div className="flex-shrink-0 w-44 bg-card border border-border/50 rounded-full p-4 shadow-sm hover:shadow-md cursor-pointer hover:border-primary/40 transition-all">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center text-xl font-black text-primary mb-3 shadow-inner relative">
+                        {v.avatar_url ? <img src={v.avatar_url} className="w-full h-full object-cover rounded-full" /> : initials}
+                        {v.is_pro ? (
+                          <img src="/goldenverifiedbadgepro.png" className="w-6 h-6 absolute -bottom-1.5 -right-1.5 drop-shadow-md" alt="Pro" />
+                        ) : (
+                          <img src="/bluetickverifiedbadge.png" className="w-5 h-5 absolute -bottom-1 -right-1 drop-shadow-md" alt="Verified" />
+                        )}
                       </div>
                       <p className="text-sm font-black truncate">{name}</p>
                       <p className="text-[11px] font-medium text-muted-foreground truncate">{v.primary_category || "General"}</p>
@@ -292,8 +324,8 @@ export default function ConsumerHome() {
 
         {/* ── Rewards Promo ── */}
         <Link href="/profile/rewards">
-          <div className="flex items-center gap-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/20 rounded-2xl p-4 cursor-pointer hover:border-purple-500/40 transition-colors">
-            <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+          <div className="flex items-center gap-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/20 rounded-full p-4 cursor-pointer hover:border-purple-500/40 transition-colors">
+            <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
               <Gift className="w-5 h-5 text-purple-400" />
             </div>
             <div className="flex-1">
@@ -316,7 +348,7 @@ export default function ConsumerHome() {
             </div>
             <button
               onClick={() => navigate("/post-job")}
-              className="px-6 py-3 bg-primary text-white font-bold rounded-2xl shadow-[0_4px_20px_rgba(27,110,243,0.4)] hover:shadow-[0_4px_30px_rgba(27,110,243,0.6)] transition-all"
+              className="px-6 py-3 bg-primary text-white font-bold rounded-full shadow-[0_4px_20px_rgba(27,110,243,0.4)] hover:shadow-[0_4px_30px_rgba(27,110,243,0.6)] transition-all"
             >
               Post a Job
             </button>

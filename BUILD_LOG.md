@@ -81,3 +81,14 @@
 - Any decisions made: Registered all 5 modules in `app.module.ts`, exposed API endpoints in `api.ts`, added routes in `App.tsx`, and inserted a Quick Services access grid on `ConsumerHome.tsx`.
 - Any pivots taken: None.
 - Any known issues: None.
+
+## Phase 14: FixIt v1.03 Production-Grade Marketplace Upgrade - 2026-07-07T11:45:00Z
+- What was completed: Integrated Capacitor native plugins (Camera, Geolocation, Background Runner, Haptics, NetworkGuard) across both `consumer-web` and `vendor-app`. Enforced "Triple-Verify" live photo capture for vendors and job postings, replacing the standard file picker. Added background keep-alive for Android. Updated app versions to 1.03 and synced with Android.
+- Any decisions made: Chose `@capacitor/camera` and `@capacitor/background-runner` to enforce native capabilities over web fallbacks where absolute reliability and anti-fraud measures (no gallery uploads) are required. 
+- Any pivots taken: None.
+- Any known issues: None.
+## Phase 15: Vendor Mobile Integration & Unified Backend Validation - 2026-07-07T16:29:12Z
+- What was completed: Cloned UI branding (splash/icons) to Vendor App, synchronized Android builds, and verified the monolithic NestJS backend handles both consumer and vendor traffic within a single Render deployment structure. Attempted USB deployment which successfully compiled but awaited user device permissions.
+- Any decisions made: Consolidated API logic remains within the single pps/backend to ensure '1 git' and single deployment architecture. 
+- Any pivots taken: Aborted APK compilation to switch to direct device installation via installDebug.
+- Any known issues: Device permissions rejected during USB installation (INSTALL_FAILED_ABORTED). User must accept the prompt on their Android device.

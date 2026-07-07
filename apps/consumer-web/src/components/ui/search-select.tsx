@@ -49,13 +49,13 @@ export function SearchSelect({
   return (
     <div className="relative" ref={ref}>
       <button type="button" onClick={() => setOpen((v) => !v)}
-        className="w-full h-12 px-3 rounded-xl border border-border bg-card text-start flex items-center justify-between gap-2 focus:ring-2 focus:ring-primary outline-none">
+        className="w-full h-12 px-3 rounded-full border border-border bg-card text-start flex items-center justify-between gap-2 focus:ring-2 focus:ring-primary outline-none">
         <span className={selected ? "text-foreground font-medium" : "text-muted-foreground"}>{selected ? selected.label : placeholder}</span>
         <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-2 w-full bg-popover border border-border rounded-xl shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-2 w-full bg-popover border border-border rounded-full shadow-lg overflow-hidden">
           <div className="flex items-center gap-2 px-3 h-11 border-b border-border">
             <Search className="w-4 h-4 text-muted-foreground shrink-0" />
             <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)} placeholder={searchPlaceholder}
@@ -67,7 +67,7 @@ export function SearchSelect({
                 <p className="text-sm text-muted-foreground">{emptyText}</p>
                 {onRequestService && (
                   <button type="button" onClick={() => { onRequestService(); setOpen(false); setQuery(""); }}
-                    className="h-10 px-4 rounded-xl bg-primary/10 text-primary font-bold text-sm hover:bg-primary/20 transition-colors">
+                    className="h-10 px-4 rounded-full bg-primary/10 text-primary font-bold text-sm hover:bg-primary/20 transition-colors">
                     Request a new service
                   </button>
                 )}

@@ -54,7 +54,7 @@ export default function ConsumerFeed() {
               {/* Vendor Header */}
               <div className="p-4 flex items-center justify-between border-b border-border">
                 <div className="flex items-center gap-3">
-                  <img src={post.vendor_avatar} alt={post.vendor_name} className="w-11 h-11 rounded-2xl object-cover border border-border" />
+                  <img src={post.vendor_avatar} alt={post.vendor_name} className="w-11 h-11 rounded-full object-cover border border-border" />
                   <div>
                     <h3 className="font-bold text-sm flex items-center gap-1">
                       {post.vendor_name} <ShieldCheck className="w-3.5 h-3.5 text-primary" />
@@ -64,7 +64,7 @@ export default function ConsumerFeed() {
                 </div>
                 <button
                   onClick={() => navigate(`/post-job?category=${post.category_id}`)}
-                  className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-xl shadow hover:bg-primary/90"
+                  className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-full shadow hover:bg-primary/90"
                 >
                   Book Pro
                 </button>
@@ -72,13 +72,13 @@ export default function ConsumerFeed() {
 
               {/* Photos Comparison */}
               <div className="grid grid-cols-2 gap-1 px-4">
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+                <div className="relative aspect-square rounded-full overflow-hidden bg-muted">
                   <img src={post.before_image} alt="Before" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/70 text-white text-[9px] font-black rounded backdrop-blur">
                     BEFORE
                   </span>
                 </div>
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted border-2 border-primary/40">
+                <div className="relative aspect-square rounded-full overflow-hidden bg-muted border-2 border-primary/40">
                   <img src={post.after_image} alt="After" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-primary text-white text-[9px] font-black rounded shadow">
                     AFTER ✨

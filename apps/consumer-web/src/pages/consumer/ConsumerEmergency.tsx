@@ -54,7 +54,7 @@ export default function ConsumerEmergency() {
         {activeSos ? (
           <div className="bg-card border-2 border-red-500 rounded-3xl p-5 shadow-2xl space-y-4">
             <div className="flex items-center gap-3 text-red-500">
-              <div className="w-12 h-12 bg-red-500/15 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-red-500/15 rounded-full flex items-center justify-center">
                 <Siren className="w-6 h-6 animate-spin" />
               </div>
               <div>
@@ -63,7 +63,7 @@ export default function ConsumerEmergency() {
               </div>
             </div>
 
-            <div className="bg-muted/60 border border-border rounded-2xl p-4 space-y-3">
+            <div className="bg-muted/60 border border-border rounded-full p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-muted-foreground">Responder</span>
                 <span className="text-sm font-extrabold text-foreground">{activeSos.responder.name}</span>
@@ -78,7 +78,7 @@ export default function ConsumerEmergency() {
 
             <a
               href={`tel:${activeSos.responder.phone}`}
-              className="w-full h-14 bg-red-600 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 shadow-lg"
+              className="w-full h-14 bg-red-600 text-white font-extrabold rounded-full flex items-center justify-center gap-2 shadow-lg"
             >
               <Phone className="w-5 h-5" /> Call Responder Now ({activeSos.responder.phone})
             </a>
@@ -92,7 +92,7 @@ export default function ConsumerEmergency() {
                   <button
                     key={e.type}
                     onClick={() => setSelectedType(e.type)}
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${
+                    className={`w-full flex items-center justify-between p-4 rounded-full border transition-all text-left ${
                       selectedType === e.type
                         ? "border-red-500 bg-red-500/10 shadow"
                         : "border-border bg-muted/30 hover:bg-muted"
@@ -116,14 +116,14 @@ export default function ConsumerEmergency() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Enter street or villa address"
-                className="w-full h-12 bg-muted/60 border border-border rounded-xl px-3 text-sm font-semibold outline-none focus:border-red-500"
+                className="w-full h-12 bg-muted/60 border border-border rounded-full px-3 text-sm font-semibold outline-none focus:border-red-500"
               />
             </div>
 
             <button
               onClick={trigger}
               disabled={dispatching}
-              className="w-full h-16 bg-gradient-to-r from-red-600 to-amber-600 text-white font-black text-lg rounded-2xl flex items-center justify-center gap-3 shadow-xl hover:opacity-90 active:scale-98 transition-all"
+              className="w-full h-16 bg-gradient-to-r from-red-600 to-amber-600 text-white font-black text-lg rounded-full flex items-center justify-center gap-3 shadow-xl hover:opacity-90 active:scale-98 transition-all"
             >
               <Siren className="w-6 h-6 animate-pulse" />
               {dispatching ? "Broadcasting SOS..." : "Trigger Instant SOS Dispatch"}

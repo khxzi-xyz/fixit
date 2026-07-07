@@ -53,7 +53,7 @@ export default function JobBids() {
 
       <div className="px-4 py-5 pb-24 space-y-4">
         {err && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-bold flex items-start gap-3">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-full text-sm font-bold flex items-start gap-3">
             <span className="shrink-0 mt-0.5 text-lg">⚠️</span>
             <p>{err}</p>
           </div>
@@ -62,7 +62,7 @@ export default function JobBids() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2].map(i => (
-              <div key={i} className="bg-card border border-border rounded-xl h-48 animate-pulse p-5" />
+              <div key={i} className="bg-card border border-border rounded-full h-48 animate-pulse p-5" />
             ))}
           </div>
         ) : bids.length === 0 ? (
@@ -70,7 +70,7 @@ export default function JobBids() {
         ) : (
           <div className="space-y-4">
             {bids.map((bid) => (
-              <div key={bid.bid_id} className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+              <div key={bid.bid_id} className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-5">
                     <div>
@@ -85,14 +85,14 @@ export default function JobBids() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 mb-5">
-                    <div className="bg-muted/50 rounded-lg p-3 flex items-center gap-3">
+                    <div className="bg-muted/50 rounded-full p-3 flex items-center gap-3">
                       <ShieldCheck className="w-5 h-5 text-success" />
                       <div>
                         <p className="text-[10px] text-muted-foreground uppercase">Warranty</p>
                         <p className="font-bold text-sm">{warrantyOf(bid)} Days</p>
                       </div>
                     </div>
-                    <div className="bg-muted/50 rounded-lg p-3 flex items-center gap-3">
+                    <div className="bg-muted/50 rounded-full p-3 flex items-center gap-3">
                       <Clock className="w-5 h-5 text-primary" />
                       <div>
                         <p className="text-[10px] text-muted-foreground uppercase">ETA</p>
@@ -102,14 +102,14 @@ export default function JobBids() {
                   </div>
 
                   {bid.status === "SELECTED" ? (
-                    <div className="w-full bg-success/10 text-success font-bold text-sm py-3 rounded-lg flex items-center justify-center gap-2 border border-success/20">
+                    <div className="w-full bg-success/10 text-success font-bold text-sm py-3 rounded-full flex items-center justify-center gap-2 border border-success/20">
                       <Check className="w-5 h-5" /> Hired & Escrow Funded
                     </div>
                   ) : (
                     <button 
                       onClick={() => accept(bid.bid_id)} 
                       disabled={!!busy}
-                      className="w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-3.5 rounded-xl flex items-center justify-center gap-2 disabled:opacity-70"
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-3.5 rounded-full flex items-center justify-center gap-2 disabled:opacity-70"
                     >
                       {busy === bid.bid_id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                       {busy === bid.bid_id ? "Funding Escrow..." : "Accept & Fund Escrow"}

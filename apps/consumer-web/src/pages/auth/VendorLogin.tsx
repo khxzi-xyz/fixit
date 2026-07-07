@@ -51,18 +51,18 @@ export default function VendorLogin() {
         <div className="space-y-2">
           <Label>Phone Number</Label>
           <div className="flex gap-2">
-            <Input type="text" value={countryCode} onChange={(e) => setCountryCode(e.target.value)} className="w-24 h-12 bg-muted/50 border-border rounded-xl text-center font-medium" />
-            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 15))} placeholder="9123 4567" inputMode="numeric" className="flex-1 h-12 bg-muted/50 border-border rounded-xl font-medium" />
+            <Input type="text" value={countryCode} onChange={(e) => setCountryCode(e.target.value)} className="w-24 h-12 bg-muted/50 border-border rounded-full text-center font-medium" />
+            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 15))} placeholder="9123 4567" inputMode="numeric" className="flex-1 h-12 bg-muted/50 border-border rounded-full font-medium" />
           </div>
         </div>
 
-        <Button onClick={sendOtp} disabled={busy} className="w-full h-14 rounded-xl text-lg font-bold">{busy ? "Sending…" : "Send OTP"}</Button>
+        <Button onClick={sendOtp} disabled={busy} className="w-full h-14 rounded-full text-lg font-bold">{busy ? "Sending…" : "Send OTP"}</Button>
 
         <div className="relative flex items-center py-1">
           <div className="flex-grow border-t border-border" /><span className="mx-3 text-xs text-muted-foreground uppercase">or</span><div className="flex-grow border-t border-border" />
         </div>
 
-        <Button variant="outline" onClick={google} className="w-full h-12 rounded-xl border-border font-semibold gap-2">
+        <Button variant="outline" onClick={google} className="w-full h-12 rounded-full border-border font-semibold gap-2">
           <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="" /> Continue with Google
         </Button>
 

@@ -50,11 +50,11 @@ export default function JobPayment() {
       </div>
 
       <div className="px-4 -mt-6 space-y-5 max-w-xl mx-auto">
-        <Card className="bg-card border-border shadow-md rounded-2xl">
+        <Card className="bg-card border-border shadow-md rounded-full">
           <CardContent className="p-5">
             <div className="flex justify-between items-center mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                   <Lock className="w-6 h-6 text-primary" />
                 </div>
                 <div>
@@ -68,22 +68,22 @@ export default function JobPayment() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3 mb-4 text-sm">
+            <div className="flex items-center justify-between bg-green-500/10 border border-green-500/20 rounded-full px-4 py-3 mb-4 text-sm">
               <span className="text-green-600 font-bold">Wallet 5% Discount</span>
               <span className="font-bold text-green-600">-{discount.toFixed(2)} OMR</span>
             </div>
 
-            <div className="flex items-center justify-between bg-muted rounded-xl px-4 py-3 mb-4 text-sm">
+            <div className="flex items-center justify-between bg-muted rounded-full px-4 py-3 mb-4 text-sm">
               <span className="text-muted-foreground">Total Due</span>
               <span className="font-bold">{discountedDue.toFixed(2)} OMR</span>
             </div>
 
-            <div className="flex items-center justify-between bg-muted rounded-xl px-4 py-3 mb-4 text-sm">
+            <div className="flex items-center justify-between bg-muted rounded-full px-4 py-3 mb-4 text-sm">
               <span className="text-muted-foreground">Wallet balance</span>
               <span className="font-bold">{balance.toFixed(2)} OMR</span>
             </div>
 
-            <div className="bg-muted p-4 rounded-xl mb-5">
+            <div className="bg-muted p-4 rounded-full mb-5">
               <div className="flex gap-2 items-start text-sm">
                 <AlertCircle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
                 <p className="text-muted-foreground"><strong className="text-foreground">Parts not included.</strong> You approve and pay for parts separately in-app once the pro evaluates the issue.</p>
@@ -94,12 +94,12 @@ export default function JobPayment() {
               <div className="space-y-3">
                 <p className="text-sm font-bold text-destructive">Top up {shortfall.toFixed(2)} OMR more to fund this escrow.</p>
                 <div className="flex gap-2">
-                  <Input value={topupAmt} onChange={(e) => setTopupAmt(e.target.value.replace(/[^\d.]/g, ""))} className="h-12 w-28 rounded-xl bg-muted" inputMode="decimal" />
-                  <Button onClick={topup} disabled={busy} className="flex-1 h-12 rounded-xl font-bold">{busy ? "Adding…" : "Top Up Wallet"}</Button>
+                  <Input value={topupAmt} onChange={(e) => setTopupAmt(e.target.value.replace(/[^\d.]/g, ""))} className="h-12 w-28 rounded-full bg-muted" inputMode="decimal" />
+                  <Button onClick={topup} disabled={busy} className="flex-1 h-12 rounded-full font-bold">{busy ? "Adding…" : "Top Up Wallet"}</Button>
                 </div>
               </div>
             ) : (
-              <Button onClick={() => navigate(`/order/${jobId}`)} className="w-full h-14 rounded-xl text-lg font-bold">
+              <Button onClick={() => navigate(`/order/${jobId}`)} className="w-full h-14 rounded-full text-lg font-bold">
                 <ShieldCheck className="w-5 h-5 mr-2" /> Funds Locked -Track Order <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             )}

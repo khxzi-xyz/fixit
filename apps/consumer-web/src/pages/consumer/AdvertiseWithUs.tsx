@@ -71,7 +71,7 @@ export default function AdvertiseWithUs() {
             <h2 className="text-2xl font-black">Request Submitted!</h2>
             <p className="text-muted-foreground mt-2 text-sm max-w-xs mx-auto">Our advertising team will review your request and reach out within 24-48 hours.</p>
           </div>
-          <button onClick={() => navigate("/home")} className="px-8 py-3 bg-primary text-white font-bold rounded-2xl">
+          <button onClick={() => navigate("/home")} className="px-8 py-3 bg-primary text-white font-bold rounded-full">
             Back to Home
           </button>
         </div>
@@ -98,7 +98,7 @@ export default function AdvertiseWithUs() {
         {/* Reach stats */}
         <div className="grid grid-cols-3 gap-2">
           {REACH_STATS.map((s) => (
-            <div key={s.label} className="bg-card border border-border rounded-2xl p-3 text-center shadow-sm">
+            <div key={s.label} className="bg-card border border-border rounded-full p-3 text-center shadow-sm">
               <s.icon className="w-4 h-4 text-primary mx-auto mb-1" />
               <p className="text-base font-black text-primary">{s.value}</p>
               <p className="text-[9px] text-muted-foreground leading-tight">{s.label}</p>
@@ -114,7 +114,7 @@ export default function AdvertiseWithUs() {
               <button
                 key={id}
                 onClick={() => setAdType(id)}
-                className={`flex flex-col items-start gap-2 p-4 border-2 rounded-2xl transition-all text-left ${adType === id ? "border-primary bg-primary/8" : "border-border bg-card"}`}
+                className={`flex flex-col items-start gap-2 p-4 border-2 rounded-full transition-all text-left ${adType === id ? "border-primary bg-primary/8" : "border-border bg-card"}`}
               >
                 <Icon className={`w-6 h-6 ${adType === id ? "text-primary" : "text-muted-foreground"}`} />
                 <div>
@@ -127,7 +127,7 @@ export default function AdvertiseWithUs() {
         </div>
 
         {/* Form */}
-        <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+        <div className="bg-card border border-border rounded-full p-4 shadow-sm space-y-3">
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Your Details</p>
 
           {[
@@ -142,7 +142,7 @@ export default function AdvertiseWithUs() {
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full h-11 bg-muted/60 border border-border rounded-xl px-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                className="w-full h-11 bg-muted/60 border border-border rounded-full px-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               />
             </div>
           ))}
@@ -154,7 +154,7 @@ export default function AdvertiseWithUs() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell us about what you're advertising, your target audience, and campaign goals..."
               rows={3}
-              className="w-full bg-muted/60 border border-border rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-primary resize-none"
+              className="w-full bg-muted/60 border border-border rounded-full px-3 py-2.5 text-sm font-medium outline-none focus:border-primary resize-none"
             />
           </div>
 
@@ -166,7 +166,7 @@ export default function AdvertiseWithUs() {
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
                 placeholder="0.000"
-                className="w-full h-11 bg-muted/60 border border-border rounded-xl pl-3 pr-12 text-sm font-medium outline-none focus:border-primary"
+                className="w-full h-11 bg-muted/60 border border-border rounded-full pl-3 pr-12 text-sm font-medium outline-none focus:border-primary"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">OMR/mo</span>
             </div>
@@ -176,7 +176,7 @@ export default function AdvertiseWithUs() {
         <button
           onClick={submit}
           disabled={submitting || !businessName.trim() || !contactName.trim() || !phone.trim()}
-          className="w-full h-14 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black rounded-2xl flex items-center justify-center gap-2 disabled:opacity-40 shadow-lg hover:shadow-xl transition-all"
+          className="w-full h-14 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black rounded-full flex items-center justify-center gap-2 disabled:opacity-40 shadow-lg hover:shadow-xl transition-all"
         >
           {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-5 h-5" /> Submit Request</>}
         </button>

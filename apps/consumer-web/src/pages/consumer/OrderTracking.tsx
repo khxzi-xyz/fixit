@@ -131,11 +131,11 @@ export default function OrderTracking() {
           </div>
 
           <div className="flex gap-3 mb-8">
-            <Button className="flex-1 h-12 rounded-xl bg-card border border-border text-foreground hover:bg-muted" variant="outline">
+            <Button className="flex-1 h-12 rounded-full bg-card border border-border text-foreground hover:bg-muted" variant="outline">
               <Phone className="w-5 h-5 mr-2 text-primary" /> Contact
             </Button>
             <Link href={`/order/${jobId}/warranty`} className="flex-1">
-              <Button className="w-full h-12 rounded-xl bg-card border border-border text-foreground hover:bg-muted" variant="outline">
+              <Button className="w-full h-12 rounded-full bg-card border border-border text-foreground hover:bg-muted" variant="outline">
                 <ShieldCheck className="w-5 h-5 mr-2 text-success" /> Warranty
               </Button>
             </Link>
@@ -143,7 +143,7 @@ export default function OrderTracking() {
 
           <div className="space-y-6">
             <h3 className="font-bold text-lg">Parts Protocol</h3>
-            <Card className="bg-card border-border rounded-xl">
+            <Card className="bg-card border-border rounded-full">
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
@@ -167,7 +167,7 @@ export default function OrderTracking() {
                 { label: "Consumer Before", p: consumerBefore, phase: "BEFORE" as const },
                 { label: "Consumer After", p: consumerAfter, phase: "CONSUMER_AFTER" as const }
               ]).map(({ label, p, phase }) => (
-                <div key={label} className="aspect-square bg-muted rounded-xl border border-dashed border-border flex flex-col items-center justify-center overflow-hidden relative">
+                <div key={label} className="aspect-square bg-muted rounded-full border border-dashed border-border flex flex-col items-center justify-center overflow-hidden relative">
                   {p?.url ? (
                     <img src={p.url} alt={label} className="w-full h-full object-cover" />
                   ) : phase ? (
@@ -186,7 +186,7 @@ export default function OrderTracking() {
             </div>
 
             <Button onClick={approve} disabled={busy || !canApprove}
-              className="w-full h-14 rounded-xl text-lg font-bold bg-success hover:bg-success/90 text-success-foreground mt-2">
+              className="w-full h-14 rounded-full text-lg font-bold bg-success hover:bg-success/90 text-success-foreground mt-2">
               {busy ? "Approving…" : canApprove ? "Approve Completion" : "Waiting for vendor's after-photo"}
             </Button>
           </div>

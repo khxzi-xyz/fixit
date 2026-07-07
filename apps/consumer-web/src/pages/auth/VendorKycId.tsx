@@ -45,11 +45,11 @@ export default function VendorKycId() {
   return (
     <AuthLayout title="Identity Verification" subtitle="We need to verify your identity to ensure platform safety." backTo="/auth/vendor/register">
       <div className="space-y-6">
-        <div className="aspect-[3/4] bg-muted border-2 border-primary/50 border-dashed rounded-2xl relative overflow-hidden flex flex-col items-center justify-center">
+        <div className="aspect-[3/4] bg-muted border-2 border-primary/50 border-dashed rounded-full relative overflow-hidden flex flex-col items-center justify-center">
           <div className="absolute inset-0 bg-black/40"></div>
           
           {/* Mock Camera Frame */}
-          <div className="w-48 h-64 border-4 border-white/50 rounded-xl relative z-10 flex items-center justify-center">
+          <div className="w-48 h-64 border-4 border-white/50 rounded-full relative z-10 flex items-center justify-center">
             <ScanFace className="w-16 h-16 text-white/50" />
             
             {/* Corner marks */}
@@ -63,11 +63,11 @@ export default function VendorKycId() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="outline" className="flex-1 h-14 rounded-xl border-border bg-card" onClick={handleUpload} disabled={busy}>
+          <Button variant="outline" className="flex-1 h-14 rounded-full border-border bg-card" onClick={handleUpload} disabled={busy}>
             <Camera className="w-5 h-5 mr-2" /> {busy ? "Uploading..." : "Take Photo"}
           </Button>
           <Link href="/auth/vendor/kyc-biz" className="flex-1 block">
-            <Button className="w-full h-14 rounded-xl bg-primary text-primary-foreground font-bold shadow-[0_0_20px_rgba(27,110,243,0.3)]">
+            <Button className="w-full h-14 rounded-full bg-primary text-primary-foreground font-bold shadow-[0_0_20px_rgba(27,110,243,0.3)]">
               Next Step
             </Button>
           </Link>

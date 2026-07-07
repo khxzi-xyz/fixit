@@ -80,7 +80,7 @@ export default function VendorProfile() {
               {reviews.slice(0, 5).map((r: any, i: number) => {
                 const stars = r.rating ?? r.rating_stars ?? 0;
                 return (
-                  <div key={r.review_id ?? i} className="bg-card border border-border rounded-xl shadow-sm p-3">
+                  <div key={r.review_id ?? i} className="bg-card border border-border rounded-full shadow-sm p-3">
                     <div className="flex items-center gap-1 mb-1">
                       {[1, 2, 3, 4, 5].map((s) => <Star key={s} className={`w-3.5 h-3.5 ${s <= stars ? "fill-warning text-warning" : "text-muted-foreground/30"}`} />)}
                     </div>
@@ -101,7 +101,7 @@ export default function VendorProfile() {
             ) : skills.map((s: any, i: number) => {
               const approved = (s.status ?? "APPROVED").toUpperCase() === "APPROVED";
               return (
-                <div key={i} className={`flex items-center justify-between p-3 bg-card border border-border rounded-xl shadow-sm ${approved ? "" : "opacity-70"}`}>
+                <div key={i} className={`flex items-center justify-between p-3 bg-card border border-border rounded-full shadow-sm ${approved ? "" : "opacity-70"}`}>
                   <span className="font-semibold text-sm">{s.skill_name ?? s.label ?? s.category_id ?? "Skill"}</span>
                   <div className={`flex items-center gap-1 text-xs font-bold ${approved ? "text-success" : "text-warning"}`}>
                     {approved ? <><CheckCircle2 className="w-4 h-4" /> APPROVED</> : "PENDING"}
@@ -112,7 +112,7 @@ export default function VendorProfile() {
           </div>
         </div>
 
-        <Card className="bg-card border-border shadow-sm rounded-2xl overflow-hidden">
+        <Card className="bg-card border-border shadow-sm rounded-full overflow-hidden">
           <CardContent className="p-0">
             {[
               { icon: Settings, label: "Shop Settings", href: "/vendor/settings" },
@@ -123,7 +123,7 @@ export default function VendorProfile() {
               <Link key={i} href={item.href}>
                 <div className="flex items-center justify-between p-4 border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><item.icon className="w-4 h-4" /></div>
+                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary"><item.icon className="w-4 h-4" /></div>
                     <span className="font-semibold text-sm">{item.label}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -133,7 +133,7 @@ export default function VendorProfile() {
           </CardContent>
         </Card>
 
-        <Button variant="ghost" onClick={signOut} className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl">
+        <Button variant="ghost" onClick={signOut} className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full">
           <LogOut className="w-5 h-5 mr-3" /> Sign Out
         </Button>
       </div>

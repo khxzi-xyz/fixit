@@ -21,11 +21,11 @@ function CodePicker({ value, onChange }: { value: string; onChange: (v: string) 
   return (
     <div className="relative">
       <button type="button" onClick={() => setOpen((v) => !v)}
-        className="h-14 px-3 bg-muted/60 border border-border rounded-xl flex items-center gap-1.5 font-bold text-sm min-w-[88px] whitespace-nowrap outline-none focus:ring-2 focus:ring-primary">
+        className="h-14 px-3 bg-muted/60 border border-border rounded-full flex items-center gap-1.5 font-bold text-sm min-w-[88px] whitespace-nowrap outline-none focus:ring-2 focus:ring-primary">
         <span className="text-lg">{sel.flag}</span><span>{sel.code}</span>
       </button>
       {open && (
-        <div className="absolute z-50 mt-2 w-44 bg-popover border border-border rounded-xl shadow-xl overflow-hidden">
+        <div className="absolute z-50 mt-2 w-44 bg-popover border border-border rounded-full shadow-xl overflow-hidden">
           {CODES.map((c) => (
             <button key={c.code} type="button" onClick={() => { onChange(c.code); setOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted transition-colors ${c.code === value ? "bg-slate-50 dark:bg-slate-900 text-primary font-bold" : ""}`}>
@@ -137,12 +137,12 @@ export default function UserRegister() {
                 <Input type="tel" value={phone} inputMode="numeric"
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 12))}
                   placeholder="9123 4567"
-                  className="w-full h-14 bg-muted/60 border-border rounded-xl px-4 text-lg font-semibold" />
+                  className="w-full h-14 bg-muted/60 border-border rounded-full px-4 text-lg font-semibold" />
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-1.5">We'll send a verification code to this number via SMS.</p>
           </div>
-          <Button type="submit" disabled={busy} className="w-full h-14 rounded-xl text-base font-bold gap-2 mt-2">
+          <Button type="submit" disabled={busy} className="w-full h-14 rounded-full text-base font-bold gap-2 mt-2">
             {busy ? "Sending OTP…" : <><span>Send verification code</span><ArrowRight className="w-5 h-5" /></>}
           </Button>
         </form>
@@ -155,7 +155,7 @@ export default function UserRegister() {
       <AuthLayout title="Check your email" subtitle="We've sent a confirmation link to your email address." backTo="/auth/user/login">
         <div className="text-center mt-6">
           <p className="text-muted-foreground mb-6">Please click the link in the email we sent to {email} to verify your account.</p>
-          <Button onClick={() => navigate("/auth/user/login")} className="w-full h-14 text-base font-bold rounded-xl">Back to Login</Button>
+          <Button onClick={() => navigate("/auth/user/login")} className="w-full h-14 text-base font-bold rounded-full">Back to Login</Button>
         </div>
       </AuthLayout>
     );
@@ -163,9 +163,9 @@ export default function UserRegister() {
 
   return (
     <AuthLayout title="Create account" subtitle="Join FixIt Now and find local pros" backTo="/auth/user/login">
-      <div className="flex bg-muted/50 p-1 rounded-xl mb-4">
-        <button onClick={() => setAuthMode("phone")} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${authMode === "phone" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>Phone</button>
-        <button onClick={() => setAuthMode("email")} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${authMode === "email" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>Email</button>
+      <div className="flex bg-muted/50 p-1 rounded-full mb-4">
+        <button onClick={() => setAuthMode("phone")} className={`flex-1 py-2.5 text-sm font-bold rounded-full transition-all ${authMode === "phone" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>Phone</button>
+        <button onClick={() => setAuthMode("email")} className={`flex-1 py-2.5 text-sm font-bold rounded-full transition-all ${authMode === "email" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>Email</button>
       </div>
 
       <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); authMode === "phone" ? submit() : submitEmail(); }}>
@@ -175,7 +175,7 @@ export default function UserRegister() {
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ahmed Al-Rashidi"
-              className="h-14 rounded-xl bg-muted/60 border-border text-base pl-10" />
+              className="h-14 rounded-full bg-muted/60 border-border text-base pl-10" />
           </div>
         </div>
 
@@ -189,7 +189,7 @@ export default function UserRegister() {
                   <Input type="tel" value={phone} inputMode="numeric"
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 12))}
                     placeholder="9123 4567"
-                    className="w-full h-14 bg-muted/60 border-border rounded-xl px-4 text-lg font-semibold" />
+                    className="w-full h-14 bg-muted/60 border-border rounded-full px-4 text-lg font-semibold" />
                 </div>
               </div>
             </div>
@@ -198,7 +198,7 @@ export default function UserRegister() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password (min 6 chars)"
-                  className="h-14 rounded-xl bg-muted/60 border-border text-base pl-10" required />
+                  className="h-14 rounded-full bg-muted/60 border-border text-base pl-10" required />
               </div>
               <p className="text-xs text-muted-foreground mt-1.5">Set a secure password for future logins.</p>
             </div>
@@ -210,7 +210,7 @@ export default function UserRegister() {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
-                  className="h-14 rounded-xl bg-muted/60 border-border text-base pl-10" />
+                  className="h-14 rounded-full bg-muted/60 border-border text-base pl-10" />
               </div>
             </div>
             <div>
@@ -218,13 +218,13 @@ export default function UserRegister() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
-                  className="h-14 rounded-xl bg-muted/60 border-border text-base pl-10" />
+                  className="h-14 rounded-full bg-muted/60 border-border text-base pl-10" />
               </div>
             </div>
           </>
         )}
 
-        <Button type="submit" disabled={busy} className="w-full h-14 rounded-xl text-base font-bold gap-2 mt-2">
+        <Button type="submit" disabled={busy} className="w-full h-14 rounded-full text-base font-bold gap-2 mt-2">
           {busy ? "Loading…" : (authMode === "phone" ? <span>Create Account</span> : <span>Create Account</span>)}
         </Button>
       </form>
@@ -237,7 +237,7 @@ export default function UserRegister() {
             <div className="flex-1 h-px bg-border" />
           </div>
           <Button variant="outline" onClick={withGoogle} disabled={busy}
-            className="w-full h-12 rounded-xl border-border font-semibold gap-2 hover:bg-muted/50">
+            className="w-full h-12 rounded-full border-border font-semibold gap-2 hover:bg-muted/50">
             <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="" />
             Sign up with Google
           </Button>

@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
           <ChevronLeft className="w-5 h-5" /> Back
         </button>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
         </div>
       </div>
       <div className="px-4 -mt-6 pb-10">
-        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-5 text-sm leading-relaxed text-muted-foreground">
+        <div className="bg-card border border-border rounded-full p-5 shadow-sm space-y-5 text-sm leading-relaxed text-muted-foreground">
           {[
             ["What We Collect", "We collect your phone number or email for authentication, your name and profile picture if provided, job descriptions and location data when posting a service request, and payment-related metadata (not card numbers -handled by payment processors)."],
             ["How We Use Your Data", "Your data is used to: match you with nearby service providers, process payments through escrow, send you order updates and notifications, and improve our AI matching algorithms."],

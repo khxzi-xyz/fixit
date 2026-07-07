@@ -55,7 +55,7 @@ export default function ConsumerSearch() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for plumbers, electricians..."
-            className="w-full h-12 bg-white rounded-xl pl-10 pr-10 text-sm font-semibold outline-none shadow-sm text-foreground placeholder:text-muted-foreground/70"
+            className="w-full h-12 bg-white rounded-full pl-10 pr-10 text-sm font-semibold outline-none shadow-sm text-foreground placeholder:text-muted-foreground/70"
           />
           {query && (
             <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -91,11 +91,11 @@ export default function ConsumerSearch() {
         {loading ? (
           <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-card border border-border rounded-xl p-4 h-40 animate-pulse" />
+              <div key={i} className="bg-card border border-border rounded-full p-4 h-40 animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl shadow-sm p-6 text-center flex flex-col items-center">
+          <div className="bg-card border border-border rounded-full shadow-sm p-6 text-center flex flex-col items-center">
             <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center mb-3">
               <SearchIcon className="w-6 h-6 text-muted-foreground" />
             </div>
@@ -105,7 +105,7 @@ export default function ConsumerSearch() {
             </p>
             <button
               onClick={() => navigate(`/post-job${query ? `?q=${encodeURIComponent(query)}` : ""}`)}
-              className="w-full h-10 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm"
+              className="w-full h-10 bg-primary text-white font-bold rounded-full flex items-center justify-center gap-2 shadow-sm"
             >
               <Plus className="w-4 h-4" /> Request a Service
             </button>
@@ -124,9 +124,9 @@ export default function ConsumerSearch() {
                 <button
                   key={v.vendor_id ?? v.user_id ?? i}
                   onClick={() => navigate(`/vendor/${v.vendor_id ?? v.user_id}`)}
-                  className="bg-card border border-border rounded-xl p-3 text-left hover:shadow-sm transition-shadow"
+                  className="bg-card border border-border rounded-full p-3 text-left hover:shadow-sm transition-shadow"
                 >
-                  <div className="relative w-full aspect-square rounded-xl bg-primary/10 flex flex-col items-center justify-center mb-3 overflow-hidden">
+                  <div className="relative w-full aspect-square rounded-full bg-primary/10 flex flex-col items-center justify-center mb-3 overflow-hidden">
                     {v.avatar_url ? (
                       <img src={v.avatar_url} className="w-full h-full object-cover" alt={name} />
                     ) : (
@@ -159,7 +159,7 @@ export default function ConsumerSearch() {
         {filtered.length > 0 && (
           <button
             onClick={() => navigate("/post-job")}
-            className="w-full mt-4 flex items-center justify-center gap-2 border border-dashed border-primary/40 text-primary font-bold rounded-xl py-3 text-sm hover:bg-slate-50 dark:bg-slate-900 transition-colors"
+            className="w-full mt-4 flex items-center justify-center gap-2 border border-dashed border-primary/40 text-primary font-bold rounded-full py-3 text-sm hover:bg-slate-50 dark:bg-slate-900 transition-colors"
           >
             <Plus className="w-4 h-4" /> Request Custom Service
           </button>

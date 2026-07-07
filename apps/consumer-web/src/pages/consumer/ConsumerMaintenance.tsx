@@ -62,14 +62,14 @@ export default function ConsumerMaintenance() {
             </h2>
             <div className="space-y-2">
               {subs.map((s) => (
-                <div key={s.subscription_id} className="bg-slate-50 dark:bg-slate-900 border border-primary/20 rounded-2xl p-3.5 flex items-center justify-between">
+                <div key={s.subscription_id} className="bg-slate-50 dark:bg-slate-900 border border-primary/20 rounded-full p-3.5 flex items-center justify-between">
                   <div>
                     <p className="font-bold text-sm">{s.plan_title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5 text-primary" /> Next Visit: <span className="font-bold text-foreground">{s.next_visit_date}</span>
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 bg-green-500/15 text-green-400 text-xs font-black rounded-lg">
+                  <span className="px-2.5 py-1 bg-green-500/15 text-green-400 text-xs font-black rounded-full">
                     {s.status}
                   </span>
                 </div>
@@ -115,7 +115,7 @@ export default function ConsumerMaintenance() {
                   <button
                     onClick={() => handleSubscribe(p.plan_id, p.title)}
                     disabled={isSubbed || subscribing === p.plan_id}
-                    className={`w-full py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
+                    className={`w-full py-3.5 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${
                       isSubbed
                         ? "bg-muted text-muted-foreground border border-border"
                         : "bg-primary text-white hover:bg-primary/90 shadow-md"

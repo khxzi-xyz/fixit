@@ -71,7 +71,7 @@ export default function ConsumerEditProfile() {
       </div>
 
       <div className="px-4 py-5 space-y-6 -mt-6">
-        <Card className="bg-card border-none shadow-lg rounded-2xl overflow-hidden">
+        <Card className="bg-card border-none shadow-lg rounded-full overflow-hidden">
           <CardContent className="p-6 space-y-6">
             <div className="flex flex-col items-center text-center gap-4">
               <div className="relative group">
@@ -92,18 +92,18 @@ export default function ConsumerEditProfile() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Full Name</Label>
-                <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-12 bg-muted/20 border-border rounded-xl font-bold" />
+                <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-12 bg-muted/20 border-border rounded-full font-bold" />
               </div>
 
               <div className="space-y-2">
                 <Label>Contact Details</Label>
-                <div className="flex items-center gap-2 p-3 bg-muted/30 border border-border/50 rounded-xl text-muted-foreground text-sm font-semibold">
+                <div className="flex items-center gap-2 p-3 bg-muted/30 border border-border/50 rounded-full text-muted-foreground text-sm font-semibold">
                   <Phone className="w-4 h-4 text-primary" />
                   {sessionUser?.phone || sessionUser?.email || "No contact info registered"}
                 </div>
               </div>
 
-              <Button onClick={saveProfile} disabled={avatarUploading} className="w-full h-12 rounded-xl font-extrabold shadow-md mt-4">
+              <Button onClick={saveProfile} disabled={avatarUploading} className="w-full h-12 rounded-full font-extrabold shadow-md mt-4">
                 {avatarUploading ? "Saving..." : "Save Profile Details"}
               </Button>
             </div>

@@ -33,36 +33,12 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  const until = result?.until ? new Date(result.until) : null;
+  const until = result?.until ? new Date(result.until) : (result?.plan?.expires_at ? new Date(result.plan.expires_at) : null);
   const daysLeft = until ? Math.max(1, Math.round((until.getTime() - Date.now()) / 86_400_000)) : null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-[#0d1b2a] via-[#12244a] to-[#1B6EF3] overflow-hidden flex flex-col items-center justify-center">
-      <style>{`
-        @keyframes fx-fall { 0% { transform: translateY(-8vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0.4; } }
-        @keyframes fx-ring { 0% { transform: scale(0.7); opacity: 0.7; } 100% { transform: scale(2.1); opacity: 0; } }
-        @keyframes fx-pop { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes fx-slide { 0% { transform: translateY(28px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-        @keyframes fx-shine { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
-      `}</style>
-
-      {/* Confetti (stages 0 and 3) */}
-      {(stage === 0 || stage === 3) && (
-        <div className="absolute inset-0 pointer-events-none">
-          {Array.from({ length: 28 }).map((_, i) => (
-            <span
-              key={i}
-              className="absolute w-2 h-3 rounded-[2px]"
-              style={{
-                left: `${(i * 37) % 100}%`,
-                top: "-5vh",
-                background: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-                animation: `fx-fall ${2.4 + (i % 5) * 0.5}s linear ${(i % 8) * 0.18}s infinite`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+    <div className="fixed inset-0 z-[100] bg-slate-900 bg-gradient-to-b from-slate-900 via-blue-900/50 to-primary overflow-hidden flex flex-col items-center justify-center">
+      {/* Confetti removed to prevent animation crashes on weak Android devices */}
 
       {/* Skip */}
       <button onClick={onDone} className="absolute top-5 right-5 z-10 w-9 h-9 bg-white/10 border border-white/20 rounded-full flex items-center justify-center text-white/70 hover:text-white">
@@ -71,10 +47,10 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
 
       {/* Stage 0 — logo splash */}
       {stage === 0 && (
-        <div className="text-center px-8" style={{ animation: "fx-pop 0.6s ease-out both" }}>
+        <div className="text-center px-8 transition-opacity duration-500 ease-in-opacity">
           <div className="relative w-28 h-28 mx-auto mb-6">
-            <span className="absolute inset-0 rounded-3xl border-2 border-white/40" style={{ animation: "fx-ring 1.4s ease-out infinite" }} />
-            <span className="absolute inset-0 rounded-3xl border-2 border-white/25" style={{ animation: "fx-ring 1.4s ease-out 0.5s infinite" }} />
+            <span className="absolute inset-0 rounded-3xl border-2 border-white/40" />
+            <span className="absolute inset-0 rounded-3xl border-2 border-white/25" />
             <img src="/logo.png" alt="FixIt" className="relative w-28 h-28 rounded-3xl shadow-2xl" />
           </div>
           <h2 className="text-3xl font-black text-white">Payment Successful!</h2>
@@ -85,15 +61,14 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
       {/* Stage 1 — perk showcase */}
       {stage === 1 && (
         <div className="w-full max-w-sm px-6">
-          <p className="text-center text-white/70 text-xs font-bold uppercase tracking-[0.25em] mb-5" style={{ animation: "fx-slide 0.4s ease-out both" }}>
+          <p className="text-center text-white/70 text-xs font-bold uppercase tracking-[0.25em] mb-5">
             Unlocked for you
           </p>
           <div className="space-y-3">
             {FALLBACK_PERKS.map((p, i) => (
               <div key={p.title}
-                className="flex items-center gap-3 bg-white/10 backdrop-blur border border-white/20 rounded-2xl px-4 py-3.5"
-                style={{ animation: `fx-slide 0.5s ease-out ${0.15 + i * 0.22}s both` }}>
-                <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center shrink-0">
+                className="flex items-center gap-3 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-3.5 transition-opacity duration-300">
+                <div className="w-10 h-10 bg-white/15 rounded-full flex items-center justify-center shrink-0">
                   <p.icon className="w-5 h-5 text-yellow-300" />
                 </div>
                 <div>
@@ -109,13 +84,12 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
 
       {/* Stage 2 — plan summary */}
       {stage === 2 && (
-        <div className="w-full max-w-sm px-6" style={{ animation: "fx-pop 0.5s ease-out both" }}>
-          <div className="bg-white/10 backdrop-blur border border-white/25 rounded-3xl p-6 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-amber-300 to-yellow-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+        <div className="w-full max-w-sm px-6">
+          <div className="bg-white/10 backdrop-blur border border-white/25 rounded-3xl p-6 text-center transition-transform duration-500">
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-300 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Crown className="w-9 h-9 text-black/80" />
             </div>
-            <h3 className="text-white text-2xl font-black"
-              style={{ backgroundImage: "linear-gradient(110deg, #fff 40%, #ffe9a8 50%, #fff 60%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", animation: "fx-shine 2.2s linear infinite" }}>
+            <h3 className="text-white text-2xl font-black">
               {planLabel}
             </h3>
             {daysLeft != null ? (
@@ -136,12 +110,12 @@ function UpgradeSuccessShow({ planLabel, result, onDone }: { planLabel: string; 
 
       {/* Stage 3 — send-off */}
       {stage === 3 && (
-        <div className="text-center px-8" style={{ animation: "fx-pop 0.5s ease-out both" }}>
-          <img src="/logo.png" alt="" className="w-20 h-20 rounded-2xl mx-auto mb-5 shadow-2xl" />
+        <div className="text-center px-8 transition-opacity duration-500">
+          <img src="/logo.png" alt="" className="w-20 h-20 rounded-full mx-auto mb-5 shadow-2xl" />
           <h2 className="text-3xl font-black text-white">Welcome to {planLabel}! 🎉</h2>
           <p className="text-primary-foreground/70 text-sm mt-2 max-w-xs mx-auto">Your perks are live right now. Post a job and feel the difference.</p>
           <button onClick={onDone}
-            className="mt-7 px-8 h-13 py-3.5 bg-white text-[#0d1b2a] font-black rounded-2xl inline-flex items-center gap-2 shadow-xl hover:scale-[1.03] transition-transform">
+            className="mt-7 px-8 h-13 py-3.5 bg-white text-[#0d1b2a] font-black rounded-full inline-flex items-center gap-2 shadow-xl hover:scale-[1.03] transition-transform">
             Start exploring <ArrowRight className="w-5 h-5" />
           </button>
         </div>
@@ -208,20 +182,20 @@ export default function ConsumerUpgrade() {
           <Crown className="w-10 h-10 text-yellow-300" />
         </div>
         <h1 className="text-3xl font-black tracking-tight">FixIt Now Plus</h1>
-        <p className="text-white/80 mt-2 text-sm max-w-xs mx-auto">Zero fees, priority matching, and 5% cashback.</p>
+        <p className="text-white/80 mt-2 text-sm max-w-xs mx-auto">Zero fees, priority matching, and 2% cashback.</p>
       </div>
 
-      <div className="px-4 -mt-8 space-y-5">
-        <Card className="bg-card border-border shadow-lg rounded-2xl relative overflow-hidden mt-4">
+      <div className="px-4 mt-6 space-y-5">
+        <Card className="bg-card border-border shadow-lg rounded-full relative overflow-hidden">
           <div className="absolute top-0 right-0 px-3 py-1.5 bg-primary text-primary-foreground text-[11px] font-bold rounded-bl-xl">
             {isAlreadyLifetime ? "LIFETIME ACTIVE" : "MOST POPULAR"}
           </div>
           <CardContent className="p-6">
 
             {isAlreadyLifetime ? (
-              <div className="bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-500/20 border border-amber-500/40 rounded-2xl p-4 mb-6">
+              <div className="bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-500/20 border border-amber-500/40 rounded-full p-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-500/30 rounded-xl flex items-center justify-center text-amber-400">
+                  <div className="w-10 h-10 bg-amber-500/30 rounded-full flex items-center justify-center text-amber-400">
                     <Crown className="w-6 h-6" />
                   </div>
                   <div>
@@ -231,7 +205,7 @@ export default function ConsumerUpgrade() {
                 </div>
               </div>
             ) : currentPlan?.planId && (
-              <div className="bg-slate-100 dark:bg-slate-800 border border-primary/20 rounded-xl p-3 mb-5">
+              <div className="bg-slate-100 dark:bg-slate-800 border border-primary/20 rounded-full p-3 mb-5">
                 <p className="text-xs font-bold text-primary mb-1">Your Current Plan: {currentPlan.planId}</p>
                 {currentPlan.expiresAt && <p className="text-[10px] text-muted-foreground">Expires: {new Date(currentPlan.expiresAt).toLocaleDateString()}</p>}
                 <p className="text-[10px] text-primary/80 mt-1">Purchasing a new plan will stack your active days.</p>
@@ -242,7 +216,7 @@ export default function ConsumerUpgrade() {
               <div className="grid grid-cols-4 gap-2 mb-5">
                 {([["WEEKLY", "Weekly"], ["MONTHLY", "Monthly"], ["YEARLY", "Yearly"], ["ONCE", "Lifetime"]] as const).map(([k, label]) => (
                   <button key={k} onClick={() => setIntervalOption(k)}
-                    className={`h-11 rounded-xl text-xs font-bold border flex items-center justify-center ${intervalOption === k ? "bg-primary text-primary-foreground border-primary" : "bg-muted border-border text-muted-foreground"}`}>
+                    className={`h-11 rounded-full text-xs font-bold border flex items-center justify-center ${intervalOption === k ? "bg-primary text-primary-foreground border-primary" : "bg-muted border-border text-muted-foreground"}`}>
                     {label}
                   </button>
                 ))}
@@ -270,7 +244,7 @@ export default function ConsumerUpgrade() {
             </div>
 
             {isAlreadyLifetime ? (
-              <Button disabled className="w-full h-14 rounded-xl text-base font-bold bg-amber-500/20 text-amber-500 border border-amber-500/40 opacity-100">
+              <Button disabled className="w-full h-14 rounded-full text-base font-bold bg-amber-500/20 text-amber-500 border border-amber-500/40 opacity-100">
                 <CheckCircle2 className="w-5 h-5 mr-2" /> Lifetime Plan Active
               </Button>
             ) : (
@@ -278,7 +252,7 @@ export default function ConsumerUpgrade() {
                 {balance != null && (
                   <p className="text-center text-xs text-muted-foreground mb-2">Wallet balance: <span className={`font-bold ${enough ? "text-success" : "text-destructive"}`}>{balance.toFixed(2)} OMR</span></p>
                 )}
-                <Button onClick={subscribe} disabled={!!busy} className="w-full h-14 rounded-xl text-lg font-bold">
+                <Button onClick={subscribe} disabled={!!busy} className="w-full h-14 rounded-full text-lg font-bold">
                   {busy ? "Activating…" : enough ? "Pay with Wallet" : "Top up & Upgrade"}
                 </Button>
                 <button onClick={() => setShowTopup((v) => !v)} className="w-full text-center text-sm text-primary font-semibold mt-3">

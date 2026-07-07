@@ -113,7 +113,7 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
       <div className="px-4 py-5 space-y-6">
       
         {/* Profile Card */}
-        <Card className="rounded-2xl border-none shadow-sm bg-card overflow-hidden">
+        <Card className="rounded-full border-none shadow-sm bg-card overflow-hidden">
           <div className="h-24 bg-gradient-to-r from-primary/10 to-primary/5"></div>
           <CardContent className="pt-0 -mt-10 px-6 pb-6">
             <div className="flex flex-col md:flex-row gap-5 items-start md:items-end mb-6">
@@ -141,11 +141,11 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
         {/* Language */}
         <section>
           <h2 className="text-sm font-extrabold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2"><Globe className="w-4 h-4" /> {t("onboarding.chooseLanguage")}</h2>
-          <Card className="bg-card border-border rounded-2xl"><CardContent className="p-2">
+          <Card className="bg-card border-border rounded-full"><CardContent className="p-2">
             <div className="grid grid-cols-2 gap-2">
               {LANGUAGES.map((l) => (
                 <button key={l.code} onClick={() => setLang(l.code as Lang)}
-                  className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${lang === l.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-transparent hover:bg-muted"}`}>
+                  className={`flex items-center justify-between p-3 rounded-full border transition-colors ${lang === l.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-transparent hover:bg-muted"}`}>
                   <div className="text-start"><p className="font-bold text-sm">{l.native}</p><p className="text-[11px] text-muted-foreground">{l.label}</p></div>
                   {lang === l.code && <Check className="w-4 h-4 text-primary" />}
                 </button>
@@ -157,11 +157,11 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
         {/* Country */}
         <section>
           <h2 className="text-sm font-extrabold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2"><MapPin className="w-4 h-4" /> {t("onboarding.chooseCountry")}</h2>
-          <Card className="bg-card border-border rounded-2xl"><CardContent className="p-2">
+          <Card className="bg-card border-border rounded-full"><CardContent className="p-2">
             <div className="grid grid-cols-2 gap-2">
               {COUNTRIES.map((c) => (
                 <button key={c.code} onClick={() => setCountry(c.code)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${country === c.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-transparent hover:bg-muted"}`}>
+                  className={`flex items-center gap-3 p-3 rounded-full border transition-colors ${country === c.code ? "border-primary bg-slate-50 dark:bg-slate-900" : "border-transparent hover:bg-muted"}`}>
                   <img src={flagUrl(c.code)} className="w-8 h-5 rounded object-cover" alt="" />
                   <span className="font-semibold text-sm truncate">{c.name}</span>
                 </button>
@@ -173,11 +173,11 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
         {/* Saved addresses */}
         <section>
           <h2 className="text-sm font-extrabold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2"><Home className="w-4 h-4" /> Saved addresses</h2>
-          <Card className="bg-card border-border rounded-2xl"><CardContent className="p-4 space-y-3">
+          <Card className="bg-card border-border rounded-full"><CardContent className="p-4 space-y-3">
             {addresses.length > 0 && (
               <div className="space-y-2">
                 {addresses.map((a) => (
-                  <div key={a.address_id} className="flex items-center gap-3 p-3 rounded-xl bg-muted">
+                  <div key={a.address_id} className="flex items-center gap-3 p-3 rounded-full bg-muted">
                     <MapPin className="w-4 h-4 text-primary shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-sm truncate">{a.label}</p>
@@ -190,7 +190,7 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
             )}
             <div className="space-y-3 pt-3 border-t border-border mt-3">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Add New Address</h3>
-              <div className="h-48 overflow-hidden rounded-xl border border-border relative">
+              <div className="h-48 overflow-hidden rounded-full border border-border relative">
                 <LocationPickerMap 
                   className="w-full h-full"
                   onLocationChange={(l) => {
@@ -199,9 +199,9 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
                   }}
                 />
               </div>
-              <Input value={addrLabel} onChange={(e) => setAddrLabel(e.target.value)} placeholder="Label (Home, Office…)" className="h-11 rounded-xl bg-muted border-border" />
-              <Input value={addrDetails} onChange={(e) => setAddrDetails(e.target.value)} placeholder="Building / street / notes" className="h-11 rounded-xl bg-muted border-border" />
-              <Button onClick={addAddress} disabled={addrBusy} className="w-full h-11 rounded-xl font-bold bg-primary text-white hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" /> {addrBusy ? "Saving…" : "Save Location"}</Button>
+              <Input value={addrLabel} onChange={(e) => setAddrLabel(e.target.value)} placeholder="Label (Home, Office…)" className="h-11 rounded-full bg-muted border-border" />
+              <Input value={addrDetails} onChange={(e) => setAddrDetails(e.target.value)} placeholder="Building / street / notes" className="h-11 rounded-full bg-muted border-border" />
+              <Button onClick={addAddress} disabled={addrBusy} className="w-full h-11 rounded-full font-bold bg-primary text-white hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" /> {addrBusy ? "Saving…" : "Save Location"}</Button>
             </div>
           </CardContent></Card>
         </section>
@@ -209,19 +209,19 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
         {/* Account Linking */}
         <section>
           <h2 className="text-sm font-extrabold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2"><UserCog className="w-4 h-4" /> Account & Linking</h2>
-          <Card className="bg-card border-border rounded-2xl"><CardContent className="p-4 space-y-4">
+          <Card className="bg-card border-border rounded-full"><CardContent className="p-4 space-y-4">
             <div className="space-y-2">
               <p className="text-sm font-semibold">Link Email</p>
               <div className="flex gap-2">
-                <Input value={linkEmail} onChange={(e) => setLinkEmail(e.target.value)} placeholder="hello@example.com" className="h-10 rounded-lg flex-1" />
-                <Button onClick={requestEmailLink} disabled={linkBusy || !linkEmail} className="h-10 rounded-lg font-bold">Verify</Button>
+                <Input value={linkEmail} onChange={(e) => setLinkEmail(e.target.value)} placeholder="hello@example.com" className="h-10 rounded-full flex-1" />
+                <Button onClick={requestEmailLink} disabled={linkBusy || !linkEmail} className="h-10 rounded-full font-bold">Verify</Button>
               </div>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-semibold">Link Phone</p>
               <div className="flex gap-2">
-                <Input value={linkPhone} onChange={(e) => setLinkPhone(e.target.value)} placeholder="+968 9123 4567" className="h-10 rounded-lg flex-1" />
-                <Button onClick={requestPhoneLink} disabled={linkBusy || !linkPhone} className="h-10 rounded-lg font-bold">Verify</Button>
+                <Input value={linkPhone} onChange={(e) => setLinkPhone(e.target.value)} placeholder="+968 9123 4567" className="h-10 rounded-full flex-1" />
+                <Button onClick={requestPhoneLink} disabled={linkBusy || !linkPhone} className="h-10 rounded-full font-bold">Verify</Button>
               </div>
             </div>
           </CardContent></Card>
@@ -230,7 +230,7 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
         {/* Preferences */}
         <section>
           <h2 className="text-sm font-extrabold text-muted-foreground uppercase tracking-wide mb-3">Preferences</h2>
-          <Card className="bg-card border-border rounded-2xl"><CardContent className="p-0">
+          <Card className="bg-card border-border rounded-full"><CardContent className="p-0">
             <Row icon={dark ? Moon : Sun} label="Dark mode" right={<Switch checked={dark} onCheckedChange={toggleTheme} />} />
             <Row icon={Bell} label="Notifications" right={<Switch checked={notif} onCheckedChange={toggleNotif} />} last />
           </CardContent></Card>
@@ -239,13 +239,13 @@ export function SettingsScreen({ variant }: { variant: "consumer" | "vendor" }) 
         {/* Legal */}
         <section>
           <h2 className="text-sm font-extrabold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2"><ShieldCheck className="w-4 h-4" /> Legal</h2>
-          <Card className="bg-card border-border rounded-2xl"><CardContent className="p-0">
+          <Card className="bg-card border-border rounded-full"><CardContent className="p-0">
             <Row icon={ShieldCheck} label={t("legal.tosHeading")} onClick={() => toast({ title: t("legal.tosHeading"), description: t("legal.intro") })} />
             <Row icon={ShieldCheck} label={t("legal.privacyHeading")} onClick={() => toast({ title: t("legal.privacyHeading"), description: t("legal.intro") })} last />
           </CardContent></Card>
         </section>
 
-        <Button variant="ghost" onClick={signOut} className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl">
+        <Button variant="ghost" onClick={signOut} className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full">
           <LogOut className="w-5 h-5 mr-3" /> Sign Out
         </Button>
         <p className="text-center text-[11px] text-muted-foreground">FixIt Now · v0.1.0</p>
@@ -258,7 +258,7 @@ function Row({ icon: Icon, label, right, onClick, last }: { icon: any; label: st
   return (
     <div onClick={onClick} className={`flex items-center justify-between p-4 ${last ? "" : "border-b border-border"} ${onClick ? "cursor-pointer hover:bg-muted/50" : ""}`}>
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><Icon className="w-4 h-4" /></div>
+        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary"><Icon className="w-4 h-4" /></div>
         <span className="font-semibold text-sm">{label}</span>
       </div>
       {right}

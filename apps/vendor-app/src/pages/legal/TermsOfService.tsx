@@ -14,7 +14,7 @@ export default function TermsOfService() {
         <p className="text-primary-foreground/70 text-sm mt-1">Last updated: July 2026</p>
       </div>
       <div className="px-4 -mt-6 pb-10">
-        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-5 text-sm leading-relaxed text-muted-foreground">
+        <div className="bg-card border border-border rounded-full p-5 shadow-sm space-y-5 text-sm leading-relaxed text-muted-foreground">
           {[
             ["1. Acceptance of Terms", "By using FixIt Now, you agree to be bound by these Terms. If you do not agree, do not use the platform."],
             ["2. Services", "FixIt Now is a marketplace connecting consumers with verified service providers. We do not directly provide any services and are not responsible for the work quality of vendors."],

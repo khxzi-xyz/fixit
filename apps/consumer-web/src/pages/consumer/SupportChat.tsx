@@ -72,7 +72,7 @@ export default function SupportChat() {
           <ChevronLeft className="w-6 h-6" />
         </button>
         <div className="relative">
-          <img src="/logo.png" alt="" className="w-10 h-10 rounded-xl" />
+          <img src="/logo.png" alt="" className="w-10 h-10 rounded-full" />
           <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-[#0d1b2a] rounded-full" />
         </div>
         <div className="flex-1 min-w-0">
@@ -84,7 +84,7 @@ export default function SupportChat() {
         <button
           onClick={escalate}
           disabled={escalating}
-          className="flex items-center gap-1.5 px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white text-xs font-bold hover:bg-white/20 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-2 bg-white/10 border border-white/20 rounded-full text-white text-xs font-bold hover:bg-white/20 transition-colors disabled:opacity-50"
         >
           <Headset className="w-3.5 h-3.5" /> {escalating ? "…" : "Talk to an agent"}
         </button>
@@ -98,10 +98,10 @@ export default function SupportChat() {
           return (
             <div key={m.msg_id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               {!mine && (
-                <img src="/logo.png" alt="" className="w-7 h-7 rounded-lg mr-2 mt-1 shrink-0" />
+                <img src="/logo.png" alt="" className="w-7 h-7 rounded-full mr-2 mt-1 shrink-0" />
               )}
               <div
-                className={`max-w-[78%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap rounded-2xl ${
+                className={`max-w-[78%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap rounded-full ${
                   mine
                     ? "bg-primary text-white rounded-br-md"
                     : agent
@@ -124,8 +124,8 @@ export default function SupportChat() {
         })}
         {sending && (
           <div className="flex justify-start items-center gap-2">
-            <img src="/logo.png" alt="" className="w-7 h-7 rounded-lg" />
-            <div className="bg-card border border-border rounded-2xl rounded-bl-md px-4 py-3 flex gap-1">
+            <img src="/logo.png" alt="" className="w-7 h-7 rounded-full" />
+            <div className="bg-card border border-border rounded-full rounded-bl-md px-4 py-3 flex gap-1">
               {[0, 1, 2].map((i) => (
                 <span key={i} className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
               ))}
@@ -153,10 +153,10 @@ export default function SupportChat() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             placeholder="Type your message…"
-            className="flex-1 h-12 bg-muted/60 border border-border rounded-xl px-4 text-sm font-medium outline-none focus:border-primary"
+            className="flex-1 h-12 bg-muted/60 border border-border rounded-full px-4 text-sm font-medium outline-none focus:border-primary"
           />
           <button onClick={() => send()} disabled={sending || !input.trim()}
-            className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center disabled:opacity-40">
+            className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center disabled:opacity-40">
             <Send className="w-5 h-5" />
           </button>
         </div>

@@ -169,15 +169,58 @@ export const api = {
   markNotificationsRead: () => req<any>("POST", "/notifications/read-all", {}),
   markOneRead: (id: string) => req<any>("POST", `/notifications/${id}/read`, {}),
   registerPushNotifications: async () => {
-    if ("serviceWorker" in navigator && "PushManager" in window) {
-      try {
-        const sw = await navigator.serviceWorker.register("/sw.js");
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          console.log("[FixIt] Push notifications granted");
+    try {
+      // Use Capacitor PushNotifications for native Android/iOS
+      const { PushNotifications } = await import('@capacitor/push-notifications');
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+
+      let permStatus = await PushNotifications.checkPermissions();
+      if (permStatus.receive !== 'granted') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
+
+      if (permStatus.receive !== 'granted') {
+        console.error("[FixIt] User denied push notification permissions.");
+        return;
+      }
+
+      await PushNotifications.register();
+
+      PushNotifications.addListener('registration', (token) => {
+        console.log('[FixIt] FCM Device Token Generated:', token.value);
+        // Send token to Supabase/API backend
+        req<any>("PUT", "/users/me/device-token", { token: token.value }).catch(() => {});
+      });
+
+      PushNotifications.addListener('registrationError', (err) => {
+        console.error('[FixIt] Capacitor Push Registration Error:', err);
+      });
+
+      PushNotifications.addListener('pushNotificationReceived', async (notification) => {
+        console.log('[FixIt] Notification received:', notification);
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              title: notification.title || "FixIt Alert",
+              body: notification.body || "",
+              id: Date.now(),
+              extra: notification.data
+            }
+          ]
+        });
+      });
+    } catch (e) {
+      console.log("[FixIt] Running on web, falling back to Web Push...");
+      if ("serviceWorker" in navigator && "PushManager" in window) {
+        try {
+          const sw = await navigator.serviceWorker.register("/sw.js");
+          const permission = await Notification.requestPermission();
+          if (permission === "granted") {
+            console.log("[FixIt] Web Push notifications granted");
+          }
+        } catch (err) {
+          console.warn("[FixIt] Web Push registration failed", err);
         }
-      } catch (e) {
-        console.warn("[FixIt] Push registration failed", e);
       }
     }
   },

@@ -67,14 +67,14 @@ export default function ConsumerPayments() {
 
       <div className="relative z-10 px-4 -mt-6 pb-10 space-y-4">
         {cards.length === 0 && !showForm && (
-          <div className="bg-card border border-border rounded-2xl p-8 text-center shadow-sm">
+          <div className="bg-card border border-border rounded-full p-8 text-center shadow-sm">
             <CreditCard className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">No saved cards yet.</p>
           </div>
         )}
 
         {cards.map((c) => (
-          <div key={c.pm_id} className={`relative bg-gradient-to-br ${BRAND_STYLE[c.brand] ?? BRAND_STYLE.CARD} rounded-2xl p-5 text-white shadow-lg overflow-hidden`}>
+          <div key={c.pm_id} className={`relative bg-gradient-to-br ${BRAND_STYLE[c.brand] ?? BRAND_STYLE.CARD} rounded-full p-5 text-white shadow-lg overflow-hidden`}>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 10%, white 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
             <div className="relative z-10 flex items-start justify-between">
               <div>
@@ -90,7 +90,7 @@ export default function ConsumerPayments() {
                     <Star className="w-3 h-3" /> Default
                   </span>
                 )}
-                <button onClick={() => removeCard(c.pm_id)} className="p-2 bg-white/15 rounded-xl hover:bg-white/25 transition-colors">
+                <button onClick={() => removeCard(c.pm_id)} className="p-2 bg-white/15 rounded-full hover:bg-white/25 transition-colors">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -99,27 +99,27 @@ export default function ConsumerPayments() {
         ))}
 
         {showForm ? (
-          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+          <div className="bg-card border border-border rounded-full p-4 shadow-sm space-y-3">
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">New card</p>
             <input value={cardNumber}
               onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 19).replace(/(.{4})/g, "$1 ").trim())}
               placeholder="Card number" inputMode="numeric"
-              className="w-full h-12 bg-muted/60 border border-border rounded-xl px-4 text-base font-semibold tracking-widest outline-none focus:border-primary" />
+              className="w-full h-12 bg-muted/60 border border-border rounded-full px-4 text-base font-semibold tracking-widest outline-none focus:border-primary" />
             <div className="flex gap-2">
               <input value={expiry}
                 onChange={(e) => { const d = e.target.value.replace(/\D/g, "").slice(0, 4); setExpiry(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d); }}
                 placeholder="MM/YY" inputMode="numeric"
-                className="flex-1 h-12 bg-muted/60 border border-border rounded-xl px-4 font-semibold outline-none focus:border-primary" />
+                className="flex-1 h-12 bg-muted/60 border border-border rounded-full px-4 font-semibold outline-none focus:border-primary" />
               <input value={cvv}
                 onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
                 placeholder="CVV" inputMode="numeric"
-                className="w-24 h-12 bg-muted/60 border border-border rounded-xl px-4 font-semibold outline-none focus:border-primary" />
+                className="w-24 h-12 bg-muted/60 border border-border rounded-full px-4 font-semibold outline-none focus:border-primary" />
             </div>
             <input value={holder} onChange={(e) => setHolder(e.target.value)} placeholder="Name on card (optional)"
-              className="w-full h-12 bg-muted/60 border border-border rounded-xl px-4 font-semibold outline-none focus:border-primary" />
+              className="w-full h-12 bg-muted/60 border border-border rounded-full px-4 font-semibold outline-none focus:border-primary" />
             <div className="flex gap-2">
-              <button onClick={() => setShowForm(false)} className="flex-1 h-11 bg-muted text-muted-foreground font-bold rounded-xl">Cancel</button>
-              <button onClick={addCard} disabled={busy} className="flex-1 h-11 bg-primary text-white font-bold rounded-xl disabled:opacity-50">
+              <button onClick={() => setShowForm(false)} className="flex-1 h-11 bg-muted text-muted-foreground font-bold rounded-full">Cancel</button>
+              <button onClick={addCard} disabled={busy} className="flex-1 h-11 bg-primary text-white font-bold rounded-full disabled:opacity-50">
                 {busy ? "Saving…" : "Save card"}
               </button>
             </div>
@@ -129,7 +129,7 @@ export default function ConsumerPayments() {
           </div>
         ) : (
           <button onClick={() => setShowForm(true)}
-            className="w-full h-12 border-2 border-dashed border-primary/40 text-primary font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-50 dark:bg-slate-900 transition-colors">
+            className="w-full h-12 border-2 border-dashed border-primary/40 text-primary font-bold rounded-full flex items-center justify-center gap-2 hover:bg-slate-50 dark:bg-slate-900 transition-colors">
             <Plus className="w-4 h-4" /> Add a card
           </button>
         )}

@@ -127,7 +127,7 @@ export class JobsService {
     if (!profile) return [];
     const { data, error } = await db
       .from('jobs')
-      .select('job_id, category_id, sub_issue_tags, urgency, description, budget_range_min, budget_range_max, created_at, media_urls')
+      .select('job_id, tracking_id, category_id, sub_issue_tags, urgency, description, budget_range_min, budget_range_max, created_at, media_urls')
       .eq('status', 'OPEN')
       .in('category_id', profile.category_ids)
       .order('created_at', { ascending: false })

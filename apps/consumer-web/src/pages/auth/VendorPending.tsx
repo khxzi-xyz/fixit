@@ -24,7 +24,7 @@ export default function VendorPending() {
           Your documents have been submitted securely. Our team is verifying your profile.
         </p>
 
-        <div className="w-full bg-muted p-4 rounded-xl text-left space-y-3 mb-8">
+        <div className="w-full bg-muted p-4 rounded-full text-left space-y-3 mb-8">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-success"></div>
             <span className="text-sm font-medium">Identity verified</span>
@@ -40,7 +40,7 @@ export default function VendorPending() {
         </div>
 
         <Link href="/vendor/home" className="w-full">
-          <Button variant="outline" className="w-full h-12 rounded-xl border-border">
+          <Button variant="outline" className="w-full h-12 rounded-full border-border">
             Skip for Demo
           </Button>
         </Link>

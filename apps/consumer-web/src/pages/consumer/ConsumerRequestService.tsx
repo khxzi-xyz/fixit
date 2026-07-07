@@ -40,7 +40,7 @@ export default function ConsumerRequestService() {
         <p className="text-white/75 mt-1 text-sm">Can't find what you need? Tell us.</p>
       </div>
       <div className="p-4 max-w-2xl mx-auto mt-4">
-        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+        <div className="bg-card border border-border rounded-full p-6 shadow-sm">
           <p className="text-sm text-muted-foreground mb-6">
             If our current catalog doesn't cover your needs, request a new service below. We continuously add categories based on user demand.
           </p>

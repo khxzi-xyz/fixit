@@ -61,34 +61,39 @@ export default function ConsumerSupport() {
         <p className="text-primary-foreground/70 text-sm mt-1">We're here for you 24/7</p>
       </div>
 
-      <div className="px-4 -mt-6 pb-10 space-y-4">
+      <div className="px-4 mt-6 pb-10 space-y-4">
         {/* Quick contact */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { icon: MessageCircle, label: "Live WhatsApp", sub: "< 2 min", href: waUrl, color: "from-green-500 to-emerald-600" },
-            { icon: Phone, label: "Call Us", sub: "+968 95956361", href: "tel:+96895956361", color: "from-blue-500 to-blue-700" },
-            { icon: Mail, label: "Email", sub: "24h reply", href: "mailto:support@fixit-now.xyz", color: "from-purple-500 to-purple-700" },
-          ].map((c) => (
+        <div className="bg-card border border-border p-4 rounded-full shadow-sm">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-3">Get in Touch</p>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { icon: MessageCircle, label: "WhatsApp", sub: "< 2 min", href: waUrl, color: "text-green-500 bg-green-500/10" },
+              { icon: Phone, label: "Call Us", sub: "+968 95956361", href: "tel:+96895956361", color: "text-blue-500 bg-blue-500/10" },
+              { icon: Mail, label: "Email", sub: "24h reply", href: "mailto:support@fixit-now.xyz", color: "text-purple-500 bg-purple-500/10" },
+            ].map((c) => (
             <a
               key={c.label}
               href={c.href}
               target="_blank"
               rel="noreferrer"
-              className={`flex flex-col items-center gap-2 py-4 bg-gradient-to-br ${c.color} rounded-2xl text-white shadow-lg hover:scale-[1.03] active:scale-95 transition-transform text-center`}
+              className="flex flex-col items-center gap-2 py-4 bg-card border border-border rounded-full shadow-sm hover:border-primary/40 active:scale-95 transition-all text-center"
             >
-              <c.icon className="w-6 h-6" />
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${c.color}`}>
+                <c.icon className="w-5 h-5" />
+              </div>
               <div>
-                <p className="text-sm font-bold">{c.label}</p>
-                <p className="text-[10px] opacity-80">{c.sub}</p>
+                <p className="text-sm font-bold text-foreground">{c.label}</p>
+                <p className="text-[10px] text-muted-foreground">{c.sub}</p>
               </div>
             </a>
           ))}
+          </div>
         </div>
 
         {/* Submit ticket */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Submit a Ticket</p>
-          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+          <div className="bg-card border border-border rounded-full p-4 shadow-sm space-y-3">
             {submitted ? (
               <div className="flex flex-col items-center gap-3 py-6 text-center">
                 <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center">
@@ -108,7 +113,7 @@ export default function ConsumerSupport() {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="What's the issue?"
-                    className="w-full h-11 bg-muted/60 border border-border rounded-xl px-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="w-full h-11 bg-muted/60 border border-border rounded-full px-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 </div>
                 <div className="space-y-1">
@@ -118,13 +123,13 @@ export default function ConsumerSupport() {
                     onChange={(e) => setBody(e.target.value)}
                     placeholder="Describe the problem in detail…"
                     rows={4}
-                    className="w-full bg-muted/60 border border-border rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                    className="w-full bg-muted/60 border border-border rounded-full px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
                   />
                 </div>
                 <button
                   onClick={submitTicket}
                   disabled={submitting || !subject.trim() || !body.trim()}
-                  className="w-full h-11 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="w-full h-11 bg-primary text-white font-bold rounded-full flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {submitting ? (
                     <Zap className="w-4 h-4 animate-pulse" />
@@ -140,7 +145,7 @@ export default function ConsumerSupport() {
         {/* FAQ */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Frequently Asked Questions</p>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             {FAQ.map((faq, i) => (
               <div key={i} className={i !== FAQ.length - 1 ? "border-b border-border" : ""}>
                 <button
@@ -157,7 +162,7 @@ export default function ConsumerSupport() {
                 </button>
                 {openFaq === i && (
                   <div className="px-4 pb-4 pt-0">
-                    <p className="text-sm text-muted-foreground leading-relaxed bg-muted/30 rounded-xl p-3">
+                    <p className="text-sm text-muted-foreground leading-relaxed bg-muted/30 rounded-full p-3">
                       {faq.a}
                     </p>
                   </div>
@@ -168,7 +173,7 @@ export default function ConsumerSupport() {
         </div>
 
         {/* Legal links */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
           {[
             { label: "Terms of Service", href: "/tos" },
             { label: "Privacy Policy", href: "/privacy" },

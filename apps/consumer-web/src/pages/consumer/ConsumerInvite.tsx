@@ -78,7 +78,7 @@ export default function ConsumerInvite() {
       {/* Hero */}
       <div className="relative bg-primary text-primary-foreground border-b border-border px-6 pt-14 pb-16 text-center overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, white 1px, transparent 1px)", backgroundSize: "26px 26px" }} />
-        <img src="/logo.png" alt="FixIt" className="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-xl relative z-10" />
+        <img src="/logo.png" alt="FixIt" className="w-16 h-16 rounded-full mx-auto mb-4 shadow-xl relative z-10" />
         <h1 className="text-2xl font-black text-white relative z-10">You're invited to FixIt Now! 🎉</h1>
         <p className="text-primary-foreground/70 text-sm mt-2 relative z-10">
           A friend shared code <span className="font-black text-white tracking-widest">{code || "…"}</span> with you
@@ -99,7 +99,7 @@ export default function ConsumerInvite() {
             <p className="text-sm text-muted-foreground mt-2">
               You have 3 days of FixIt Plus — zero fees, priority matching and more. No charge today.
             </p>
-            <button onClick={() => navigate("/home")} className="mt-6 w-full h-12 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2">
+            <button onClick={() => navigate("/home")} className="mt-6 w-full h-12 bg-primary text-white font-bold rounded-full flex items-center justify-center gap-2">
               Start exploring <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -118,7 +118,7 @@ export default function ConsumerInvite() {
                 onChange={(e) => setCardNumber(formatCard(e.target.value))}
                 placeholder="Card number"
                 inputMode="numeric"
-                className="w-full h-12 bg-muted/60 border border-border rounded-xl px-4 text-base font-semibold tracking-widest outline-none focus:border-primary"
+                className="w-full h-12 bg-muted/60 border border-border rounded-full px-4 text-base font-semibold tracking-widest outline-none focus:border-primary"
               />
               <div className="flex gap-2">
                 <input
@@ -129,25 +129,25 @@ export default function ConsumerInvite() {
                   }}
                   placeholder="MM/YY"
                   inputMode="numeric"
-                  className="flex-1 h-12 bg-muted/60 border border-border rounded-xl px-4 text-base font-semibold outline-none focus:border-primary"
+                  className="flex-1 h-12 bg-muted/60 border border-border rounded-full px-4 text-base font-semibold outline-none focus:border-primary"
                 />
                 <input
                   value={cvv}
                   onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
                   placeholder="CVV"
                   inputMode="numeric"
-                  className="w-24 h-12 bg-muted/60 border border-border rounded-xl px-4 text-base font-semibold outline-none focus:border-primary"
+                  className="w-24 h-12 bg-muted/60 border border-border rounded-full px-4 text-base font-semibold outline-none focus:border-primary"
                 />
               </div>
               <input
                 value={holder}
                 onChange={(e) => setHolder(e.target.value)}
                 placeholder="Name on card (optional)"
-                className="w-full h-12 bg-muted/60 border border-border rounded-xl px-4 text-base font-semibold outline-none focus:border-primary"
+                className="w-full h-12 bg-muted/60 border border-border rounded-full px-4 text-base font-semibold outline-none focus:border-primary"
               />
             </div>
             <button onClick={startTrial} disabled={busy}
-              className="w-full h-13 py-3.5 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50">
+              className="w-full h-13 py-3.5 bg-primary text-white font-bold rounded-full flex items-center justify-center gap-2 disabled:opacity-50">
               {busy ? "Activating…" : <><Lock className="w-4 h-4" /> Start 3-day free trial</>}
             </button>
             <p className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1">
@@ -160,7 +160,7 @@ export default function ConsumerInvite() {
             <div className="space-y-3">
               {PERKS.map((p) => (
                 <div key={p.text} className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center shrink-0">
                     <p.icon className="w-5 h-5 text-primary" />
                   </div>
                   <p className="text-sm font-semibold">{p.text}</p>
@@ -171,7 +171,7 @@ export default function ConsumerInvite() {
             {!loggedIn ? (
               <>
                 <button onClick={goRegister}
-                  className="w-full py-3.5 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2">
+                  className="w-full py-3.5 bg-primary text-white font-bold rounded-full flex items-center justify-center gap-2">
                   Claim with a new account <ArrowRight className="w-4 h-4" />
                 </button>
                 <button onClick={() => { sessionStorage.setItem("fixit_post_auth", `/invite/${code}`); navigate("/auth/user/login"); }}
@@ -182,13 +182,13 @@ export default function ConsumerInvite() {
             ) : hasActivePlan ? (
               <div className="text-center space-y-3">
                 <p className="text-sm text-muted-foreground">You already have an active plan — the trial is for new members. Share your own code from the Rewards page!</p>
-                <button onClick={() => navigate("/rewards")} className="w-full py-3.5 bg-primary text-white font-bold rounded-xl">
+                <button onClick={() => navigate("/rewards")} className="w-full py-3.5 bg-primary text-white font-bold rounded-full">
                   Open Rewards
                 </button>
               </div>
             ) : (
               <button onClick={() => setStep("card")}
-                className="w-full py-3.5 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2">
+                className="w-full py-3.5 bg-primary text-white font-bold rounded-full flex items-center justify-center gap-2">
                 Start my free trial <ArrowRight className="w-4 h-4" />
               </button>
             )}

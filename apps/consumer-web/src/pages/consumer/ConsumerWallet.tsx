@@ -12,13 +12,11 @@ export default function ConsumerWallet() {
   const [txns, setTxns] = useState<Txn[]>([]);
   const [showTopup, setShowTopup] = useState(false);
 
-  const load = useCallback(async () => {
-    try { 
-      const [w, t] = await Promise.all([api.wallet(), api.walletTxns()]); 
-      setWallet(w); 
-      setTxns(t); 
-    }
-    catch { /* not authed or no db */ }
+  const load = useCallback(() => {
+    import("@/lib/api").then(({ swr }) => {
+      swr("wallet", api.wallet, setWallet).catch(() => {});
+      swr("wallet_txns", api.walletTxns, setTxns).catch(() => {});
+    });
   }, []);
   
   useEffect(() => { load(); }, [load]);
@@ -40,11 +38,11 @@ export default function ConsumerWallet() {
         </div>
 
         <div className="flex gap-4">
-          <div className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3">
+          <div className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-3">
             <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Available</p>
             <p className="text-base font-black text-white">{(wallet?.balance ?? 0).toFixed(3)}</p>
           </div>
-          <div className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3">
+          <div className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-3">
             <div className="flex items-center gap-1 text-[10px] text-white/60 uppercase tracking-widest font-bold">
               <ShieldCheck className="w-3 h-3" /> Escrow
             </div>
@@ -57,7 +55,7 @@ export default function ConsumerWallet() {
         <div className="flex gap-3">
           <button 
             onClick={() => setShowTopup(!showTopup)}
-            className="flex-1 bg-card border border-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-50 dark:bg-slate-900 transition-colors shadow-sm"
+            className="flex-1 bg-card border border-border rounded-full p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-50 dark:bg-slate-900 transition-colors shadow-sm"
           >
             <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
               <Plus className="w-5 h-5 text-primary" />
@@ -66,7 +64,7 @@ export default function ConsumerWallet() {
           </button>
           <button 
             onClick={() => navigate("/request-service")}
-            className="flex-1 bg-card border border-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-50 dark:bg-slate-900 transition-colors shadow-sm"
+            className="flex-1 bg-card border border-border rounded-full p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-50 dark:bg-slate-900 transition-colors shadow-sm"
           >
             <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
               <ArrowUpRight className="w-5 h-5 text-primary" />
@@ -82,7 +80,7 @@ export default function ConsumerWallet() {
         )}
 
         {!!wallet?.lockedBalance && wallet.lockedBalance > 0 && (
-          <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-start gap-3">
+          <div className="bg-primary/10 border border-primary/20 rounded-full p-4 flex items-start gap-3">
             <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <p className="text-xs text-primary/90 leading-relaxed font-medium">
               You have funds held securely in escrow for active jobs. They will be released to the vendor only when you mark the job as completed.
@@ -95,7 +93,7 @@ export default function ConsumerWallet() {
             <h3 className="text-base font-bold">History</h3>
           </div>
           
-          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             {txns.length === 0 ? (
               <div className="p-8 text-center flex flex-col items-center justify-center gap-3">
                 <Clock className="w-10 h-10 text-muted-foreground/50" />

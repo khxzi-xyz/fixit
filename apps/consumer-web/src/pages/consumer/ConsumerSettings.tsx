@@ -55,14 +55,28 @@ export default function ConsumerSettings() {
   };
 
   const enablePush = async () => {
-    if (!("Notification" in window)) return;
-    const perm = await Notification.requestPermission();
-    setPushEnabled(perm === "granted");
-    if (perm === "granted") {
-      await api.registerPushNotifications();
-      toast({ title: "Push notifications enabled ✅" });
-    } else {
-      toast({ title: "Permission denied", variant: "destructive" });
+    try {
+      const { PushNotifications } = await import("@capacitor/push-notifications");
+      const result = await PushNotifications.requestPermissions();
+      const isGranted = result.receive === "granted";
+      setPushEnabled(isGranted);
+      if (isGranted) {
+        await PushNotifications.register();
+        toast({ title: "Push notifications enabled ✅" });
+      } else {
+        toast({ title: "Permission denied", variant: "destructive" });
+      }
+    } catch (e: any) {
+      // Fallback for web
+      if ("Notification" in window) {
+        const perm = await Notification.requestPermission();
+        setPushEnabled(perm === "granted");
+        if (perm === "granted") {
+          toast({ title: "Push notifications enabled ✅" });
+        } else {
+          toast({ title: "Permission denied", variant: "destructive" });
+        }
+      }
     }
   };
 
@@ -102,7 +116,7 @@ export default function ConsumerSettings() {
         {/* Appearance */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Appearance</p>
-          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+          <div className="bg-card border border-border rounded-full p-4 shadow-sm">
             <div className="grid grid-cols-2 gap-2">
               {(["light", "dark"] as const).map((t) => (
                 <button
@@ -122,7 +136,7 @@ export default function ConsumerSettings() {
         {/* Language */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Language</p>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             {LANGS.map((l, i) => (
               <button
                 key={l.code}
@@ -143,7 +157,7 @@ export default function ConsumerSettings() {
         {/* Notifications */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Notifications</p>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
               <div className="w-10 h-10 border border-border rounded-full flex items-center justify-center shrink-0">
                 <Smartphone className="w-5 h-5 text-primary" />
@@ -153,9 +167,9 @@ export default function ConsumerSettings() {
                 <p className="text-xs text-muted-foreground">{pushEnabled ? "Enabled -you'll get alerts" : "Disabled -tap to enable"}</p>
               </div>
               {pushEnabled ? (
-                <span className="px-2 py-1 bg-green-500/15 text-green-400 text-xs font-bold rounded-lg">ON</span>
+                <span className="px-2 py-1 bg-green-500/15 text-green-400 text-xs font-bold rounded-full">ON</span>
               ) : (
-                <button onClick={enablePush} className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary/90 transition-colors">
+                <button onClick={enablePush} className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-full hover:bg-primary/90 transition-colors">
                   Enable
                 </button>
               )}
@@ -198,11 +212,11 @@ export default function ConsumerSettings() {
         {/* Payments & Support */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Payments & Support</p>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             {[
               { icon: CreditCard, label: "Payment Methods", sub: "Saved cards for one-tap pay", href: "/settings/payments" },
               { icon: Headset, label: "Support Chat (AI + Agents)", sub: "Instant answers, 24/7", href: "/support/chat" },
-              { icon: Ticket, label: "My Support Tickets", sub: "Track open requests", href: "/support" },
+              { icon: Ticket, label: "Disputes & Warranties", sub: "Track active escrows", href: "/support/warranties" },
             ].map(({ icon: Icon, label, sub, href }, i) => (
               <button
                 key={label}
@@ -225,7 +239,7 @@ export default function ConsumerSettings() {
         {/* Legal / Links */}
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">Legal</p>
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-card border border-border rounded-full overflow-hidden shadow-sm">
             {[
               { icon: Shield, label: "Terms of Service", href: "/tos" },
               { icon: Shield, label: "Privacy Policy", href: "/privacy" },
@@ -254,7 +268,7 @@ export default function ConsumerSettings() {
               sessionStorage.removeItem("fixit_guest");
               navigate("/auth/user/login");
             }} 
-            className="w-full bg-destructive/10 text-destructive font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-destructive/20 transition-colors"
+            className="w-full bg-destructive/10 text-destructive font-bold py-3.5 rounded-full flex items-center justify-center gap-2 hover:bg-destructive/20 transition-colors"
           >
             <LogOut className="w-5 h-5" /> Logout
           </button>

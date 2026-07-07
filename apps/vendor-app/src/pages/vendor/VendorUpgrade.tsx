@@ -100,7 +100,7 @@ export default function VendorUpgrade() {
             const TIcon = TIERS[t].icon;
             return (
               <button key={t} onClick={() => setTier(t)}
-                className={`flex-1 h-14 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm border-2 transition-all ${tier === t ? (t === "ELITE" ? "bg-amber-50 border-amber-500 text-amber-600 dark:bg-amber-950" : "bg-primary/10 border-primary text-primary") : "bg-card border-border text-muted-foreground"}`}>
+                className={`flex-1 h-14 rounded-full flex items-center justify-center gap-2 font-bold text-sm border-2 transition-all ${tier === t ? (t === "ELITE" ? "bg-amber-50 border-amber-500 text-amber-600 dark:bg-amber-950" : "bg-primary/10 border-primary text-primary") : "bg-card border-border text-muted-foreground"}`}>
                 <TIcon className="w-4 h-4" />
                 {TIERS[t].label}
               </button>
@@ -108,10 +108,10 @@ export default function VendorUpgrade() {
           })}
         </div>
 
-        <Card className="bg-card border-border shadow-lg rounded-2xl overflow-hidden">
+        <Card className="bg-card border-border shadow-lg rounded-full overflow-hidden">
           <CardContent className="p-5">
             {currentPlan?.planId && (
-              <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 mb-4">
+              <div className="bg-primary/10 border border-primary/20 rounded-full p-3 mb-4">
                 <p className="text-xs font-bold text-primary mb-0.5">Active: {currentPlan.planId}</p>
                 {currentPlan.expiresAt && (
                   <p className="text-[10px] text-muted-foreground">Expires {new Date(currentPlan.expiresAt).toLocaleDateString()}</p>
@@ -127,7 +127,7 @@ export default function VendorUpgrade() {
                 const hint = b === "YEARLY" ? "2 mo free" : b === "ONCE" ? "Forever" : "";
                 return (
                   <button key={b} onClick={() => setBilling(b)}
-                    className={`rounded-xl py-2 px-1 text-center border transition-all ${billing === b ? "border-primary bg-primary/10 text-primary" : "border-border bg-muted text-muted-foreground"}`}>
+                    className={`rounded-full py-2 px-1 text-center border transition-all ${billing === b ? "border-primary bg-primary/10 text-primary" : "border-border bg-muted text-muted-foreground"}`}>
                     <span className="block text-xs font-bold">{label}</span>
                     {hint && <span className="block text-[10px] mt-0.5 font-medium">{hint}</span>}
                   </button>
@@ -165,7 +165,7 @@ export default function VendorUpgrade() {
             )}
 
             <Button onClick={subscribe} disabled={busy}
-              className={`w-full h-14 rounded-xl text-base font-bold ${tier === "ELITE" ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}`}>
+              className={`w-full h-14 rounded-full text-base font-bold ${tier === "ELITE" ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}`}>
               {busy ? "Activating…" : enough ? `Activate ${TIERS[tier].label}` : "Top up to upgrade"}
             </Button>
           </CardContent>

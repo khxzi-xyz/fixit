@@ -10,9 +10,11 @@ export default function ConsumerChats() {
   const [jobs, setJobs] = useState<any[]>([]);
 
   useEffect(() => {
-    api.myJobs()
-      .then((j) => setJobs(j.filter((x: any) => ["ASSIGNED", "IN_PROGRESS", "VENDOR_MARKED_COMPLETE"].includes(x.status))))
-      .catch(() => setJobs([]));
+    import("@/lib/api").then(({ swr }) => {
+      swr("my_jobs", api.myJobs, (j) =>
+        setJobs(j.filter((x: any) => ["ASSIGNED", "IN_PROGRESS", "VENDOR_MARKED_COMPLETE"].includes(x.status)))
+      ).catch(() => setJobs([]));
+    });
   }, []);
 
   return (
@@ -26,11 +28,11 @@ export default function ConsumerChats() {
         {/* Pinned: permanent AI support chat */}
         <button
           onClick={() => navigate("/support/chat")}
-          className="w-full bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/25 rounded-2xl p-4 flex items-center gap-3 text-left hover:border-primary/50 transition-colors"
+          className="w-full bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/25 rounded-full p-4 flex items-center gap-3 text-left hover:border-primary/50 transition-colors"
         >
           <div className="relative shrink-0">
-            <img src="/logo.png" alt="" className="w-12 h-12 rounded-xl shadow" />
-            <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-background rounded-full" />
+            <img src="/logo.png" alt="" className="w-12 h-12 rounded-full shadow" />
+            <img src="/status/status-online-gray.png" alt="Online" className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-card" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-black text-sm flex items-center gap-1.5">
@@ -58,9 +60,9 @@ export default function ConsumerChats() {
             <button
               key={j.job_id}
               onClick={() => navigate(`/order/${j.job_id}`)}
-              className="w-full bg-card border border-border rounded-2xl p-4 flex items-center gap-3 text-left hover:border-primary/40 transition-colors"
+              className="w-full bg-card border border-border rounded-full p-4 flex items-center gap-3 text-left hover:border-primary/40 transition-colors"
             >
-              <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center shrink-0">
                 <Briefcase className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">

@@ -5,9 +5,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import { I18nProvider } from "@/lib/i18n";
 import { OnboardingGate } from "@/components/OnboardingGate";
-import { useEffect } from "react";
+import { NetworkGuard } from "@/components/NetworkGuard";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { setToken } from "@/lib/api";
+import { loginWithFingerprint } from "@/lib/biometrics";
 
 // Layouts
 import { VendorLayout } from "./components/layouts/VendorLayout";
@@ -44,13 +46,13 @@ const Splash = () => (
       <p className="text-muted-foreground mb-8 text-sm">Select an app to continue</p>
 
       <div className="space-y-3">
-        <a href="/auth/user/login" className="block px-6 py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl w-full shadow-[0_0_20px_rgba(27,110,243,0.3)] transition-all transform hover:scale-[1.02] active:scale-95 text-base">
+        <a href="/auth/user/login" className="block px-6 py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-full w-full shadow-[0_0_20px_rgba(27,110,243,0.3)] transition-all transform hover:scale-[1.02] active:scale-95 text-base">
           Consumer App
         </a>
-        <a href="/auth/vendor/login" className="block px-6 py-4 bg-warning hover:bg-warning/90 text-white font-bold rounded-xl w-full shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all transform hover:scale-[1.02] active:scale-95 text-base">
+        <a href="/auth/vendor/login" className="block px-6 py-4 bg-warning hover:bg-warning/90 text-white font-bold rounded-full w-full shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all transform hover:scale-[1.02] active:scale-95 text-base">
           Vendor App
         </a>
-        <a href="/admin/login" className="block px-6 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl w-full shadow-[0_0_20px_rgba(39,39,42,0.3)] transition-all transform hover:scale-[1.02] active:scale-95 text-base">
+        <a href="/admin/login" className="block px-6 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-full w-full shadow-[0_0_20px_rgba(39,39,42,0.3)] transition-all transform hover:scale-[1.02] active:scale-95 text-base">
           Admin Dashboard
         </a>
       </div>
@@ -102,9 +104,45 @@ function Router() {
 }
 
 function App() {
+  const [isInitializing, setIsInitializing] = useState(true);
+
   useEffect(() => {
+    let sessionChecked = false;
+    let bioChecked = false;
+
+    const checkDone = () => {
+      if (sessionChecked && bioChecked) {
+        setIsInitializing(false);
+      }
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.access_token) setToken(session.access_token);
+      if (session?.access_token) {
+        setToken(session.access_token);
+        if (window.location.pathname === "/" || window.location.pathname.includes("/auth/")) {
+           window.location.replace("/vendor/home");
+        }
+        sessionChecked = true;
+        bioChecked = true; // Skip bio if already have session
+        checkDone();
+      } else {
+        sessionChecked = true;
+        
+        // Only prompt for biometrics if enabled and on auth screen
+        if (localStorage.getItem("fixit_bio_enabled") === "true" && window.location.pathname.includes("/auth/")) {
+          loginWithFingerprint().then(async (result) => {
+            if (result?.token) {
+              setToken(result.token);
+              window.location.replace("/vendor/home");
+            }
+            bioChecked = true;
+            checkDone();
+          });
+        } else {
+          bioChecked = true;
+          checkDone();
+        }
+      }
     });
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -115,13 +153,77 @@ function App() {
       }
     });
     
+    // Initialize Capacitor Push Notifications
+    import("@capacitor/push-notifications").then(({ PushNotifications }) => {
+      PushNotifications.requestPermissions().then(result => {
+        if (result.receive === 'granted') {
+          PushNotifications.register();
+        }
+      });
+      PushNotifications.addListener('registration', (token) => {
+        console.log('Push registration success, token: ' + token.value);
+        import("@/lib/api").then(({ api }) => {
+          api.updateFcmToken(token.value).catch(() => {});
+        });
+      });
+      PushNotifications.addListener('registrationError', (error: any) => {
+        console.error('Error on push registration: ' + JSON.stringify(error));
+      });
+      PushNotifications.addListener('pushNotificationReceived', (notification) => {
+        console.log('Push received: ' + JSON.stringify(notification));
+        import("@/hooks/use-toast").then(({ toast }) => {
+          toast({ title: notification.title, description: notification.body });
+        });
+      });
+      PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+        console.log('Push action performed: ' + JSON.stringify(notification));
+      });
+    }).catch(e => console.warn('PushNotifications plugin not available', e));
+
+    // Hardware Back Button + Deep Link Interception
+    import("@capacitor/app").then(({ App: CapApp }) => {
+      CapApp.addListener("backButton", ({ canGoBack }) => {
+        const path = window.location.pathname;
+        if (path === "/vendor/home" || path === "/" || (!canGoBack && path !== "/auth/vendor/login")) {
+          if (window.confirm("Are you sure you want to exit the app?")) {
+            CapApp.exitApp();
+          }
+        } else if (path.includes("/auth/")) {
+           window.history.back();
+        } else {
+          window.history.back();
+        }
+      });
+
+      // Deep link handler
+      CapApp.addListener("appUrlOpen", ({ url }) => {
+        try {
+          let path: string | null = null;
+          if (url.startsWith("fixit://")) {
+            path = "/" + url.replace("fixit://", "");
+          } else if (url.includes("fixit-now.xyz")) {
+            const u = new URL(url);
+            path = u.pathname + u.search;
+          }
+          if (path) window.location.replace(path);
+        } catch (err) {
+          console.warn("[DeepLink] Failed to parse URL:", url, err);
+        }
+      });
+    }).catch(() => {});
+
     return () => subscription.unsubscribe();
   }, []);
+
+  if (isInitializing) {
+    return <Splash />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <TooltipProvider>
+          <NetworkGuard />
           <OnboardingGate>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
               <Router />

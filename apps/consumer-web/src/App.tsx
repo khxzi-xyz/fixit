@@ -4,7 +4,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { setToken } from "@/lib/api";
 import { setTranslationLang } from "@/lib/realtime-translate";
@@ -12,8 +12,10 @@ import { I18nProvider } from "@/lib/i18n";
 import { OnboardingGate } from "@/components/OnboardingGate";
 import { PermissionsPrompt } from "@/components/PermissionsPrompt";
 import { NotificationManager } from "@/components/NotificationManager";
+import { NetworkGuard } from "@/components/NetworkGuard";
 import NotFound from "@/pages/not-found";
 import { loginWithFingerprint } from "@/lib/biometrics";
+import { Splash } from "@/components/Splash";
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 import UserRegister from "./pages/auth/UserRegister";
@@ -29,12 +31,10 @@ import ConsumerHome from "./pages/consumer/ConsumerHome";
 import ConsumerSearch from "./pages/consumer/ConsumerSearch";
 import ConsumerCategories from "./pages/consumer/ConsumerCategories";
 import ConsumerPostJob from "./pages/consumer/ConsumerPostJob";
-import ConsumerWallet from "./pages/consumer/ConsumerWallet";
 import ConsumerProfile from "./pages/consumer/ConsumerProfile";
 import ConsumerMyAccount from "./pages/consumer/ConsumerMyAccount";
 import ConsumerRewards from "./pages/consumer/ConsumerRewards";
 import ConsumerNotifications from "./pages/consumer/ConsumerNotifications";
-import ConsumerSettings from "./pages/consumer/ConsumerSettings";
 import ConsumerSupport from "./pages/consumer/ConsumerSupport";
 import ConsumerMyJobs from "./pages/consumer/ConsumerMyJobs";
 import ConsumerChats from "./pages/consumer/ConsumerChats";
@@ -58,7 +58,13 @@ import ConsumerStore from "./pages/consumer/ConsumerStore";
 import ConsumerEmergency from "./pages/consumer/ConsumerEmergency";
 import ConsumerMaintenance from "./pages/consumer/ConsumerMaintenance";
 import ConsumerFeed from "./pages/consumer/ConsumerFeed";
-import ConsumerFavorites from "./pages/consumer/ConsumerFavorites";
+const ConsumerSettings = lazy(() => import("@/pages/consumer/ConsumerSettings"));
+const ConsumerWallet = lazy(() => import("@/pages/consumer/ConsumerWallet"));
+const ConsumerFavorites = lazy(() => import("@/pages/consumer/ConsumerFavorites"));
+const SavedAddresses = lazy(() => import("@/pages/consumer/SavedAddresses"));
+const PaymentSettings = lazy(() => import("@/pages/consumer/PaymentSettings"));
+const AccountSecurity = lazy(() => import("@/pages/consumer/AccountSecurity"));
+const DisputeWarrantyManager = lazy(() => import("@/pages/consumer/DisputeWarrantyManager"));
 
 // ── Legal ─────────────────────────────────────────────────────────────────────
 import TermsOfService from "./pages/legal/TermsOfService";
@@ -81,7 +87,8 @@ const persister = createSyncStoragePersister({
 
 function Router() {
   return (
-    <Switch>
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" /></div>}>
+      <Switch>
       {/* Root */}
       <Route path="/"><Redirect to="/auth/user/login" /></Route>
 
@@ -103,6 +110,18 @@ function Router() {
       <Route path="/search" component={ConsumerSearch} />
       <Route path="/my-jobs" component={ConsumerMyJobs} />
       <Route path="/chats" component={ConsumerChats} />
+      <Route path="/account" component={AccountSecurity} />
+      <Route path="/settings" component={ConsumerSettings} />
+      <Route path="/settings/payments" component={PaymentSettings} />
+      <Route path="/wallet" component={ConsumerWallet} />
+      <Route path="/support/warranties" component={DisputeWarrantyManager} />
+      
+      <Route path="/profile" component={ConsumerProfile} />
+      <Route path="/profile/edit" component={ConsumerEditProfile} />
+      <Route path="/profile/addresses" component={ConsumerAddresses} />
+      <Route path="/profile/rewards" component={ConsumerRewards} />
+      <Route path="/profile/:id" component={PublicVendorProfile} />
+      
       <Route path="/marketplace" component={ConsumerMarketplace} />
       <Route path="/categories" component={ConsumerCategories} />
 
@@ -118,12 +137,6 @@ function Router() {
 
       {/* Wallet */}
       <Route path="/wallet" component={ConsumerWallet} />
-
-      {/* Profile section */}
-      <Route path="/profile" component={ConsumerProfile} />
-      <Route path="/profile/edit" component={ConsumerEditProfile} />
-      <Route path="/profile/addresses" component={ConsumerAddresses} />
-      <Route path="/profile/rewards" component={ConsumerRewards} />
 
       {/* Account management */}
       <Route path="/account" component={ConsumerMyAccount} />
@@ -167,12 +180,24 @@ function Router() {
 
       {/* 404 */}
       <Route component={NotFound} />
-    </Switch>
+      </Switch>
+    </Suspense>
   );
 }
 
 function App() {
+  const [isInitializing, setIsInitializing] = useState(true);
+
   useEffect(() => {
+    let sessionChecked = false;
+    let bioChecked = false;
+
+    const checkDone = () => {
+      if (sessionChecked && bioChecked) {
+        setIsInitializing(false);
+      }
+    };
+
     // Restore auth token
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.access_token) {
@@ -180,19 +205,25 @@ function App() {
         if (window.location.pathname.includes("/auth/")) {
            window.location.replace("/home");
         }
-      }
-    });
-
-    // Biometric Auth Hook
-    loginWithFingerprint().then(async (result) => {
-      if (result?.token) {
-        // Technically biometric gives us a token, if we also saved refresh token it'd be better.
-        // Assuming we saved the JWT access token here:
-        setToken(result.token);
-        // Supabase session hydration is limited without refresh token but we set client token.
-        // Navigate to home if we are on login screen
-        if (window.location.pathname.includes("/auth/")) {
-          window.location.replace("/home");
+        sessionChecked = true;
+        bioChecked = true; // Skip bio if already have session
+        checkDone();
+      } else {
+        sessionChecked = true;
+        
+        // Only prompt for biometrics if enabled and on auth screen
+        if (localStorage.getItem("fixit_bio_enabled") === "true" && window.location.pathname.includes("/auth/")) {
+          loginWithFingerprint().then(async (result) => {
+            if (result?.token) {
+              setToken(result.token);
+              window.location.replace("/home");
+            }
+            bioChecked = true;
+            checkDone();
+          });
+        } else {
+          bioChecked = true;
+          checkDone();
         }
       }
     });
@@ -210,7 +241,7 @@ function App() {
     document.documentElement.setAttribute("dir", savedLang === "ar" || savedLang === "ur" ? "rtl" : "ltr");
 
     // Restore theme
-    const savedTheme = localStorage.getItem("fixit_theme") || "light";
+    const savedTheme = localStorage.getItem("fixit_theme") || "dark";
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
 
     // Permissions are handled by PermissionsPrompt on startup
@@ -231,15 +262,20 @@ function App() {
         console.error('Error on push registration: ' + JSON.stringify(error));
       });
       PushNotifications.addListener('pushNotificationReceived', (notification) => {
-        console.log('Push received: ' + JSON.stringify(notification));
+        import("@/hooks/use-toast").then(({ toast }) => {
+          toast({ title: notification.title, description: notification.body });
+        });
       });
       PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
-        console.log('Push action performed: ' + JSON.stringify(notification));
+        import("@/hooks/use-toast").then(({ toast }) => {
+          toast({ title: "Notification opened", description: notification.notification.title });
+        });
       });
     }).catch(e => console.warn('PushNotifications plugin not available', e));
 
-    // Hardware Back Button Interception
+    // Hardware Back Button + Deep Link Interception
     import("@capacitor/app").then(({ App: CapApp }) => {
+      // Back button handler
       CapApp.addListener("backButton", ({ canGoBack }) => {
         const path = window.location.pathname;
         if (path === "/home" || path === "/" || (!canGoBack && path !== "/auth/user/login")) {
@@ -256,15 +292,44 @@ function App() {
           window.history.back();
         }
       });
+
+      // Deep link handler — processes fixit:// and https://fixit-now.xyz/ links
+      CapApp.addListener("appUrlOpen", ({ url }) => {
+        try {
+          // Parse path from both custom scheme and universal links
+          let path: string | null = null;
+          if (url.startsWith("fixit://")) {
+            path = "/" + url.replace("fixit://", "");
+          } else if (url.includes("fixit-now.xyz")) {
+            const u = new URL(url);
+            path = u.pathname + u.search;
+          }
+          if (path) {
+            // Map known deep link paths
+            // fixit://order/123 → /order/123
+            // fixit://vendor/abc → /vendor/abc
+            // fixit://invite/CODE → /invite/CODE
+            // fixit://job/123/bids → /job/123/bids
+            window.location.replace(path);
+          }
+        } catch (err) {
+          console.warn("[DeepLink] Failed to parse URL:", url, err);
+        }
+      });
     }).catch(() => {});
 
     return () => subscription.unsubscribe();
   }, []);
 
+  if (isInitializing) {
+    return <Splash />;
+  }
+
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
       <I18nProvider>
         <TooltipProvider>
+          <NetworkGuard />
           <OnboardingGate>
             <PermissionsPrompt onComplete={() => {}} />
             <NotificationManager />

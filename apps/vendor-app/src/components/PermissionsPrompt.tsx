@@ -89,7 +89,7 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
       </p>
 
       <div className="w-full space-y-4 mb-10">
-        <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-2xl text-left border border-border">
+        <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-full text-left border border-border">
           <MapPin className="w-6 h-6 text-primary shrink-0" />
           <div className="flex-1">
             <p className="font-bold text-sm">Location</p>
@@ -98,13 +98,13 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
           {perms.location === "granted" ? (
             <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
           ) : (
-            <Button onClick={requestLocation} disabled={perms.location !== "idle"} variant="outline" size="sm" className="shrink-0 rounded-xl">
+            <Button onClick={requestLocation} disabled={perms.location !== "idle"} variant="outline" size="sm" className="shrink-0 rounded-full">
               {perms.location === "idle" ? "Allow" : "Denied"}
             </Button>
           )}
         </div>
         
-        <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-2xl text-left border border-border">
+        <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-full text-left border border-border">
           <CameraIcon className="w-6 h-6 text-primary shrink-0" />
           <div className="flex-1">
             <p className="font-bold text-sm">Camera</p>
@@ -113,13 +113,13 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
           {perms.camera === "granted" ? (
             <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
           ) : (
-            <Button onClick={requestCamera} disabled={perms.camera !== "idle"} variant="outline" size="sm" className="shrink-0 rounded-xl">
+            <Button onClick={requestCamera} disabled={perms.camera !== "idle"} variant="outline" size="sm" className="shrink-0 rounded-full">
               {perms.camera === "idle" ? "Allow" : "Denied"}
             </Button>
           )}
         </div>
 
-        <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-2xl text-left border border-border">
+        <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-full text-left border border-border">
           <Bell className="w-6 h-6 text-primary shrink-0" />
           <div className="flex-1">
             <p className="font-bold text-sm">Notifications</p>
@@ -128,14 +128,14 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
           {perms.push === "granted" ? (
             <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
           ) : (
-            <Button onClick={requestPush} disabled={perms.push !== "idle"} variant="outline" size="sm" className="shrink-0 rounded-xl">
+            <Button onClick={requestPush} disabled={perms.push !== "idle"} variant="outline" size="sm" className="shrink-0 rounded-full">
               {perms.push === "idle" ? "Allow" : "Denied"}
             </Button>
           )}
         </div>
       </div>
 
-      <Button onClick={finish} disabled={!allRequested} className="w-full h-14 rounded-xl text-base font-bold gap-2">
+      <Button onClick={finish} disabled={!allRequested} className="w-full h-14 rounded-full text-base font-bold gap-2">
         Continue to App <ArrowRight className="w-5 h-5" />
       </Button>
     </div>

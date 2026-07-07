@@ -3,7 +3,9 @@ import { useLocation } from "wouter";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { api } from "@/lib/api";
 import { renderApi } from "@/lib/renderApi";
+import { stageAndUpload } from "@/lib/upload";
 import { useToast } from "@/hooks/use-toast";
+import { Capacitor } from "@capacitor/core";
 import {
   ChevronLeft, ChevronRight, Zap, Clock, Sparkles,
   Camera, ImagePlus, MapPin, X, ArrowRight, Loader2, CheckCircle2,
@@ -77,86 +79,144 @@ export default function ConsumerPostJob() {
   const [posting, setPosting] = useState(false);
   const [done, setDone] = useState(false);
   const [aiInput, setAiInput] = useState("");
-  const [aiMatching, setAiMatching] = useState(false);
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [fetchingLoc, setFetchingLoc] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const cat = SERVICE_CATEGORIES.find((c) => c.id === selectedCat);
+
+  // Excluded photos from draft storage to prevent QuotaExceededError
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fixit_job_draft");
+      if (saved) {
+        const d = JSON.parse(saved);
+        if (d.step) setStep(d.step);
+        if (d.selectedCat) setSelectedCat(d.selectedCat);
+        if (d.urgency) setUrgency(d.urgency);
+        if (d.description) setDescription(d.description);
+        if (d.bounty) setBounty(d.bounty);
+        if (d.useBounty) setUseBounty(d.useBounty);
+        if (d.lat) setLat(d.lat);
+        if (d.lng) setLng(d.lng);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!done) {
+      localStorage.setItem("fixit_job_draft", JSON.stringify({
+        step, selectedCat, urgency, description, bounty, useBounty, lat, lng
+      }));
+    }
+  }, [step, selectedCat, urgency, description, bounty, useBounty, lat, lng, done]);
+
+  const fetchLocation = async () => {
+    setFetchingLoc(true);
+    try {
+      const { Geolocation } = await import('@capacitor/geolocation');
+      const perm = await Geolocation.requestPermissions();
+      if (perm.location === 'granted' || perm.coarseLocation === 'granted') {
+        const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true });
+        setLat(pos.coords.latitude);
+        setLng(pos.coords.longitude);
+        toast({ title: "Location Captured ✅" });
+      } else {
+        toast({ title: "Location Denied", description: "Enable location in settings to share exactly where you are.", variant: "destructive" });
+      }
+    } catch (e: any) {
+      toast({ title: "Couldn't get location", description: e.message, variant: "destructive" });
+    } finally {
+      setFetchingLoc(false);
+    }
+  };
 
   const rewriteWithAI = async () => {
     if (!description.trim() || !selectedCat) return;
     setAiRewriting(true);
     try {
-      const res = await api.rewriteTicket(description, cat?.label);
-      setDescription(res?.ticket || res?.rewritten || res?.text || description);
-      toast({ title: "AI improved your description" });
-    } catch {
-      toast({ title: "AI unavailable", description: "Using your original text" });
-    } finally {
-      setAiRewriting(false);
-    }
+      const better = await api.aiRewrite(description);
+      if (better && better.trim()) setDescription(better);
+    } catch {}
+    setAiRewriting(false);
   };
 
-  const handleAiMatch = async () => {
-    if (!aiInput.trim()) return;
-    setAiMatching(true);
-    try {
-      const res = await api.aiMatchmaker(aiInput);
-      if (res.categoryId && SERVICE_CATEGORIES.some(c => c.id === res.categoryId)) {
-        setSelectedCat(res.categoryId as ServiceId);
-      } else {
-        setSelectedCat("OTHER");
+  /**
+   * Photo capture — uses @capacitor/camera (CameraSource.Camera) on native
+   * to enforce live Triple-Verify (no gallery bypass). Falls back to file input on web.
+   */
+  const capturePhoto = async () => {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const { Camera, CameraSource, CameraResultType } = await import("@capacitor/camera");
+        const perm = await Camera.requestPermissions();
+        if (perm.camera !== "granted") {
+          toast({ title: "Camera permission denied", description: "Enable camera access in settings.", variant: "destructive" });
+          return;
+        }
+        const image = await Camera.getPhoto({
+          quality: 85,
+          allowEditing: false,
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Camera, // Live camera ONLY — no gallery (Triple-Verify)
+        });
+        if (image.dataUrl) {
+          setPhotos((p) => [...p, image.dataUrl!].slice(0, 10));
+        }
+      } catch (err: any) {
+        if (err?.message !== "User cancelled photos app") {
+          toast({ title: "Camera error", description: err.message, variant: "destructive" });
+        }
       }
-      if (res.urgency && URGENCY.some(u => u.id === res.urgency)) {
-        setUrgency(res.urgency);
-      }
-      if (res.description) {
-        setDescription(res.description);
-      }
-      setStep("details");
-      toast({ title: "AI Matched your job!" });
-    } catch (e: any) {
-      toast({ title: "Matchmaker failed", description: e.message, variant: "destructive" });
-    } finally {
-      setAiMatching(false);
+    } else {
+      fileRef.current?.click();
     }
   };
 
   const addPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    files.slice(0, 5 - photos.length).forEach((f) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          setPhotos((p) => [...p, ev.target!.result as string].slice(0, 5));
-        }
-      };
-      reader.readAsDataURL(f);
-    });
-    e.target.value = "";
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      files.forEach((f) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          if (ev.target?.result) setPhotos((p) => [...p, ev.target!.result as string].slice(0, 10));
+        };
+        reader.readAsDataURL(f);
+      });
+    }
   };
 
-  const postJob = async () => {
-    if (!selectedCat || !description.trim()) {
-      toast({ title: "Please describe your job", variant: "destructive" });
-      return;
-    }
+  const submitJob = async () => {
+    if (!description.trim()) { toast({ title: "Please add a description" }); return; }
+    if (useBounty && !bounty) { toast({ title: "Enter a budget amount" }); return; }
+    if (!lat || !lng) { toast({ title: "Please fetch your location first" }); return; }
+    
     setPosting(true);
     try {
-      // Upload photos in parallel
+      // Stage photos through filesystem before uploading (prevents memory-pressure loss on Android)
       const mediaUrls = await Promise.all(
-        photos.map((p) => api.uploadImage(p, "jobs").then((r) => r.url).catch(() => ""))
+        photos.map((p) => stageAndUpload(p, "jobs").catch(() => ""))
       ).then((urls) => urls.filter(Boolean));
 
       await api.createJob({
         categoryId: selectedCat,
         urgency,
         description,
-        lat: 23.5938,
-        lng: 58.1456,
+        lat,
+        lng,
         postingKind: useBounty ? "BOUNTY" : "STANDARD",
         bountyPrice: useBounty && bounty ? parseFloat(bounty) : undefined,
         mediaUrls,
       });
+
+      localStorage.removeItem("fixit_job_draft");
+
+      // Haptic feedback: light pulse on success
+      import("@capacitor/haptics").then(({ Haptics, ImpactStyle }) => {
+        Haptics.impact({ style: ImpactStyle.Light });
+      }).catch(() => {});
+
       setDone(true);
     } catch (e: any) {
       toast({ title: "Couldn't post job", description: e.message || "Network connection failed", variant: "destructive" });
@@ -177,10 +237,10 @@ export default function ConsumerPostJob() {
             <p className="text-muted-foreground mt-2 text-sm">Your job is now live. Vendors are being notified and will start sending bids soon.</p>
           </div>
           <div className="flex gap-3 w-full max-w-xs">
-            <button onClick={() => navigate("/my-jobs")} className="flex-1 h-12 bg-primary text-white font-bold rounded-xl">
+            <button onClick={() => navigate("/my-jobs")} className="flex-1 h-12 bg-primary text-white font-bold rounded-full">
               View My Jobs
             </button>
-            <button onClick={() => { setDone(false); setStep("category"); setSelectedCat(null); setDescription(""); setPhotos([]); }} className="flex-1 h-12 border border-border rounded-xl font-bold text-muted-foreground hover:bg-muted/40">
+            <button onClick={() => { setDone(false); setStep("category"); setSelectedCat(null); setDescription(""); setPhotos([]); }} className="flex-1 h-12 border border-border rounded-full font-bold text-muted-foreground hover:bg-muted/40">
               Post Another
             </button>
           </div>
@@ -192,23 +252,41 @@ export default function ConsumerPostJob() {
   return (
     <ConsumerLayout>
       {/* Header */}
-      <div className="bg-primary text-primary-foreground border-b border-border px-5 pt-[calc(env(safe-area-inset-top,1rem)+1.5rem)] pb-14 rounded-b-[2rem] shadow-lg relative overflow-hidden">
+      <div className="bg-primary text-primary-foreground border-b border-border px-5 pt-[calc(env(safe-area-inset-top,1rem)+1.5rem)] pb-6 rounded-b-[2rem] shadow-lg relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
         
         <div className="flex items-center gap-4 mb-6 relative z-10">
           {step !== "category" && (
-            <button onClick={() => setStep(step === "review" ? "details" : "category")} className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-all shadow-sm">
+            <button onClick={() => setStep(step === "review" ? "details" : "category")} className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all shadow-sm">
               <ChevronLeft className="w-6 h-6 text-white" />
             </button>
           )}
-          <div>
-            <h1 className="text-2xl font-black text-white flex items-center gap-2 drop-shadow-sm">
-              {step === "category" ? "What do you need?" : step === "details" ? cat?.label : "Review & Post"}
-            </h1>
-            <p className="text-primary-foreground/80/90 text-xs mt-1 font-medium">
-              {step === "category" ? "Pick a service" : step === "details" ? "Describe your job" : "Confirm your job details"}
-            </p>
+          {step === "category" && (
+            <button onClick={() => navigate("/home")} className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all shadow-sm">
+              <ChevronLeft className="w-6 h-6 text-white" />
+            </button>
+          )}
+          <div className="flex-1 flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl font-black text-white flex items-center gap-2 drop-shadow-sm">
+                {step === "category" ? "What do you need?" : step === "details" ? cat?.label : "Review & Post"}
+              </h1>
+              <p className="text-primary-foreground/80 text-xs mt-1 font-medium">
+                {step === "category" ? "Pick a service" : step === "details" ? "Describe your job" : "Confirm your job details"}
+              </p>
+            </div>
+            {step !== "category" && (
+              <button
+                onClick={() => {
+                  toast({ title: "Draft Saved 💾", description: "Your job is saved. Resume from My Jobs → Drafts." });
+                  navigate("/my-jobs");
+                }}
+                className="text-white/70 text-xs font-bold hover:text-white transition-colors px-2 py-1 rounded-full hover:bg-white/10"
+              >
+                Save Draft
+              </button>
+            )}
           </div>
         </div>
         {/* Steps */}
@@ -219,41 +297,34 @@ export default function ConsumerPostJob() {
         </div>
       </div>
 
-      <div className="px-4 -mt-6 pb-10">
+      <div className="px-4 mt-6 pb-10">
         {/* STEP 1: Category */}
         {step === "category" && (
           <div className="space-y-4">
-            <div className="bg-card border border-primary/20 rounded-2xl p-4 shadow-sm mb-6 bg-gradient-to-br from-primary/5 to-purple-500/5">
-              <div className="flex items-center justify-between mb-3">
-                 <p className="text-sm font-black flex items-center gap-2"><Sparkles className="w-4 h-4 text-primary" /> AI Auto-Match</p>
-                 <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">BETA</span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-3">Just tell us what's wrong, and AI will format your job and select the right category.</p>
-              <div className="flex gap-2">
-                 <input 
-                   type="text" 
-                   value={aiInput} 
-                   onChange={(e) => setAiInput(e.target.value)} 
-                   placeholder="e.g. My AC is leaking water..."
-                   className="flex-1 h-11 bg-white border border-border rounded-xl px-3 text-sm outline-none focus:border-primary"
-                 />
-                 <button onClick={handleAiMatch} disabled={!aiInput || aiMatching} className="h-11 px-4 bg-primary text-white font-bold rounded-xl disabled:opacity-50">
-                    {aiMatching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Match"}
-                 </button>
-              </div>
+            <div className="relative mb-6">
+              <input 
+                type="text" 
+                value={aiInput} 
+                onChange={(e) => setAiInput(e.target.value)} 
+                placeholder="Search for a service..."
+                className="w-full h-12 bg-card border border-border rounded-full px-4 text-sm font-bold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
+              />
             </div>
 
-            {GROUPS.map((group) => (
+            {GROUPS.map((group) => {
+              const filtered = SERVICE_CATEGORIES.filter(c => c.group === group && (!aiInput || c.label.toLowerCase().includes(aiInput.toLowerCase()) || c.id.toLowerCase().includes(aiInput.toLowerCase())));
+              if (filtered.length === 0) return null;
+              return (
               <div key={group}>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2">{group}</p>
                 <div className="grid grid-cols-3 gap-2">
-                  {SERVICE_CATEGORIES.filter((c) => c.group === group).map((c) => (
+                  {filtered.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => { setSelectedCat(c.id as ServiceId); setStep("details"); }}
-                      className={`flex flex-col items-center gap-2.5 p-3.5 bg-card border rounded-2xl transition-all hover:shadow-md hover:-translate-y-0.5 ${selectedCat === c.id ? "border-primary bg-slate-50 dark:bg-slate-900 ring-2 ring-primary/20" : "border-border/60 hover:border-primary/30"}`}
+                      className={`flex flex-col items-center gap-2.5 p-3.5 bg-card border rounded-full transition-all hover:shadow-md hover:-translate-y-0.5 ${selectedCat === c.id ? "border-primary bg-slate-50 dark:bg-slate-900 ring-2 ring-primary/20" : "border-border/60 hover:border-primary/30"}`}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-muted/60 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-muted/60 flex items-center justify-center">
                         <ServiceIcon id={c.id} className="w-6 h-6" />
                       </div>
                       <span className="text-[11px] font-bold text-center leading-tight">{c.label}</span>
@@ -261,7 +332,8 @@ export default function ConsumerPostJob() {
                   ))}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -269,14 +341,14 @@ export default function ConsumerPostJob() {
         {step === "details" && cat && (
           <div className="space-y-4">
             {/* Urgency */}
-            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+            <div className="bg-card border border-border rounded-full p-4 shadow-sm">
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">Urgency</p>
               <div className="grid grid-cols-3 gap-2">
                 {URGENCY.map((u) => (
                   <button
                     key={u.id}
                     onClick={() => setUrgency(u.id)}
-                    className={`flex flex-col items-center gap-1 p-3 border-2 rounded-2xl transition-all text-center ${urgency === u.id ? u.color : "border-border text-muted-foreground"}`}
+                    className={`flex flex-col items-center gap-1 p-3 border-2 rounded-full transition-all text-center ${urgency === u.id ? u.color : "border-border text-muted-foreground"}`}
                   >
                     <div className="flex justify-center items-center h-8">{u.icon}</div>
                     <span className="text-[11px] font-black">{u.label}</span>
@@ -287,13 +359,13 @@ export default function ConsumerPostJob() {
             </div>
 
             {/* Description */}
-            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+            <div className="bg-card border border-border rounded-full p-4 shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Describe the Job</p>
                 <button
                   onClick={rewriteWithAI}
                   disabled={aiRewriting || !description.trim()}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/20 disabled:opacity-40 transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-full hover:bg-primary/20 disabled:opacity-40 transition-colors"
                 >
                   {aiRewriting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                   AI Improve
@@ -309,38 +381,43 @@ export default function ConsumerPostJob() {
                         `Describe what you need from the ${cat.label}…`
                 }
                 rows={4}
-                className="w-full bg-muted/60 border border-border rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                className="w-full bg-muted/60 border border-border rounded-full px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
               />
             </div>
 
             {/* Photos (only if service needs them) */}
             {cat.needsPhotos && (
-              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+              <div className="bg-card border border-border rounded-full p-4 shadow-sm">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">
-                  Photos <span className="text-muted-foreground font-normal">(optional, up to 5)</span>
+                  Photos / Video <span className="text-muted-foreground font-normal">(live camera only, max 10)</span>
                 </p>
                 <div className="flex gap-2 flex-wrap">
                   {photos.map((p, i) => (
-                    <div key={i} className="relative w-16 h-16 rounded-xl overflow-hidden border border-border">
-                      <img src={p} className="w-full h-full object-cover" />
+                    <div key={i} className="relative w-16 h-16 rounded-full overflow-hidden border border-border">
+                      {p.includes("video") ? (
+                        <video src={p} className="w-full h-full object-cover" muted />
+                      ) : (
+                        <img src={p} className="w-full h-full object-cover" />
+                      )}
                       <button onClick={() => setPhotos((prev) => prev.filter((_, pi) => pi !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center">
                         <X className="w-3 h-3 text-white" />
                       </button>
                     </div>
                   ))}
-                  {photos.length < 5 && (
-                    <button onClick={() => fileRef.current?.click()} className="w-16 h-16 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                      <ImagePlus className="w-5 h-5" />
+                  {photos.length < 10 && (
+                    <button onClick={capturePhoto} className="w-16 h-16 rounded-full border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                      <Camera className="w-5 h-5" />
                       <span className="text-[9px] font-bold">Add</span>
                     </button>
                   )}
-                  <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={addPhoto} />
+                  {/* Web fallback file input */}
+                  <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={addPhoto} />
                 </div>
               </div>
             )}
 
             {/* Bounty option */}
-            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+            <div className="bg-card border border-border rounded-full p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-bold">Set Fixed Price</p>
@@ -363,7 +440,7 @@ export default function ConsumerPostJob() {
                     placeholder="0.000"
                     min="1"
                     step="0.5"
-                    className="w-full h-11 bg-muted/60 border border-border rounded-xl pl-8 pr-12 text-base font-bold outline-none focus:border-primary"
+                    className="w-full h-11 bg-muted/60 border border-border rounded-full pl-8 pr-12 text-base font-bold outline-none focus:border-primary"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-muted-foreground">OMR</span>
                 </div>
@@ -373,7 +450,7 @@ export default function ConsumerPostJob() {
             <button
               onClick={() => setStep("review")}
               disabled={!description.trim()}
-              className="w-full h-14 bg-primary text-white font-black rounded-2xl flex items-center justify-center gap-2 disabled:opacity-40 shadow-[0_4px_20px_rgba(27,110,243,0.4)] hover:shadow-[0_4px_30px_rgba(27,110,243,0.6)] transition-all"
+              className="w-full h-14 bg-primary text-white font-black rounded-full flex items-center justify-center gap-2 disabled:opacity-40 shadow-[0_4px_20px_rgba(27,110,243,0.4)] hover:shadow-[0_4px_30px_rgba(27,110,243,0.6)] transition-all"
             >
               Review Job <ArrowRight className="w-5 h-5" />
             </button>
@@ -383,9 +460,9 @@ export default function ConsumerPostJob() {
         {/* STEP 3: Review */}
         {step === "review" && cat && (
           <div className="space-y-4">
-            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-4">
+            <div className="bg-card border border-border rounded-full p-4 shadow-sm space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                   <ServiceIcon id={cat.id} className="w-7 h-7" />
                 </div>
                 <div>
@@ -405,7 +482,7 @@ export default function ConsumerPostJob() {
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Photos ({photos.length})</p>
                     <div className="flex gap-2">
                       {photos.map((p, i) => (
-                        <img key={i} src={p} className="w-14 h-14 rounded-xl object-cover border border-border" />
+                        <img key={i} src={p} className="w-14 h-14 rounded-full object-cover border border-border" />
                       ))}
                     </div>
                   </div>
@@ -425,15 +502,26 @@ export default function ConsumerPostJob() {
               )}
             </div>
 
-            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-3 text-sm text-primary flex gap-2">
-              <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>Using your current location. Vendors near you will be notified automatically.</span>
+            <div className="bg-primary/10 border border-primary/20 rounded-full p-3 text-sm text-primary flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{lat ? "Location Ready. Vendors near you will be notified." : "We need your location to find nearby vendors."}</span>
+              </div>
+              {!lat && (
+                <button 
+                  onClick={fetchLocation} 
+                  disabled={fetchingLoc}
+                  className="mt-2 bg-primary text-white py-2 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {fetchingLoc ? "Finding you..." : "Get My Location"}
+                </button>
+              )}
             </div>
 
             <button
-              onClick={postJob}
+              onClick={submitJob}
               disabled={posting}
-              className="w-full h-14 bg-primary text-white font-black rounded-2xl flex items-center justify-center gap-2 disabled:opacity-60 shadow-[0_4px_20px_rgba(27,110,243,0.4)] hover:shadow-[0_4px_30px_rgba(27,110,243,0.6)] transition-all"
+              className="w-full h-14 bg-primary text-white font-black rounded-full flex items-center justify-center gap-2 disabled:opacity-60 shadow-[0_4px_20px_rgba(27,110,243,0.4)] hover:shadow-[0_4px_30px_rgba(27,110,243,0.6)] transition-all"
             >
               {posting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Zap className="w-5 h-5" /> Post Job Now</>}
             </button>

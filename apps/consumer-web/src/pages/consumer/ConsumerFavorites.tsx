@@ -54,7 +54,7 @@ export default function ConsumerFavorites() {
             <Heart className="w-12 h-12 text-muted-foreground/40 mx-auto" />
             <h3 className="font-bold text-base">No saved pros yet</h3>
             <p className="text-xs text-muted-foreground">Bookmark your favorite plumbers, electricians, and technicians for 1-tap rebooking.</p>
-            <button onClick={() => navigate("/search")} className="px-6 py-2.5 bg-primary text-white font-bold rounded-xl text-xs">
+            <button onClick={() => navigate("/search")} className="px-6 py-2.5 bg-primary text-white font-bold rounded-full text-xs">
               Explore Pros
             </button>
           </div>
@@ -64,7 +64,7 @@ export default function ConsumerFavorites() {
               <div key={v.vendor_id} className="bg-card border border-border rounded-3xl p-4 shadow-md space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={v.avatar_url} alt={v.display_name} className="w-12 h-12 rounded-2xl object-cover border border-border" />
+                    <img src={v.avatar_url} alt={v.display_name} className="w-12 h-12 rounded-full object-cover border border-border" />
                     <div>
                       <h3 className="font-extrabold text-sm flex items-center gap-1">
                         {v.display_name} {v.is_verified && <ShieldCheck className="w-3.5 h-3.5 text-primary" />}
@@ -84,7 +84,7 @@ export default function ConsumerFavorites() {
                 </div>
 
                 {v.note && (
-                  <p className="text-xs text-muted-foreground/90 bg-muted/60 rounded-xl p-2.5 font-medium italic">
+                  <p className="text-xs text-muted-foreground/90 bg-muted/60 rounded-full p-2.5 font-medium italic">
                     "{v.note}"
                   </p>
                 )}
@@ -92,13 +92,13 @@ export default function ConsumerFavorites() {
                 <div className="flex gap-2 pt-1">
                   <button
                     onClick={() => navigate(`/post-job?category=${v.primary_category}`)}
-                    className="flex-1 py-2.5 bg-primary text-white font-bold text-xs rounded-xl shadow hover:bg-primary/90"
+                    className="flex-1 py-2.5 bg-primary text-white font-bold text-xs rounded-full shadow hover:bg-primary/90"
                   >
                     Direct Request
                   </button>
                   <a
                     href={`tel:${v.phone}`}
-                    className="px-4 py-2.5 bg-muted/80 border border-border rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-muted"
+                    className="px-4 py-2.5 bg-muted/80 border border-border rounded-full font-bold text-xs flex items-center gap-1.5 hover:bg-muted"
                   >
                     <Phone className="w-3.5 h-3.5 text-primary" /> Call
                   </a>

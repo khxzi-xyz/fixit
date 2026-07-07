@@ -51,7 +51,7 @@ export default function OrderWarranty() {
       </div>
 
       <div className="px-4 -mt-8 space-y-5 max-w-xl mx-auto">
-        <Card className="bg-card border-border shadow-lg rounded-2xl">
+        <Card className="bg-card border-border shadow-lg rounded-full">
           <CardContent className="p-6">
             <div className="flex justify-between items-center mb-6 border-b border-border pb-6">
               <div>
@@ -69,7 +69,7 @@ export default function OrderWarranty() {
               </div>
             ) : (
               <div className="space-y-4">
-                <Button onClick={agree} disabled={busy} className="w-full h-14 rounded-xl text-lg font-bold bg-success hover:bg-success/90 text-success-foreground">
+                <Button onClick={agree} disabled={busy} className="w-full h-14 rounded-full text-lg font-bold bg-success hover:bg-success/90 text-success-foreground">
                   <Check className="w-5 h-5 mr-2" /> Agree to {proposedDays} Days
                 </Button>
                 <div className="relative flex items-center py-1">
@@ -79,7 +79,7 @@ export default function OrderWarranty() {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {[14, 30, 60].map((d) => (
-                    <Button key={d} onClick={() => counter(d)} disabled={busy} variant="outline" className="h-12 rounded-xl border-border font-semibold">{d} Days</Button>
+                    <Button key={d} onClick={() => counter(d)} disabled={busy} variant="outline" className="h-12 rounded-full border-border font-semibold">{d} Days</Button>
                   ))}
                 </div>
               </div>
