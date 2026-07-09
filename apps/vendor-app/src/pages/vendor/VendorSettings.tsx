@@ -84,17 +84,17 @@ export default function VendorSettings() {
 
   return (
     <VendorLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-8 rounded-b-3xl shadow-md">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 text-foreground px-4 pt-5 pb-8 rounded-b-[32px] shadow-sm">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/vendor/home")} className="bg-white/20 p-2 rounded-full hover:bg-white/30 transition-colors"><ChevronLeft className="w-6 h-6" /></button>
-          <h1 className="text-2xl font-extrabold">Shop Settings</h1>
+          <button onClick={() => navigate("/vendor/home")} className="bg-primary/10 text-primary p-2 rounded-full hover:bg-primary/20 transition-colors"><ChevronLeft className="w-6 h-6" /></button>
+          <h1 className="text-2xl font-extrabold text-foreground">Shop Settings</h1>
         </div>
       </div>
 
       <div className="px-4 py-5 space-y-6 -mt-6">
       
         {/* Profile Info */}
-        <Card className="bg-card border-none shadow-lg rounded-full overflow-hidden">
+        <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px] overflow-hidden">
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center gap-4">
               <div className="relative group">
@@ -142,7 +142,7 @@ export default function VendorSettings() {
         {/* My Skills */}
         <div className="space-y-4">
           <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">Approved Skills</h2>
-          <Card className="bg-card border border-border/50 shadow-sm rounded-full overflow-hidden">
+          <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px] overflow-hidden">
             <CardContent className="p-4">
               {mySkills.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">No skills registered yet.</p>
@@ -165,7 +165,7 @@ export default function VendorSettings() {
         {/* Support */}
         <div className="space-y-4">
           <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">Vendor Support</h2>
-          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-sm rounded-full cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/support")}>
+          <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-primary/20 shadow-sm rounded-[24px] cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/support")}>
             <CardContent className="p-5 flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center text-primary shadow-sm">
                 <MessageSquare className="w-7 h-7" />
@@ -182,7 +182,7 @@ export default function VendorSettings() {
         {/* Preferences */}
         <div className="space-y-4">
           <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">App Preferences</h2>
-          <Card className="bg-card border border-border/50 shadow-sm rounded-full overflow-hidden">
+          <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px] overflow-hidden">
             <CardContent className="p-0 divide-y divide-border/50">
               <div className="flex items-center justify-between p-5 hover:bg-muted/20 transition-colors">
                 <div className="flex items-center gap-4">

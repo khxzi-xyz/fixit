@@ -9,7 +9,7 @@ import { Capacitor } from "@capacitor/core";
 import {
   ChevronLeft, ChevronRight, Zap, Clock, Sparkles,
   Camera, ImagePlus, MapPin, X, ArrowRight, Loader2, CheckCircle2,
-  Tag, DollarSign, Siren, Calendar,
+  Tag, DollarSign, Siren, Calendar, Map
 } from "lucide-react";
 
 import { ServiceIcon } from "@/components/ServiceIcon";
@@ -72,7 +72,8 @@ export default function ConsumerPostJob() {
   const [selectedCat, setSelectedCat] = useState<ServiceId | null>(null);
   const [urgency, setUrgency] = useState<string>("THIS_WEEK");
   const [description, setDescription] = useState("");
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>([]);
+  const [video, setVideo] = useState<string | null>(null);
   const [bounty, setBounty] = useState("");
   const [useBounty, setUseBounty] = useState(false);
   const [aiRewriting, setAiRewriting] = useState(false);
@@ -86,7 +87,7 @@ export default function ConsumerPostJob() {
 
   const cat = SERVICE_CATEGORIES.find((c) => c.id === selectedCat);
 
-  // Excluded photos from draft storage to prevent QuotaExceededError
+  // Cloud Sync + Local Storage
   useEffect(() => {
     try {
       const saved = localStorage.getItem("fixit_job_draft");
@@ -100,15 +101,49 @@ export default function ConsumerPostJob() {
         if (d.useBounty) setUseBounty(d.useBounty);
         if (d.lat) setLat(d.lat);
         if (d.lng) setLng(d.lng);
+        if (d.mediaUrls) {
+          const imgs = d.mediaUrls.filter((u: string) => !u.includes("video") && !u.endsWith(".mp4"));
+          const vids = d.mediaUrls.find((u: string) => u.includes("video") || u.endsWith(".mp4"));
+          setImages(imgs.slice(0, 5));
+          if (vids) setVideo(vids);
+        }
       }
     } catch {}
+    
+    // Cloud fallback/override
+    api.draftGet().then((d) => {
+      if (d) {
+        if (d.category_id && !selectedCat) setSelectedCat(d.category_id as ServiceId);
+        if (d.urgency && urgency === "THIS_WEEK") setUrgency(d.urgency);
+        if (d.description && !description) setDescription(d.description);
+        if (d.lat && !lat) setLat(Number(d.lat));
+        if (d.lng && !lng) setLng(Number(d.lng));
+      }
+    }).catch(() => {});
+    // URL search params override
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const catParam = sp.get("category");
+      if (catParam) {
+        setSelectedCat(catParam as ServiceId);
+        if (step === "category") setStep("details");
+      }
+    } catch (e) {}
   }, []);
 
   useEffect(() => {
     if (!done) {
-      localStorage.setItem("fixit_job_draft", JSON.stringify({
-        step, selectedCat, urgency, description, bounty, useBounty, lat, lng
-      }));
+      const mediaUrls = [...images, ...(video ? [video] : [])];
+      const draft = { step, selectedCat, urgency, description, bounty, useBounty, lat, lng, mediaUrls };
+      localStorage.setItem("fixit_job_draft", JSON.stringify(draft));
+      
+      // Auto-sync to cloud if category is chosen (debounced ideally, but here we just sync on step/major changes)
+      const timer = setTimeout(() => {
+        if (selectedCat) {
+          api.draftSave({ categoryId: selectedCat, urgency, description, lat, lng }).catch(()=>{});
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [step, selectedCat, urgency, description, bounty, useBounty, lat, lng, done]);
 
@@ -156,13 +191,14 @@ export default function ConsumerPostJob() {
           return;
         }
         const image = await Camera.getPhoto({
-          quality: 85,
+          quality: 80,
+          width: 1080,
           allowEditing: false,
           resultType: CameraResultType.DataUrl,
           source: CameraSource.Camera, // Live camera ONLY — no gallery (Triple-Verify)
         });
         if (image.dataUrl) {
-          setPhotos((p) => [...p, image.dataUrl!].slice(0, 10));
+          setImages((p) => [...p, image.dataUrl!].slice(0, 5));
         }
       } catch (err: any) {
         if (err?.message !== "User cancelled photos app") {
@@ -178,9 +214,15 @@ export default function ConsumerPostJob() {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       files.forEach((f) => {
+        const isVideo = f.type.startsWith("video/");
+        if (isVideo) {
+          const url = URL.createObjectURL(f);
+          setVideo(url);
+          return;
+        }
         const reader = new FileReader();
         reader.onload = (ev) => {
-          if (ev.target?.result) setPhotos((p) => [...p, ev.target!.result as string].slice(0, 10));
+          if (ev.target?.result) setImages((p) => [...p, ev.target!.result as string].slice(0, 5));
         };
         reader.readAsDataURL(f);
       });
@@ -195,8 +237,9 @@ export default function ConsumerPostJob() {
     setPosting(true);
     try {
       // Stage photos through filesystem before uploading (prevents memory-pressure loss on Android)
+      const allMedia = [...images, ...(video ? [video] : [])];
       const mediaUrls = await Promise.all(
-        photos.map((p) => stageAndUpload(p, "jobs").catch(() => ""))
+        allMedia.map((p) => stageAndUpload(p, "jobs").catch(() => ""))
       ).then((urls) => urls.filter(Boolean));
 
       await api.createJob({
@@ -211,6 +254,7 @@ export default function ConsumerPostJob() {
       });
 
       localStorage.removeItem("fixit_job_draft");
+      api.draftDelete().catch(()=>{});
 
       // Haptic feedback: light pulse on success
       import("@capacitor/haptics").then(({ Haptics, ImpactStyle }) => {
@@ -359,15 +403,15 @@ export default function ConsumerPostJob() {
             </div>
 
             {/* Description */}
-            <div className="bg-card border border-border rounded-full p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Describe the Job</p>
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Describe the Job</p>
                 <button
                   onClick={rewriteWithAI}
                   disabled={aiRewriting || !description.trim()}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-full hover:bg-primary/20 disabled:opacity-40 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 text-primary text-xs font-bold rounded-full hover:from-blue-500/20 hover:to-indigo-500/20 disabled:opacity-40 transition-all active:scale-95"
                 >
-                  {aiRewriting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                  {aiRewriting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                   AI Improve
                 </button>
               </div>
@@ -381,68 +425,101 @@ export default function ConsumerPostJob() {
                         `Describe what you need from the ${cat.label}…`
                 }
                 rows={4}
-                className="w-full bg-muted/60 border border-border rounded-full px-3 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                className="w-full bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none shadow-inner"
               />
             </div>
 
             {/* Photos (only if service needs them) */}
             {cat.needsPhotos && (
-              <div className="bg-card border border-border rounded-full p-4 shadow-sm">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">
-                  Photos / Video <span className="text-muted-foreground font-normal">(live camera only, max 10)</span>
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  {photos.map((p, i) => (
-                    <div key={i} className="relative w-16 h-16 rounded-full overflow-hidden border border-border">
-                      {p.includes("video") ? (
-                        <video src={p} className="w-full h-full object-cover" muted />
-                      ) : (
-                        <img src={p} className="w-full h-full object-cover" />
-                      )}
-                      <button onClick={() => setPhotos((prev) => prev.filter((_, pi) => pi !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center">
-                        <X className="w-3 h-3 text-white" />
-                      </button>
-                    </div>
-                  ))}
-                  {photos.length < 10 && (
-                    <button onClick={capturePhoto} className="w-16 h-16 rounded-full border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                      <Camera className="w-5 h-5" />
-                      <span className="text-[9px] font-bold">Add</span>
-                    </button>
-                  )}
-                  {/* Web fallback file input */}
-                  <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={addPhoto} />
+              <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] p-5 shadow-sm">
+                <div className="mb-4">
+                  <p className="text-sm font-black">Media Proof</p>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">Add up to 5 images and 1 video to help pros bid accurately.</p>
                 </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Images block */}
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <p className="text-[10px] font-black uppercase text-muted-foreground mb-2 flex justify-between">
+                      <span>Images</span>
+                      <span>{images.length} / 5</span>
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {images.map((p, i) => (
+                        <div key={i} className="relative w-14 h-14 rounded-md overflow-hidden border border-border shadow-sm">
+                          <img src={p} className="w-full h-full object-cover" />
+                          <button onClick={() => setImages((prev) => prev.filter((_, pi) => pi !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center backdrop-blur-md">
+                            <X className="w-3 h-3 text-white" />
+                          </button>
+                        </div>
+                      ))}
+                      {images.length < 5 && (
+                        <button onClick={capturePhoto} className="w-14 h-14 rounded-md border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">
+                          <Camera className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Video block */}
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border flex flex-col">
+                    <p className="text-[10px] font-black uppercase text-muted-foreground mb-2 flex justify-between">
+                      <span>Video</span>
+                      <span>{video ? "1" : "0"} / 1</span>
+                    </p>
+                    <div className="flex-1 flex items-center justify-center">
+                      {video ? (
+                        <div className="relative w-full h-14 rounded-md overflow-hidden border border-border shadow-sm">
+                          <video src={video} className="w-full h-full object-cover" muted />
+                          <button onClick={() => setVideo(null)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center backdrop-blur-md">
+                            <X className="w-3 h-3 text-white" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button onClick={() => fileRef.current?.click()} className="w-full h-14 rounded-md border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">
+                          <ImagePlus className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Web fallback file input */}
+                <input ref={fileRef} type="file" accept="image/*,video/mp4,video/quicktime" multiple className="hidden" onChange={addPhoto} />
               </div>
             )}
 
-            {/* Bounty option */}
-            <div className="bg-card border border-border rounded-full p-4 shadow-sm">
-              <div className="flex items-center justify-between">
+            {/* Budget / Fixed Price */}
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm font-bold">Set Fixed Price</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Name your budget -vendors compete at or below it</p>
+                  <p className="text-sm font-black flex items-center gap-2">
+                    Set Fixed Price
+                  </p>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">Name your budget - vendors compete at or below it</p>
                 </div>
-                <button
-                  onClick={() => setUseBounty((v) => !v)}
-                  className={`w-12 h-6 rounded-full transition-all relative ${useBounty ? "bg-primary" : "bg-muted-foreground/30"}`}
+                <div
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${useBounty ? "bg-primary" : "bg-slate-300 dark:bg-slate-700"}`}
+                  onClick={() => {
+                    setUseBounty(!useBounty);
+                    if (useBounty) setBounty("");
+                  }}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${useBounty ? "left-6" : "left-0.5"}`} />
-                </button>
+                  <div className={`w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform ${useBounty ? "translate-x-6" : ""}`} />
+                </div>
               </div>
               {useBounty && (
-                <div className="mt-3 relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <div className="relative overflow-hidden rounded-xl bg-slate-100/50 dark:bg-slate-800/50 shadow-inner">
+                  <div className="absolute left-4 top-0 bottom-0 flex items-center justify-center text-primary font-black">
+                    OMR
+                  </div>
                   <input
                     type="number"
                     value={bounty}
                     onChange={(e) => setBounty(e.target.value)}
-                    placeholder="0.000"
-                    min="1"
-                    step="0.5"
-                    className="w-full h-11 bg-muted/60 border border-border rounded-full pl-8 pr-12 text-base font-bold outline-none focus:border-primary"
+                    placeholder="25.000"
+                    className="w-full bg-transparent border-none pl-14 pr-4 py-3 text-lg font-black outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-muted-foreground">OMR</span>
                 </div>
               )}
             </div>
@@ -475,15 +552,18 @@ export default function ConsumerPostJob() {
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1">Job Description</p>
                 <p className="text-sm text-foreground leading-relaxed">{description}</p>
               </div>
-              {photos.length > 0 && (
+              {(images.length > 0 || video) && (
                 <>
                   <div className="h-px bg-border" />
                   <div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Photos ({photos.length})</p>
-                    <div className="flex gap-2">
-                      {photos.map((p, i) => (
-                        <img key={i} src={p} className="w-14 h-14 rounded-full object-cover border border-border" />
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Media Proof ({images.length + (video ? 1 : 0)})</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {images.map((p, i) => (
+                        <img key={i} src={p} className="w-14 h-14 rounded-md object-cover border border-border shadow-sm" />
                       ))}
+                      {video && (
+                        <video src={video} className="w-14 h-14 rounded-md object-cover border border-border shadow-sm" muted />
+                      )}
                     </div>
                   </div>
                 </>
@@ -502,20 +582,22 @@ export default function ConsumerPostJob() {
               )}
             </div>
 
-            <div className="bg-primary/10 border border-primary/20 rounded-full p-3 text-sm text-primary flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>{lat ? "Location Ready. Vendors near you will be notified." : "We need your location to find nearby vendors."}</span>
+            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-sm text-primary flex flex-col gap-3 shadow-inner">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 mt-0.5 shrink-0 text-primary" />
+                <div className="flex-1">
+                  <p className="font-bold text-primary">{lat ? "Location Saved" : "Set Job Location"}</p>
+                  <p className="text-xs text-primary/70">{lat ? "Vendors nearby will be notified." : "Optional, but helps find better matches nearby."}</p>
+                </div>
               </div>
-              {!lat && (
-                <button 
-                  onClick={fetchLocation} 
-                  disabled={fetchingLoc}
-                  className="mt-2 bg-primary text-white py-2 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {fetchingLoc ? "Finding you..." : "Get My Location"}
-                </button>
-              )}
+              <button 
+                onClick={fetchLocation} 
+                disabled={fetchingLoc}
+                className="mt-1 w-full bg-white dark:bg-slate-900 border border-primary/20 text-primary py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors shadow-sm disabled:opacity-50"
+              >
+                {fetchingLoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Map className="w-4 h-4" />}
+                {fetchingLoc ? "Finding you..." : lat ? "Update Location" : "Use Current Location"}
+              </button>
             </div>
 
             <button

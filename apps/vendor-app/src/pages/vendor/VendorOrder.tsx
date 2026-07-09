@@ -217,7 +217,7 @@ export default function VendorOrder() {
   const PhotoTile = ({ phase, label, canUpload = false }: { phase: Phase; label: string; canUpload?: boolean }) => {
     const isUploaded = !!photos[phase];
     return (
-      <div className="aspect-square bg-muted rounded-full border border-dashed border-border flex flex-col items-center justify-center overflow-hidden relative">
+      <div className="aspect-square bg-muted rounded-[24px] border border-dashed border-border flex flex-col items-center justify-center overflow-hidden relative">
         {canUpload && !Capacitor.isNativePlatform() && (
           <input ref={fileRefs[phase as "BEFORE"|"VENDOR_AFTER"]} type="file" accept="image/*" className="hidden" onChange={(e) => handleCapture(phase, e.target.files?.[0])} />
         )}
@@ -250,22 +250,22 @@ export default function VendorOrder() {
 
   return (
     <VendorLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-12 rounded-b-3xl shadow-md">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 text-foreground px-4 pt-5 pb-12 rounded-b-[32px] shadow-sm">
         <div className="flex justify-between items-start">
           <div>
-            <Badge className="bg-white/15 text-white border-0 hover:bg-white/15 mb-2">{status.replace(/_/g, " ")}</Badge>
+            <Badge className="bg-primary/10 text-primary border-0 mb-2">{status.replace(/_/g, " ")}</Badge>
             <h1 className="text-xl font-extrabold">{job?.description?.slice(0, 36) || "Active job"}</h1>
-            <p className="text-white/70 text-sm mt-1">Muscat</p>
+            <p className="text-muted-foreground text-sm mt-1">Muscat</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-black">{job?.bid_amount ? Number(job.bid_amount).toFixed(2) : "—"}</p>
-            <p className="text-[10px] text-white/70 uppercase font-medium">OMR locked</p>
+            <p className="text-2xl font-black text-primary">{job?.bid_amount ? Number(job.bid_amount).toFixed(2) : "—"}</p>
+            <p className="text-[10px] text-muted-foreground uppercase font-medium">OMR locked</p>
           </div>
         </div>
       </div>
 
       <div className="px-4 -mt-6 space-y-6 pb-6">
-        <Card className="bg-card border-border shadow-md rounded-full">
+        <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px]">
           <CardContent className="p-4">
             {status === "ASSIGNED" && (
               <Button onClick={onWay} disabled={busy} className="w-full h-14 rounded-full text-lg font-bold">
@@ -290,7 +290,7 @@ export default function VendorOrder() {
         </Card>
 
         {status === "EN_ROUTE" && (
-          <Card className="bg-card border-border shadow-md rounded-full overflow-hidden">
+          <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px] overflow-hidden">
             <div className="h-56 relative">
               <LiveMap vendor={myPos} destination={dest} className="w-full h-full" />
               <div className="absolute bottom-2 left-2 right-2 bg-background/90 backdrop-blur rounded-full px-3 py-2 text-xs font-semibold flex items-center gap-2">

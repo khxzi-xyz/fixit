@@ -6,6 +6,7 @@ import { CheckCircle2, Star, Zap, Crown } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
+import { PaymentGatewayModal } from "@/components/PaymentGatewayModal";
 
 type Billing = "MONTHLY" | "YEARLY" | "ONCE";
 type Tier = "PRO" | "ELITE";
@@ -52,6 +53,7 @@ export default function VendorUpgrade() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [tier, setTier] = useState<Tier>("PRO");
   const [billing, setBilling] = useState<Billing>("MONTHLY");
+  const [showPayment, setShowPayment] = useState(false);
 
   useEffect(() => {
     api.plans().then((p) => setPlans(Array.isArray(p) ? p : [])).catch(() => { });
@@ -65,10 +67,11 @@ export default function VendorUpgrade() {
   const enough = balance != null && balance >= Number(price);
 
   const subscribe = async () => {
-    if (!enough) {
-      toast({ title: "Top up first", description: `Need ${Number(price).toFixed(3)} OMR in wallet.` });
-      return;
-    }
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = async () => {
+    setShowPayment(false);
     setBusy(true);
     try {
       await api.subscribe(planId);
@@ -85,12 +88,20 @@ export default function VendorUpgrade() {
 
   return (
     <VendorLayout>
-      <div className={`text-white px-4 pt-10 pb-16 rounded-b-3xl shadow-md text-center ${tier === "ELITE" ? "bg-gradient-to-br from-amber-500 to-orange-600" : "hero-blue"}`}>
-        <div className="w-20 h-20 bg-white/15 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4">
-          <Icon className="w-10 h-10 fill-current" />
+      <div className={`relative px-4 pt-10 pb-16 rounded-b-[32px] shadow-sm overflow-hidden text-center ${tier === "ELITE" ? "" : "hero-blue"}`}>
+        {tier === "ELITE" && (
+          <div className="absolute inset-0">
+            <img src="/vendor_elite_banner.png" className="w-full h-full object-cover" alt="Elite Banner" />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+          </div>
+        )}
+        <div className="relative z-10">
+          <div className="w-20 h-20 bg-white/15 backdrop-blur-xl rounded-[24px] flex items-center justify-center mx-auto mb-4 border border-white/20 shadow-xl">
+            <Icon className="w-10 h-10 text-white fill-white/20" />
+          </div>
+          <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-md">FixIt Pro {TIERS[tier].label}</h1>
+          <p className="text-white/90 mt-2 text-sm max-w-xs mx-auto drop-shadow">Stand out, bid more, earn more.</p>
         </div>
-        <h1 className="text-3xl font-black tracking-tight">FixIt Now {TIERS[tier].label}</h1>
-        <p className="text-white/80 mt-2 text-sm max-w-xs mx-auto">Stand out, bid more, earn more.</p>
       </div>
 
       <div className="px-4 -mt-8 space-y-4">
@@ -193,6 +204,13 @@ export default function VendorUpgrade() {
           </p>
         </div>
       )}
+      <PaymentGatewayModal
+        open={showPayment}
+        onOpenChange={setShowPayment}
+        amount={Number(price)}
+        planName={`FixIt Pro ${TIERS[tier].label}`}
+        onSuccess={handlePaymentSuccess}
+      />
     </VendorLayout>
   );
 }

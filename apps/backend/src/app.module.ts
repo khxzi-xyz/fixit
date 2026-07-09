@@ -38,6 +38,8 @@ import { EmergencyModule } from './modules/emergency/emergency.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { FeedModule } from './modules/feed/feed.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -84,6 +86,8 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
     MaintenanceModule,
     FeedModule,
     FavoritesModule,
+    NotificationsModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

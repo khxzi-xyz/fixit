@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import { Camera } from "@capacitor/camera";
-import { Geolocation } from "@capacitor/geolocation";
-
-import { Preferences } from "@capacitor/preferences";
 import { Capacitor } from "@capacitor/core";
-import { LocalNotifications } from "@capacitor/local-notifications";
 
 import { ShieldCheck, MapPin, Camera as CameraIcon, Bell, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -24,6 +19,7 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
         onComplete();
         return;
       }
+      const { Preferences } = await import("@capacitor/preferences");
       const { value } = await Preferences.get({ key: "permissions_requested" });
       if (value === "true") {
         onComplete();
@@ -37,6 +33,7 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
   const requestCamera = async () => {
     try {
       setPerms(p => ({ ...p, camera: "loading" }));
+      const { Camera } = await import("@capacitor/camera");
       const status = await Camera.requestPermissions();
       setPerms(p => ({ ...p, camera: status.camera === "granted" ? "granted" : "denied" }));
     } catch (e) {
@@ -48,6 +45,7 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
   const requestLocation = async () => {
     try {
       setPerms(p => ({ ...p, location: "loading" }));
+      const { Geolocation } = await import("@capacitor/geolocation");
       const status = await Geolocation.requestPermissions();
       setPerms(p => ({ ...p, location: status.location === "granted" || status.coarseLocation === "granted" ? "granted" : "denied" }));
     } catch (e) {
@@ -59,6 +57,7 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
   const requestPush = async () => {
     try {
       setPerms(p => ({ ...p, push: "loading" }));
+      const { LocalNotifications } = await import("@capacitor/local-notifications");
       const status = await LocalNotifications.requestPermissions();
       setPerms(p => ({ ...p, push: status.display === "granted" ? "granted" : "denied" }));
     } catch (e) {
@@ -68,6 +67,7 @@ export function PermissionsPrompt({ onComplete }: { onComplete: () => void }) {
   };
 
   const finish = async () => {
+    const { Preferences } = await import("@capacitor/preferences");
     await Preferences.set({ key: "permissions_requested", value: "true" });
     setShow(false);
     onComplete();

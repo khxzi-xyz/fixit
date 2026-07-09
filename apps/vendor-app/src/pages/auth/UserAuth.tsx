@@ -132,7 +132,7 @@ export function UserLogin() {
       options: { emailRedirectTo: window.location.origin + '/home' }
     });
     setBusy(false);
-    if (error) { toast({ title: "Failed to send link", description: e.message, variant: "destructive" }); return; }
+    if (error) { toast({ title: "Failed to send link", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Magic Link Sent", description: "Check your email for the login link." });
   };
 
@@ -519,28 +519,6 @@ export function UserOTP() {
           <MessageSquare className="w-3 h-3" /> OTP delivered via SMS
         </p>
       </div>
-
-      {showBioPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Fingerprint className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-black text-center mb-2">Enable Biometric Login</h3>
-            <p className="text-sm text-muted-foreground text-center mb-6">
-              Use your fingerprint or face to sign in quickly and securely next time.
-            </p>
-            <div className="space-y-3">
-              <Button onClick={enableBio} className="w-full h-12 rounded-full text-base font-bold">
-                Enable Biometrics
-              </Button>
-              <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-full text-sm font-bold text-muted-foreground">
-                Not now
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </AuthLayout>
   );
 }

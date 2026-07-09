@@ -13,9 +13,9 @@ interface ServiceIconProps {
 
 export const ServiceIcon: React.FC<ServiceIconProps> = ({ id, className = "w-6 h-6" }) => {
   switch (id) {
-    case "ELECTRICIAN": return <Zap className={`${className} text-amber-500 fill-amber-500/20`} />;
+    case "ELECTRICIAN": return <img src="/icons/electrical.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Electrician" />;
     case "PLUMBER": return <Wrench className={`${className} text-primary`} />;
-    case "CARPENTER": return <Hammer className={`${className} text-amber-600`} />;
+    case "CARPENTER": return <img src="/icons/carpentry.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Carpenter" />;
     case "AC_REPAIR": return <Snowflake className={`${className} text-cyan-400`} />;
     case "PAINTER": return <Paintbrush className={`${className} text-purple-500`} />;
     case "HANDYMAN": return <Wrench className={`${className} text-slate-400`} />;

@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
+import { supabase } from "@/lib/supabase";
 import { VendorLayout } from "@/components/layouts/VendorLayout";
 import { MessageCircle, Send, ChevronLeft, Image } from "lucide-react";
 import { api, tokenClaims } from "@/lib/api";
@@ -26,10 +27,33 @@ export default function VendorChats() {
 
   useEffect(() => {
     if (!activeJob) return;
-    const load = () => api.getMessages(activeJob.job_id).then(setMessages).catch(() => {});
-    load();
-    const t = setInterval(load, 5000);
-    return () => clearInterval(t);
+    
+    // Load initial messages
+    api.getMessages(activeJob.job_id).then(setMessages).catch(() => {});
+    
+    // Subscribe to real-time updates
+    const channel = supabase.channel(`room:${activeJob.job_id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "chat_messages",
+          filter: `channel_id=eq.${activeJob.job_id}`
+        },
+        (payload) => {
+          setMessages((prev) => {
+            // Prevent duplicates
+            if (prev.some(m => m.message_id === payload.new.message_id)) return prev;
+            return [...prev, payload.new];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [activeJob]);
 
   useEffect(() => {

@@ -45,6 +45,23 @@ export class AdminService {
     return data;
   }
 
+  async updateUser(userId: string, updates: any) {
+    const db = requireDb(this.db);
+    const { password, ...rest } = updates;
+    
+    // Update public.users table
+    const { error: dbError } = await db.from('users').update(rest).eq('user_id', userId);
+    if (dbError) throw new Error(dbError.message);
+    
+    // We only update auth.users via admin api if a password is provided
+    if (password) {
+       const { error: authError } = await db.auth.admin.updateUserById(userId, { password });
+       if (authError) throw new Error(authError.message);
+    }
+    
+    return { success: true };
+  }
+
   async reviewKyc(documentId: string, approve: boolean, reason?: string) {
     const db = requireDb(this.db);
     const { data, error } = await db.from('vendor_kyc_documents')

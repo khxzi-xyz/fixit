@@ -48,25 +48,24 @@ export function swr<T>(
   onData: (data: T) => void
 ): Promise<T> {
   const cacheKey = `fixit_cache_${key}`;
+  let hasCache = false;
   if (typeof window !== "undefined") {
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached !== null) {
         onData(JSON.parse(cached));
+        hasCache = true;
       }
     } catch { /* ignore cache parse error */ }
   }
-  return fetcher().then((fresh) => {
-    if (typeof window !== "undefined" && fresh !== undefined && fresh !== null) {
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify(fresh));
-      } catch { /* storage quota */ }
-    }
-    onData(fresh);
-    return fresh;
+  return fetcher().then((data) => {
+    onData(data);
+    if (typeof window !== "undefined") localStorage.setItem(cacheKey, JSON.stringify(data));
+    return data;
   }).catch((err) => {
-    // If network fails but cache exists, we still served cached data
-    return Promise.reject(err);
+    if (!hasCache) throw err;
+    console.warn(`[SWR] Offline or fetch failed for ${key}, using cache.`);
+    return undefined as unknown as T;
   });
 }
 
@@ -84,8 +83,8 @@ export const api = {
   me: () => req<any>("GET", "/auth/me"),
   googleLogin: (idToken: string, role: "CONSUMER" | "VENDOR" = "CONSUMER") => req<AuthResult>("POST", "/auth/google", { idToken, role }),
   requestOtp: (phoneNumber: string) => req<{ sent: true }>("POST", "/auth/otp/request", { phoneNumber }),
-  verifyOtp: (phoneNumber: string, code: string, fullName: string | undefined, role: "CONSUMER" | "VENDOR") =>
-    req<AuthResult>("POST", "/auth/otp/verify", { phoneNumber, code, fullName, role }),
+  verifyOtp: (phoneNumber: string, code: string, fullName: string | undefined, role: "CONSUMER" | "VENDOR", referralCode?: string) =>
+    req<AuthResult>("POST", "/auth/otp/verify", { phoneNumber, code, fullName, role, referralCode }),
   linkPhone: (phoneNumber: string, code: string) => req<AuthResult>("POST", "/auth/otp/link", { phoneNumber, code }),
 
   // ── Wallet ────────────────────────────────────────────────────────
@@ -107,9 +106,14 @@ export const api = {
   referralStats: () => req<{ total_referred: number; pending: number; rewarded: number }>("GET", "/rewards/referral-stats"),
   applyCoupon: (code: string) => req<any>("POST", "/rewards/coupon/apply", { code }),
   availableCoupons: () => req<any[]>("GET", "/rewards/coupons"),
+  claimReferral: (code: string) => req<any>("POST", "/rewards/referral/claim", { code }),
 
   // ── Categories + Jobs ─────────────────────────────────────────────
   categories: () => req<{ category_id: string; display_name: string; icon_key?: string; framework?: string }[]>("GET", "/categories"),
+  subTags: (cat: string) => req<{ tags: string[] }>("GET", `/categories/${cat}/tags`),
+  draftGet: () => req<any>("GET", "/job-drafts"),
+  draftSave: (draft: any) => req<any>("PUT", "/job-drafts", draft),
+  draftDelete: () => req<any>("DELETE", "/job-drafts"),
   createJob: (input: { categoryId: string; urgency: string; description?: string; lat: number; lng: number; postingKind?: string; bountyPrice?: number; aiRewritten?: boolean; originalDescription?: string; mediaUrls?: string[] }) =>
     req<any>("POST", "/jobs", input),
   myJobs: () => req<any[]>("GET", "/jobs/mine"),
@@ -123,6 +127,7 @@ export const api = {
   // ── Bids ──────────────────────────────────────────────────────────
   jobBids: (jobId: string) => req<any[]>("GET", `/jobs/${jobId}/bids`),
   selectBid: (jobId: string, bidId: string) => req<any>("POST", `/jobs/${jobId}/bids/${bidId}/select`),
+  submitReview: (jobId: string, rating: number, comment?: string) => req<any>("POST", `/jobs/${jobId}/reviews`, { rating, comment }),
   submitBid: (input: { jobId: string; bidAmount: number; proposedMilestones: { label: string; pct: number }[] }) => req<any>("POST", "/bids", input),
 
   // ── Completion / Warranty ─────────────────────────────────────────
@@ -244,7 +249,6 @@ export const api = {
   addPaymentMethod: (card: { cardNumber: string; expMonth: number; expYear: number; holderName?: string; cvv?: string }) =>
     req<any>("POST", "/billing/payment-methods", card),
   deletePaymentMethod: (id: string) => req<any>("DELETE", `/billing/payment-methods/${id}`),
-  claimReferral: (code: string) => req<any>("POST", "/rewards/referral/claim", { code }),
 
   // ── AI Support chat ───────────────────────────────────────────────
   supportChatHistory: () => req<any[]>("GET", "/support/chat"),
@@ -254,6 +258,8 @@ export const api = {
   // ── Settings / KYC ───────────────────────────────────────────────
   updateSettings: (dto: { theme?: string; language?: string }) => req("PUT", "/settings", dto),
   updateFcmToken: (token: string) => req<any>("PUT", "/settings/fcm-token", { token }),
+  trustedDevices: () => req<any[]>("GET", "/auth/trusted-devices"),
+  deleteTrustedDevice: (id: string) => req<any>("DELETE", `/auth/trusted-devices/${id}`),
   updateProfile: (dto: { full_name?: string; phone?: string }) => req<any>("PUT", "/settings/profile", dto),
   changePassword: (currentPassword: string, newPassword: string) => req<any>("POST", "/settings/change-password", { currentPassword, newPassword }),
   deleteAccount: () => req<any>("DELETE", "/settings/account"),

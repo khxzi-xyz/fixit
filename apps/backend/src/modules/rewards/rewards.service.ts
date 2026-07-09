@@ -202,6 +202,28 @@ export class RewardsService {
     }
   }
 
+  /** Called after a job is completed: pay out the pending referral to both sides if not already paid. */
+  async onJobCompleted(userId: string) {
+    if (!this.db) return;
+    try {
+      const { data: ref } = await this.db
+        .from('referrals')
+        .select('*')
+        .eq('referred_id', userId)
+        .eq('status', 'PENDING')
+        .maybeSingle();
+      if (!ref) return;
+      await this.db
+        .from('referrals')
+        .update({ status: 'REWARDED', rewarded_at: new Date().toISOString() })
+        .eq('referral_id', ref.referral_id);
+      await this.addReward(ref.referrer_id, 1.0, 'REFERRAL', 'Referral bonus — your friend completed their first job');
+      await this.addReward(userId, 1.0, 'REFERRAL', 'Referral bonus — first job completed');
+    } catch (e) {
+      this.logger.warn(`job completion referral payout skipped: ${e}`);
+    }
+  }
+
   async getReferralStats(userId: string) {
     if (!this.db) return { total_referred: 0, pending: 0, rewarded: 0 };
     const { data, error } = await this.db.from('referrals').select('status').eq('referrer_id', userId);

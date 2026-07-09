@@ -1,4 +1,3 @@
-import { PushNotifications, Token } from "@capacitor/push-notifications";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "./supabase";
 
@@ -6,7 +5,10 @@ export async function setupPushNotifications() {
   if (!Capacitor.isNativePlatform()) return;
 
   // Register for push notifications
+  let PushNotifications: any;
   try {
+    const mod = await import("@capacitor/push-notifications");
+    PushNotifications = mod.PushNotifications;
     await PushNotifications.register();
   } catch (error) {
     console.error("Failed to register for push notifications:", error);
@@ -14,7 +16,7 @@ export async function setupPushNotifications() {
   }
 
   // On success, we should be able to receive notifications
-  PushNotifications.addListener("registration", async (token: Token) => {
+  PushNotifications.addListener("registration", async (token: any) => {
     console.log("Push registration success, token: " + token.value);
     await syncFCMToken(token.value);
   });

@@ -157,33 +157,36 @@
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --background: 222 47% 7%;
+  --background: 222 47% 11%;
   --foreground: 210 40% 98%;
-
-  --card: 222 47% 11%;
+  --border: 215 27.9% 16.9%;
+  
+  --card: 215 27.9% 16.9%;
   --card-foreground: 210 40% 98%;
-  --card-border: 240 3.7% 15.9%;
-  --sidebar: 240 10% 3.9%;
-  --sidebar-foreground: 0 0% 98%;
-  --sidebar-border: 240 3.7% 15.9%;
-  --sidebar-accent: 240 3.7% 15.9%;
-  --sidebar-accent-foreground: 0 0% 98%;
-  --popover: 222 47% 11%;
+  --card-border: 215 27.9% 16.9%;
+  
+  --sidebar: 222 47% 11%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-border: 215 27.9% 16.9%;
+  --sidebar-accent: 215 27.9% 16.9%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  
+  --popover: 215 27.9% 16.9%;
   --popover-foreground: 210 40% 98%;
-  --popover-border: 240 3.7% 15.9%;
+  --popover-border: 215 27.9% 16.9%;
   
   --primary: 217.2 91.2% 59.8%;
   --primary-foreground: 222.2 47.4% 11.2%;
   
   --secondary: 217.2 32.6% 17.5%;
   --secondary-foreground: 210 40% 98%;
+  
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
+  
   --accent: 217.2 32.6% 17.5%;
   --accent-foreground: 210 40% 98%;
+  
   --input: 217.2 32.6% 17.5%;
   --ring: 224.3 76.3% 48%;
 }
@@ -203,6 +206,15 @@
 }
 
 @layer utilities {
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animate-gradient {
+    animation: gradient 3s ease infinite;
+  }
+
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
   }

@@ -34,6 +34,13 @@ export class VendorsController {
     return this.vendors.upsertProfile(req.user!.sub, dto);
   }
 
+  @Put('me/location')
+  @UseGuards(JwtAuthGuard)
+  @Roles('VENDOR')
+  updateLocation(@Req() req: AuthedRequest, @Body() body: { lat: number, lng: number }) {
+    return this.vendors.updateLocation(req.user!.sub, body.lat, body.lng);
+  }
+
   @Get('compliance')
   @UseGuards(JwtAuthGuard)
   @Roles('ADMIN')

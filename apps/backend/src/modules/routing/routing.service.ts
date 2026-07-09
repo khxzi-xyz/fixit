@@ -4,6 +4,8 @@ import { SUPABASE_CLIENT } from '../../supabase/supabase.module';
 import { requireDb } from '../../common/db.util';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 
+import { NotificationsService } from '../notifications/notifications.service';
+
 /**
  * Asynchronous targeted routing (PRD §2.A.2). On JobCardPublished:
  *   1. PostGIS + category + verification + subscription filter (DB function)
@@ -21,6 +23,7 @@ export class RoutingService {
   constructor(
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
+    private readonly push: NotificationsService,
   ) { }
 
   /** Enqueue routing without blocking the caller. */
@@ -50,6 +53,23 @@ export class RoutingService {
       }));
       const ins = await db.from('notifications').insert(notifications);
       if (ins.error) this.logger.warn(`notification insert: ${ins.error.message}`);
+      
+      // Look up FCM tokens for the eligible vendors
+      const { data: usersWithTokens } = await db
+        .from('users')
+        .select('fcm_token')
+        .in('user_id', vendorIds)
+        .not('fcm_token', 'is', null);
+      
+      const tokens = (usersWithTokens ?? []).map(u => u.fcm_token).filter(Boolean);
+      if (tokens.length > 0) {
+        await this.push.sendMulticastPushNotification(
+          tokens,
+          'New job in your area',
+          'A job matching your category and radius is open for bids.',
+          { type: 'NEW_JOB', jobId }
+        );
+      }
     }
 
     await db.from('jobs').update({ notified_vendor_count: vendorIds.length }).eq('job_id', jobId);

@@ -6,6 +6,7 @@ import { Sparkles, CheckCircle2, ShieldCheck, Zap, Crown, ArrowRight, X } from "
 import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
+import { PaymentGatewayModal } from "@/components/PaymentGatewayModal";
 import { TopUpCard } from "@/components/consumer/TopUpCard";
 
 const FALLBACK_PERKS = [
@@ -141,6 +142,7 @@ export default function ConsumerUpgrade() {
   const [intervalOption, setIntervalOption] = useState<"WEEKLY" | "MONTHLY" | "YEARLY" | "ONCE">("MONTHLY");
   const [successResult, setSuccessResult] = useState<any>(null);
   const [currentPlan, setCurrentPlan] = useState<any>(null);
+  const [showPayment, setShowPayment] = useState(false);
 
   const loadWallet = () => api.wallet().then((w) => setBalance(w.balance)).catch(() => { });
   const loadUser = () => api.me().then((u) => setCurrentPlan({ planId: u.plan_id, isLifetime: u.is_lifetime || u.plan_id === "ONCE", expiresAt: u.plan_expires_at })).catch(() => { });
@@ -163,52 +165,64 @@ export default function ConsumerUpgrade() {
       toast({ title: "You are a Lifetime Member! ✨", description: "You already have permanent access to all benefits." });
       return;
     }
-    if (!enough) { setShowTopup(true); toast({ title: "Top up first", description: `You need ${Number(price).toFixed(2)} OMR in your wallet.` }); return; }
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = async () => {
+    setShowPayment(false);
     setBusy(planId);
     try {
       const res = await api.subscribe(planId);
       setSuccessResult(res);
     } catch (e) {
       const m = e instanceof Error ? e.message : String(e);
-      if (/balance|fund|insufficient/i.test(m)) { setShowTopup(true); toast({ title: "Insufficient balance", description: "Top up to continue." }); }
-      else toast({ title: "Couldn't upgrade", description: m });
+      toast({ title: "Couldn't upgrade", description: m });
     } finally { setBusy(null); }
   };
 
   return (
     <ConsumerLayout>
-      <div className="bg-primary text-primary-foreground border-b border-border text-white px-4 pt-10 pb-16 rounded-b-3xl shadow-md text-center">
-        <div className="w-20 h-20 bg-white/15 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4">
-          <Crown className="w-10 h-10 text-yellow-300" />
+      <div className="relative border-b border-border text-white px-4 pt-10 pb-16 rounded-b-3xl shadow-md text-center overflow-hidden">
+        <div className="absolute inset-0 bg-primary" />
+        <img src="/consumer_profile_banner.png" className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-60" />
+        <div className="relative z-10">
+          <div className="w-20 h-20 bg-white/15 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-white/20">
+            <Crown className="w-10 h-10 text-yellow-300 drop-shadow-md" />
+          </div>
+          <h1 className="text-3xl font-black tracking-tight drop-shadow-sm">FixIt Now Plus</h1>
+          <p className="text-white mt-2 text-sm max-w-xs mx-auto font-medium drop-shadow-sm">Zero fees, priority matching, and cashback.</p>
         </div>
-        <h1 className="text-3xl font-black tracking-tight">FixIt Now Plus</h1>
-        <p className="text-white/80 mt-2 text-sm max-w-xs mx-auto">Zero fees, priority matching, and 2% cashback.</p>
       </div>
 
       <div className="px-4 mt-6 space-y-5">
-        <Card className="bg-card border-border shadow-lg rounded-full relative overflow-hidden">
-          <div className="absolute top-0 right-0 px-3 py-1.5 bg-primary text-primary-foreground text-[11px] font-bold rounded-bl-xl">
+        <Card className="bg-card border-border shadow-lg rounded-[2rem] relative overflow-hidden">
+          <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-primary-foreground text-[11px] font-black rounded-bl-2xl uppercase tracking-wider">
             {isAlreadyLifetime ? "LIFETIME ACTIVE" : "MOST POPULAR"}
           </div>
           <CardContent className="p-6">
 
             {isAlreadyLifetime ? (
-              <div className="bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-500/20 border border-amber-500/40 rounded-full p-4 mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-500/30 rounded-full flex items-center justify-center text-amber-400">
-                    <Crown className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-base text-foreground">You Have Lifetime Membership! 🎉</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">Your account has permanent access to all Pro benefits below.</p>
-                  </div>
-                </div>
+              <div className="bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-amber-500/10 border border-amber-500/30 rounded-[1.5rem] p-6 mb-6 text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-300 to-amber-600" />
+                <h3 className="font-black text-5xl text-foreground tracking-tighter mb-1 mt-2">Forever</h3>
+                <p className="text-sm font-bold text-amber-500 uppercase tracking-widest mb-2">Lifetime Access</p>
+                <p className="text-xs text-muted-foreground font-medium">You have permanent access to all Pro benefits.</p>
               </div>
             ) : currentPlan?.planId && (
-              <div className="bg-slate-100 dark:bg-slate-800 border border-primary/20 rounded-full p-3 mb-5">
-                <p className="text-xs font-bold text-primary mb-1">Your Current Plan: {currentPlan.planId}</p>
-                {currentPlan.expiresAt && <p className="text-[10px] text-muted-foreground">Expires: {new Date(currentPlan.expiresAt).toLocaleDateString()}</p>}
-                <p className="text-[10px] text-primary/80 mt-1">Purchasing a new plan will stack your active days.</p>
+              <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 border border-primary/20 rounded-[1.5rem] p-6 mb-6 text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-blue-400" />
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">Current Active Plan</h3>
+                {currentPlan.expiresAt ? (
+                  <>
+                    <p className="text-5xl font-black text-foreground tracking-tighter mb-1 mt-2">
+                      {Math.max(0, Math.ceil((new Date(currentPlan.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}
+                    </p>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Days Remaining</p>
+                  </>
+                ) : (
+                  <p className="text-4xl font-black text-foreground mb-1">Active</p>
+                )}
+                <p className="text-[10px] text-primary/70 mt-4 font-semibold bg-primary/10 py-1.5 rounded-full inline-block px-3">Stack your active days by purchasing a new plan below.</p>
               </div>
             )}
 
@@ -277,6 +291,13 @@ export default function ConsumerUpgrade() {
           onDone={() => { setSuccessResult(null); navigate("/profile"); }}
         />
       )}
+      <PaymentGatewayModal
+          open={showPayment}
+          onOpenChange={setShowPayment}
+          amount={Number(price)}
+          planName={consumerPlan?.display_name || "FixIt Plus"}
+          onSuccess={handlePaymentSuccess}
+        />
     </ConsumerLayout>
   );
 }

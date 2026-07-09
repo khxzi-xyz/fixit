@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, lazy, Suspense, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { setToken } from "@/lib/api";
+import { setToken, getToken } from "@/lib/api";
 import { setTranslationLang } from "@/lib/realtime-translate";
 import { I18nProvider } from "@/lib/i18n";
 import { OnboardingGate } from "@/components/OnboardingGate";
@@ -90,9 +90,17 @@ function Router() {
     <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" /></div>}>
       <Switch>
       {/* Root */}
-      <Route path="/"><Redirect to="/auth/user/login" /></Route>
+      <Route path="/">
+        {getToken() ? <Redirect to="/home" /> : <Redirect to="/auth/user/login" />}
+      </Route>
 
       {/* Auth */}
+      <Route path="/auth/login" component={() => { 
+        if (typeof window !== "undefined") {
+          window.location.replace('/auth/user/login' + window.location.hash);
+        }
+        return null;
+      }} />
       <Route path="/auth/user/login" component={UserLogin} />
       <Route path="/auth/user/otp" component={UserOTP} />
       <Route path="/auth/user/register" component={UserRegister} />
@@ -202,8 +210,18 @@ function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.access_token) {
         setToken(session.access_token);
+        const refCode = localStorage.getItem("fixit_referral_code");
+        if (refCode) {
+          import("@/lib/api").then(({ api }) => {
+            api.claimReferral(refCode).finally(() => localStorage.removeItem("fixit_referral_code"));
+          });
+        }
         if (window.location.pathname.includes("/auth/")) {
-           window.location.replace("/home");
+           const search = window.location.search;
+           const hash = window.location.hash;
+           if (!search.includes("reset=1") && !hash.includes("type=recovery") && !search.includes("type=recovery")) {
+             window.location.replace("/home");
+           }
         }
         sessionChecked = true;
         bioChecked = true; // Skip bio if already have session
@@ -211,11 +229,18 @@ function App() {
       } else {
         sessionChecked = true;
         
-        // Only prompt for biometrics if enabled and on auth screen
-        if (localStorage.getItem("fixit_bio_enabled") === "true" && window.location.pathname.includes("/auth/")) {
+        // Only prompt for biometrics if enabled and on auth screen or root
+        const path = window.location.pathname;
+        if (localStorage.getItem("fixit_bio_enabled") === "true" && (path.includes("/auth/") || path === "/")) {
           loginWithFingerprint().then(async (result) => {
             if (result?.token) {
               setToken(result.token);
+              const rc = localStorage.getItem("fixit_referral_code");
+              if (rc) {
+                const { api } = await import("@/lib/api");
+                await api.claimReferral(rc).catch(()=>{});
+                localStorage.removeItem("fixit_referral_code");
+              }
               window.location.replace("/home");
             }
             bioChecked = true;
@@ -231,7 +256,11 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setToken(session?.access_token ?? null);
       if (session?.access_token && window.location.pathname.includes("/auth/")) {
-         window.location.replace("/home");
+         const search = window.location.search;
+         const hash = window.location.hash;
+         if (!search.includes("reset=1") && !hash.includes("type=recovery") && !search.includes("type=recovery")) {
+           window.location.replace("/home");
+         }
       }
     });
 

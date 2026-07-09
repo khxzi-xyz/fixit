@@ -34,6 +34,7 @@ import VendorUpgrade from "./pages/vendor/VendorUpgrade";
 import VendorKycBiz from "./pages/auth/VendorKycBiz";
 import VendorKycId from "./pages/auth/VendorKycId";
 import VendorPending from "./pages/auth/VendorPending";
+import VendorTripleVerify from "./pages/vendor/VendorTripleVerify";
 
 const Splash = () => (
   <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
@@ -92,6 +93,7 @@ function Router() {
       <Route path="/vendor/wallet" component={VendorWallet} />
       <Route path="/vendor/profile" component={VendorProfile} />
       <Route path="/vendor/settings" component={VendorSettings} />
+      <Route path="/vendor/settings/triple-verify" component={VendorTripleVerify} />
       <Route path="/vendor/upgrade" component={VendorUpgrade} />
 
 

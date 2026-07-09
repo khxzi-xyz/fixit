@@ -130,7 +130,7 @@ export class CouponsService {
       throw new BadRequestException('This coupon has reached its usage limit');
     }
     if (coupon.audience !== 'ALL' && coupon.audience !== role) {
-      throw new BadRequestException(`This coupon is only for ${coupon.audience.toLowerCase()} accounts`);
+      throw new BadRequestException(`This coupon is only for ${coupon.audience?.toLowerCase() || 'specific'} accounts`);
     }
 
     const { error: redErr } = await db

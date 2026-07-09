@@ -198,7 +198,7 @@ export default function ConsumerAddresses() {
                 onLocationChange={(l: any) => {
                   setAddrLat(l.lat);
                   setAddrLng(l.lng);
-                  if (l.address && !addrDetails) setAddrDetails(l.address);
+                  if (l.address) setAddrDetails(l.address);
                 }}
               />
             </div>

@@ -58,4 +58,16 @@ export class JobsController {
   get(@Param('jobId') jobId: string) {
     return this.jobs.get(jobId);
   }
+
+  @Post(':jobId/reviews')
+  @UseGuards(JwtAuthGuard)
+  @Roles('CONSUMER')
+  submitReview(
+    @Req() req: AuthedRequest,
+    @Param('jobId') jobId: string,
+    @Body('rating') rating: number,
+    @Body('comment') comment?: string,
+  ) {
+    return this.jobs.submitReview(req.user!.sub, jobId, rating, comment);
+  }
 }

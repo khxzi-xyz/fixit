@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { api } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { useToast } from "@/hooks/use-toast";
 import {
   ChevronLeft, Gift, Copy, Check, Share2, Tag, TrendingUp,
@@ -11,6 +14,8 @@ import {
 export default function ConsumerRewards() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useI18n();
+  const queryClient = useQueryClient();
 
   const [rewards, setRewards] = useState<any>(null);
   const [txns, setTxns] = useState<any[]>([]);
@@ -21,21 +26,33 @@ export default function ConsumerRewards() {
   const [couponCode, setCouponCode] = useState("");
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [redeeming, setRedeeming] = useState(false);
+  const [redeemAmount, setRedeemAmount] = useState("");
   const [activeTab, setActiveTab] = useState<"balance" | "referral" | "coupons">("balance");
 
-  const refresh = () => {
-    api.myRewards().then(setRewards).catch(() => {});
-    api.rewardTxns().then(setTxns).catch(() => {});
-  };
+  const refresh = useCallback(() => {
+    return new Promise<void>((resolve) => {
+      import("@/lib/api").then(({ swr }) => {
+        swr("my_rewards", api.myRewards, setRewards).catch(() => {});
+        swr("reward_txns", api.rewardTxns, setTxns).catch(() => {});
+        swr("available_coupons", api.availableCoupons, setCoupons).catch(() => {});
+        swr("my_referral", api.myReferralCode, setReferral).catch(() => {});
+        swr("referral_stats", api.referralStats, setRefStats).catch(() => {});
+        resolve();
+      });
+    });
+  }, []);
 
   const redeemToWallet = async () => {
     if (redeeming) return;
-    const bal = Number(rewards?.balance ?? 0);
-    if (bal < 0.1) { toast({ title: "Nothing to redeem yet", description: "Earn at least 0.100 OMR in rewards first." }); return; }
+    const amount = Number(redeemAmount);
+    if (!amount || amount < 0.1) { toast({ title: t("rewards.redeemMin", "Enter at least 0.100 OMR to redeem.") }); return; }
+    if (amount > Number(rewards?.balance ?? 0)) { toast({ title: "Insufficient rewards balance." }); return; }
+    
     setRedeeming(true);
     try {
-      const res = await api.redeemRewards(bal);
+      const res = await api.redeemRewards(amount);
       toast({ title: `💸 ${Number(res.redeemed).toFixed(3)} OMR moved to your wallet!` });
+      setRedeemAmount("");
       refresh();
     } catch (e: any) {
       toast({ title: "Couldn't redeem", description: e.message, variant: "destructive" });
@@ -44,19 +61,12 @@ export default function ConsumerRewards() {
     }
   };
 
-  useEffect(() => {
-    import("@/lib/api").then(({ swr }) => {
-      swr("rewards", api.myRewards, setRewards).catch(() => setRewards({ balance: 0, lifetime_earned: 0 }));
-      swr("reward_txns", api.rewardTxns, setTxns).catch(() => setTxns([]));
-      swr("coupons", api.availableCoupons, setCoupons).catch(() => setCoupons([]));
-      swr("referral_code", api.myReferralCode, setReferral).catch(() => {});
-      swr("referral_stats", api.referralStats, setRefStats).catch(() => {});
-    });
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
   const rawCode = referral?.code ?? "";
   const displayCode = rawCode ? (rawCode.startsWith("FixIt-") ? rawCode : `FixIt-${rawCode}`) : "";
-  const displayUrl = displayCode ? `https://backend.fixit-now.xyz/invite/${displayCode}` : "";
+  // App should open this link, so use consumer domain
+  const displayUrl = displayCode ? `https://consumer.fixit-now.xyz/invite/${displayCode}` : "";
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -107,6 +117,7 @@ export default function ConsumerRewards() {
 
   return (
     <ConsumerLayout>
+      <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries(); await refresh(); }}>
       {/* Header */}
       <div className="relative bg-gradient-to-br from-purple-900 via-purple-800 to-pink-700 px-4 pt-10 pb-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
@@ -116,10 +127,10 @@ export default function ConsumerRewards() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Gift className="w-6 h-6 text-pink-300" />
-            <h1 className="text-2xl font-black text-white">My Rewards</h1>
+            <h1 className="text-2xl font-black text-white">{t("rewards.myRewards", "My Rewards")}</h1>
           </div>
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-4 mt-4">
-            <p className="text-white/70 text-xs font-bold uppercase tracking-wide">Available Balance</p>
+            <p className="text-white/70 text-xs font-bold uppercase tracking-wide">{t("wallet.available", "Available Balance")}</p>
             <p className="text-4xl font-black text-white mt-1">
               {(rewards?.balance ?? 0).toFixed(3)} <span className="text-xl font-bold text-white/70">OMR</span>
             </p>
@@ -134,13 +145,33 @@ export default function ConsumerRewards() {
                 <p className="text-white font-bold text-sm">2%</p>
               </div>
             </div>
-            <button
-              onClick={redeemToWallet}
-              disabled={redeeming}
-              className="mt-3 w-full h-10 bg-white/15 border border-white/20 rounded-full text-white text-sm font-bold hover:bg-white/25 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
-            >
-              <Zap className="w-4 h-4" /> {redeeming ? "Redeeming…" : "Redeem to Wallet"}
-            </button>
+            <div className="mt-4 bg-black/10 rounded-xl p-3 border border-white/10 flex flex-col gap-2">
+              <div className="flex items-center gap-2 bg-black/20 rounded-lg p-1 pr-2">
+                <input
+                  type="number"
+                  value={redeemAmount}
+                  onChange={(e) => setRedeemAmount(e.target.value)}
+                  placeholder="Amount"
+                  min="0.1"
+                  step="0.1"
+                  className="w-full bg-transparent border-none text-white outline-none px-3 py-2 placeholder:text-white/30 font-bold"
+                />
+                <span className="text-white/70 text-xs font-bold shrink-0">OMR</span>
+                <button
+                  onClick={() => setRedeemAmount((rewards?.balance ?? 0).toFixed(3))}
+                  className="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded hover:bg-white/30"
+                >
+                  ALL
+                </button>
+              </div>
+              <button
+                onClick={redeemToWallet}
+                disabled={redeeming || !redeemAmount}
+                className="w-full h-10 bg-white border border-white/20 rounded-lg text-purple-900 text-sm font-bold hover:bg-white/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                <Zap className="w-4 h-4" /> {redeeming ? "Redeeming…" : "Redeem to Wallet"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -154,7 +185,7 @@ export default function ConsumerRewards() {
               onClick={() => setActiveTab(tab)}
               className={`flex-1 py-2 text-xs font-bold rounded-full transition-all capitalize ${activeTab === tab ? "bg-primary text-white shadow" : "text-muted-foreground"}`}
             >
-              {tab === "balance" ? "History" : tab === "referral" ? "Invite" : "Coupons"}
+              {tab === "balance" ? "History" : tab === "referral" ? t("rewards.invite", "Invite") : t("home.promos", "Coupons")}
             </button>
           ))}
         </div>
@@ -312,6 +343,7 @@ export default function ConsumerRewards() {
           </div>
         )}
       </div>
+      </PullToRefresh>
     </ConsumerLayout>
   );
 }

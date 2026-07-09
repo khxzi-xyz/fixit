@@ -156,4 +156,26 @@ export class JobsService {
     if (error) throw new BadRequestException(error.message);
     return data;
   }
+
+  async submitReview(consumerId: string, jobId: string, rating: number, comment?: string) {
+    const db = requireDb(this.db);
+    const { data: job, error: jobError } = await db
+      .from('jobs')
+      .select('assigned_vendor_id, status')
+      .eq('job_id', jobId)
+      .eq('consumer_id', consumerId)
+      .single();
+    if (jobError || !job) throw new BadRequestException('Job not found or not yours');
+    if (!job.assigned_vendor_id) throw new BadRequestException('Job has no vendor');
+
+    const { data, error } = await db.from('reviews').insert({
+      job_id: jobId,
+      reviewer_id: consumerId,
+      vendor_id: job.assigned_vendor_id,
+      rating,
+      content: comment,
+    }).select().single();
+    if (error) throw new BadRequestException(error.message);
+    return data;
+  }
 }

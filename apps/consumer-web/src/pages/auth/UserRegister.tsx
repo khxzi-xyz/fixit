@@ -58,11 +58,11 @@ export default function UserRegister() {
     setBusy(true);
     try {
       const full = countryCode + num;
-      const res = await supabase.auth.signUp({ 
-        phone: full, password,
+      // Phone signup: send OTP (no password needed for phone auth)
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: full,
         options: { data: { full_name: name.trim(), role: "CONSUMER" } }
       });
-      const error = res.error;
       if (error) throw error;
       
       sessionStorage.setItem("fixit_otp_phone", full);
@@ -70,7 +70,8 @@ export default function UserRegister() {
       sessionStorage.setItem("fixit_otp_role", "CONSUMER");
       navigate("/auth/user/otp");
     } catch (e: any) {
-      toast({ title: "Registration failed", description: e?.message || JSON.stringify(e), variant: "destructive" });
+      const msg = e?.message || e?.msg || (typeof e === "object" ? JSON.stringify(e) : String(e)) || "Registration failed. Try again.";
+      toast({ title: "Registration failed", description: msg, variant: "destructive" });
     } finally { setBusy(false); }
   };
 
@@ -83,11 +84,12 @@ export default function UserRegister() {
       options: { data: { full_name: name, role: "CONSUMER" } }
     });
     setBusy(false);
-    if (error) { toast({ title: "Signup Failed", description: error.message || JSON.stringify(error), variant: "destructive" }); return; }
+    if (error) { toast({ title: "Signup Failed", description: error.message || error.status?.toString() || "Unknown error - check your email", variant: "destructive" }); return; }
     if (data.session) {
       setToken(data.session.access_token);
       navigate("/home");
     } else {
+      // Email needs verification
       setStep("confirm");
     }
   };

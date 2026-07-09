@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { api } from "@/lib/api";
-import { ChevronLeft, Clock, CheckCircle2, ShieldAlert, Wrench, XCircle, Zap, FileEdit, RefreshCw } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import { PullToRefresh } from "@/components/PullToRefresh";
+import { ChevronLeft, Clock, CheckCircle2, ShieldAlert, Wrench, XCircle, Zap, FileEdit, RefreshCw, ChevronRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 const STATUS_MAP: Record<string, { label: string, color: string, bg: string, icon: any }> = {
@@ -16,18 +19,27 @@ const STATUS_MAP: Record<string, { label: string, color: string, bg: string, ico
 
 export default function ConsumerMyJobs() {
   const [, navigate] = useLocation();
+  const { t } = useI18n();
+  const queryClient = useQueryClient();
   const [jobs, setJobs] = useState<any[]>([]);
   const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "PAST" | "DRAFTS">("ALL");
   const [busy, setBusy] = useState(true);
   const [draft, setDraft] = useState<any>(null);
 
-  useEffect(() => {
-    import("@/lib/api").then(({ swr }) => {
-      swr("my_jobs", api.myJobs, (data) => {
-        setJobs(Array.isArray(data) ? data : []);
-        setBusy(false);
-      }).catch(() => setBusy(false));
+  const loadData = () => {
+    return new Promise<void>((resolve) => {
+      import("@/lib/api").then(({ swr }) => {
+        swr("my_jobs", api.myJobs, (data) => {
+          setJobs(Array.isArray(data) ? data : []);
+          setBusy(false);
+          resolve();
+        }).catch(() => { setBusy(false); resolve(); });
+      });
     });
+  };
+
+  useEffect(() => {
+    loadData();
 
     // Load any saved draft
     try {
@@ -62,21 +74,19 @@ export default function ConsumerMyJobs() {
   });
 
   const tabs: { key: "ALL" | "ACTIVE" | "PAST" | "DRAFTS"; label: string }[] = [
-    { key: "ALL", label: "All" },
-    { key: "ACTIVE", label: "Active" },
-    { key: "PAST", label: "Past" },
-    { key: "DRAFTS", label: draft ? "Draft 🟡" : "Drafts" },
+    { key: "ALL", label: t("jobs.all") },
+    { key: "ACTIVE", label: t("jobs.active") },
+    { key: "PAST", label: t("jobs.past") },
+    { key: "DRAFTS", label: t("jobs.drafts") },
   ];
 
   return (
     <ConsumerLayout>
+      <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries(); await loadData(); }}>
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-primary text-primary-foreground border-b border-border text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
-        <div className="flex items-center gap-3 mb-2">
-          <button onClick={() => navigate("/home")} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-xl font-extrabold flex-1">My Jobs</h1>
+      <div className="sticky top-0 z-40 bg-primary text-primary-foreground pt-[env(safe-area-inset-top,2rem)] pb-4 px-4 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-black tracking-tight">{t("jobs.myJobs")}</h1>
           <button
             onClick={() => navigate("/post-job")}
             className="w-9 h-9 bg-white/15 hover:bg-white/25 rounded-full flex items-center justify-center transition-all"
@@ -84,7 +94,6 @@ export default function ConsumerMyJobs() {
             <Zap className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-white/80 text-sm mb-4 px-1">{jobs.length} total request{jobs.length !== 1 ? "s" : ""}</p>
 
         <div className="flex bg-white/20 rounded-full p-1 gap-1 shadow-sm mx-1">
           {tabs.map((t) => (
@@ -143,7 +152,7 @@ export default function ConsumerMyJobs() {
               <p className="font-bold text-base mb-1">No Saved Drafts</p>
               <p className="text-xs text-muted-foreground mb-4">Start posting a job and it'll auto-save here.</p>
               <button onClick={() => navigate("/post-job")} className="px-6 h-10 bg-primary text-white font-bold rounded-full text-sm">
-                Post a Job
+                {t("jobs.postNew")}
               </button>
             </div>
           )
@@ -159,10 +168,10 @@ export default function ConsumerMyJobs() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="bg-card border border-border rounded-full shadow-sm p-6 text-center flex flex-col items-center">
-              <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center mb-3">
-                <Wrench className="w-6 h-6 text-muted-foreground" />
+              <div className="w-24 h-24 flex items-center justify-center mb-3">
+                <img src="/icons/empty_jobs.png" className="w-full h-full object-contain opacity-80 mix-blend-multiply dark:mix-blend-screen" alt="No Jobs" />
               </div>
-              <p className="font-bold text-base mb-1">No jobs found</p>
+              <p className="font-bold text-base mb-1">{t("jobs.noJobs")}</p>
               <p className="text-xs text-muted-foreground mb-4">
                 {filter === "ACTIVE" ? "You have no active jobs right now." : filter === "PAST" ? "No completed or cancelled jobs yet." : "You haven't posted any jobs yet."}
               </p>
@@ -170,7 +179,7 @@ export default function ConsumerMyJobs() {
                 onClick={() => navigate("/post-job")}
                 className="w-full h-10 bg-primary text-white font-bold rounded-full flex items-center justify-center shadow-sm"
               >
-                Post a New Job
+                {t("jobs.postNew")}
               </button>
             </div>
           ) : (
@@ -195,33 +204,58 @@ export default function ConsumerMyJobs() {
                             )}
                           </div>
                           <h3 className="font-bold text-sm leading-snug line-clamp-2">
-                            {j.tracking_id ? <span className="text-primary/70 font-mono text-[11px] mr-1 block">{j.tracking_id}</span> : null}
+                            <span className="text-primary/70 font-mono text-[11px] mr-1 block">#{j.short_id || j.job_id?.substring(0, 8).toUpperCase()}</span>
                             {j.description || `${j.category_id} Service Request`}
                           </h3>
                         </div>
-                        {j.bounty_price && (
-                          <span className="font-black text-primary text-sm shrink-0">{j.bounty_price} OMR</span>
-                        )}
+                        <div className="text-right shrink-0">
+                          {j.bounty_price && (
+                            <p className="font-black text-sm text-primary">{Number(j.bounty_price).toFixed(2)}</p>
+                          )}
+                          <p className="text-[10px] text-muted-foreground">{formatDistanceToNow(new Date(j.created_at), { addSuffix: true })}</p>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                        <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{formatDistanceToNow(new Date(j.created_at), { addSuffix: true })}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {isPast && (
-                            <button
-                              onClick={(e) => repostJob(j, e)}
-                              className="flex items-center gap-1 text-xs font-bold px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-full transition-colors"
-                            >
-                              <RefreshCw className="w-3 h-3" /> Re-post
-                            </button>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                        <div className="flex -space-x-2">
+                          {isActionable ? (
+                            <>
+                              {[1, 2, 3].slice(0, Math.min(3, j.bid_count || 1)).map((i) => (
+                                <div key={i} className="w-7 h-7 rounded-full bg-muted border-2 border-card flex items-center justify-center text-[10px] font-bold text-muted-foreground z-10">
+                                  ?
+                                </div>
+                              ))}
+                              {j.bid_count > 0 ? (
+                                <span className="pl-3 text-[10px] font-bold text-primary">{j.bid_count} bid{j.bid_count !== 1 ? "s" : ""}</span>
+                              ) : (
+                                <span className="pl-3 text-[10px] font-medium text-muted-foreground">Finding pros...</span>
+                              )}
+                            </>
+                          ) : j.assigned_vendor ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                                {j.assigned_vendor.slice(0, 2).toUpperCase()}
+                              </div>
+                              <span className="text-xs font-bold">{j.assigned_vendor}</span>
+                            </div>
+                          ) : (
+                            <span className="text-xs font-bold text-muted-foreground capitalize">{status.label}</span>
                           )}
-                          <span className="text-xs font-bold text-primary">
-                            {isActionable ? "View Bids →" : isPast ? "Details →" : "Track →"}
-                          </span>
                         </div>
+
+                        {isActionable ? (
+                          <button className="h-8 px-4 bg-primary text-white text-[10px] font-black uppercase tracking-wider rounded-full flex items-center gap-1">
+                            {t("jobs.viewBids")} <ChevronRight className="w-3 h-3" />
+                          </button>
+                        ) : isPast ? (
+                          <button onClick={(e) => repostJob(j, e)} className="h-8 px-4 bg-muted text-foreground text-[10px] font-black uppercase tracking-wider rounded-full flex items-center gap-1 hover:bg-muted/80">
+                            <RefreshCw className="w-3 h-3" /> {t("jobs.repost")}
+                          </button>
+                        ) : (
+                          <button className="h-8 px-4 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider rounded-full flex items-center gap-1">
+                            {t("jobs.track")} <ChevronRight className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </Link>
@@ -231,6 +265,7 @@ export default function ConsumerMyJobs() {
           )
         )}
       </div>
+      </PullToRefresh>
     </ConsumerLayout>
   );
 }

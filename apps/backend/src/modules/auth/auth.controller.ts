@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Delete, Param, Req, UseGuards } from '@nestjs/common';
 import { IsIn, IsOptional, IsString, Length, Matches } from 'class-validator';
 import { AuthService, Role } from './auth.service';
 import { WhatsAppService } from '../whatsapp/whatsapp.service';
@@ -13,6 +13,7 @@ class VerifyOtpDto {
   @IsString() @Length(6, 6) code!: string;
   @IsOptional() @IsString() fullName?: string;
   @IsOptional() @IsIn(['CONSUMER', 'VENDOR', 'ADMIN']) role?: Role;
+  @IsOptional() @IsString() referralCode?: string;
 }
 
 class LinkOtpDto {
@@ -27,6 +28,10 @@ class AdminLoginDto {
 class GoogleLoginDto {
   @IsString() idToken!: string;
   @IsOptional() @IsIn(['CONSUMER', 'VENDOR', 'ADMIN']) role?: Role;
+}
+
+class RegisterDeviceDto {
+  @IsString() deviceName!: string;
 }
 
 @Controller('auth')
@@ -54,6 +59,25 @@ export class AuthController {
     return this.auth.me(req.user!.sub);
   }
 
+  @Get('trusted-devices')
+  @UseGuards(JwtAuthGuard)
+  trustedDevices(@Req() req: AuthedRequest) {
+    return this.auth.getTrustedDevices(req.user!.sub);
+  }
+
+  @Post('trusted-devices')
+  @UseGuards(JwtAuthGuard)
+  registerDevice(@Req() req: AuthedRequest, @Body() dto: RegisterDeviceDto) {
+    const ip = req.headers['x-forwarded-for'] || (req as any).socket.remoteAddress;
+    return this.auth.registerTrustedDevice(req.user!.sub, dto.deviceName, String(ip));
+  }
+
+  @Delete('trusted-devices/:deviceId')
+  @UseGuards(JwtAuthGuard)
+  removeDevice(@Req() req: AuthedRequest, @Param('deviceId') deviceId: string) {
+    return this.auth.removeTrustedDevice(req.user!.sub, deviceId);
+  }
+
   /** Password-gated admin login (replaces one-click dev login for the panel).
    *  Set ADMIN_PASSWORD in .env; defaults to a dev value if unset. */
   @Post('admin-login')
@@ -73,7 +97,7 @@ export class AuthController {
 
   @Post('otp/verify')
   verify(@Body() dto: VerifyOtpDto) {
-    return this.auth.verifyOtp(dto.phoneNumber, dto.code, dto.fullName, dto.role ?? 'CONSUMER');
+    return this.auth.verifyOtp(dto.phoneNumber, dto.code, dto.fullName, dto.role ?? 'CONSUMER', dto.referralCode);
   }
 
   @Post('otp/link')

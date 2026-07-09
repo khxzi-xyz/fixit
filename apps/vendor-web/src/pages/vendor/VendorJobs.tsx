@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Link } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { VendorLayout } from "@/components/layouts/VendorLayout";
 import { ChevronLeft } from "lucide-react";
 import { JobFeedCard } from "@/components/consumer/talabat-kit";
 import { api } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 import { useTranslated } from "@/lib/useTranslated";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 function timeAgo(iso?: string) {
   if (!iso) return "";
@@ -16,14 +19,22 @@ function timeAgo(iso?: string) {
 }
 
 export default function VendorJobs() {
+  const { t } = useI18n();
+  const queryClient = useQueryClient();
   const [feed, setFeed] = useState<any[]>([]);
   const [cats, setCats] = useState<{ category_id: string; display_name: string }[]>([]);
   const [active, setActive] = useState("All");
 
-  useEffect(() => {
-    api.feed().then((f) => setFeed(Array.isArray(f) ? f : [])).catch(() => { });
-    api.categories().then(setCats).catch(() => { });
+  const load = useCallback(() => {
+    return new Promise<void>((resolve) => {
+      let done = 0;
+      const check = () => { done++; if (done === 2) resolve(); };
+      api.feed().then((f) => { setFeed(Array.isArray(f) ? f : []); check(); }).catch(() => { setFeed([]); check(); });
+      api.categories().then((c) => { setCats(c); check(); }).catch(() => { setCats([]); check(); });
+    });
   }, []);
+
+  useEffect(() => { load(); }, [load]);
 
   const filtered = useMemo(
     () => (active === "All" ? feed : feed.filter((j) => String(j.category_id).toUpperCase() === active.toUpperCase())),
@@ -33,11 +44,12 @@ export default function VendorJobs() {
 
   return (
     <VendorLayout>
+      <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries(); await load(); }}>
       <div className="sticky top-0 z-40 hero-blue text-white px-4 pt-5 pb-5 rounded-b-3xl shadow-md">
         <div className="flex items-center gap-3 mb-4">
           <Link href="/vendor/home"><ChevronLeft className="w-6 h-6" /></Link>
           <div>
-            <h1 className="text-xl font-extrabold">Job Feed</h1>
+            <h1 className="text-xl font-extrabold">{t("vendor.jobs", "Job Feed")}</h1>
             <p className="text-xs text-white/70">{filtered.length} open job{filtered.length === 1 ? "" : "s"} near you</p>
           </div>
         </div>
@@ -55,12 +67,12 @@ export default function VendorJobs() {
         </div>
       </div>
 
-      <div className="px-4 py-5 space-y-3">
+      <div className="px-4 py-5 space-y-3 pb-20">
         {filtered.length === 0 ? (
           <p className="text-sm text-muted-foreground">No open jobs right now -check back soon.</p>
         ) : filtered.map((job, i) => (
           <JobFeedCard key={job.job_id}
-            title={titles[i] || job.description?.slice(0, 44) || job.category_id}
+            title={`#${job.short_id || job.job_id.substring(0, 8).toUpperCase()} - ${titles[i] || job.description?.slice(0, 44) || job.category_id}`}
             area="Muscat"
             distance={job.distance_km ? `${Number(job.distance_km).toFixed(1)} km` : undefined}
             time={timeAgo(job.created_at)}
@@ -69,6 +81,7 @@ export default function VendorJobs() {
             href={`/vendor/jobs/${job.job_id}`} />
         ))}
       </div>
+      </PullToRefresh>
     </VendorLayout>
   );
 }

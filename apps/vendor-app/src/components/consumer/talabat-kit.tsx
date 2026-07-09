@@ -200,7 +200,7 @@ export function ProCard({
 }) {
   return (
     <Link href={href}>
-      <div className="bg-card rounded-full border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
         <div className="relative h-28 bg-primary text-primary-foreground border-b border-border flex items-center justify-center">
           <span className="text-3xl font-black text-white/90">{initials}</span>
           {verified && (
@@ -290,7 +290,7 @@ export function JobFeedCard({
   const hot = String(urgency).toUpperCase() === "EMERGENCY" || String(urgency).toUpperCase() === "HIGH";
   return (
     <Link href={href}>
-      <div className="bg-card rounded-full border border-border shadow-sm p-4 relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] shadow-sm p-4 relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
         {bounty && <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-[10px] font-bold px-3 py-1 rounded-bl-xl">BOUNTY · {bounty}</div>}
         <div className="flex items-center gap-2 mb-2">
           {hot && <span className="bg-destructive/10 text-destructive text-[10px] font-bold px-2 py-0.5 rounded uppercase">Urgent</span>}

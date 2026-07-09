@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { VendorLayout } from "@/components/layouts/VendorLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, Star, MapPin, Briefcase, ChevronRight } from "lucide-react";
 import { VendorHeader, SectionHeader } from "@/components/consumer/talabat-kit";
 import { api, tokenClaims } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const MUSCAT = { lat: 23.588, lng: 58.3829 };
 
 export default function VendorHome() {
+  const { t } = useI18n();
+  const queryClient = useQueryClient();
   const [online, setOnline] = useState(true);
   const [tokens, setTokens] = useState<number | null>(null);
   const [earnings, setEarnings] = useState<number | null>(null);
@@ -32,6 +37,7 @@ export default function VendorHome() {
 
   return (
     <VendorLayout>
+      <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries(); await load(); }}>
       <VendorHeader shopName={shopName} online={online} onToggle={toggle}>
         <div className="grid grid-cols-2 gap-3 mt-5">
           <div className="bg-white/15 backdrop-blur rounded-2xl p-3">
@@ -45,7 +51,7 @@ export default function VendorHome() {
         </div>
       </VendorHeader>
 
-      <div className="px-4 -mt-6 space-y-6">
+      <div className="px-4 -mt-6 space-y-6 pb-20">
         {active && (
           <div>
             <SectionHeader title="Current assignment" />
@@ -72,7 +78,7 @@ export default function VendorHome() {
           <div className="grid grid-cols-2 gap-3">
             <Link href="/vendor/jobs" className="bg-card border border-border rounded-2xl shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><Briefcase className="w-5 h-5" /></div>
-              <span className="font-bold text-sm">Find Jobs</span>
+              <span className="font-bold text-sm">{t("vendor.jobs", "Find Jobs")}</span>
             </Link>
             <Link href="/vendor/profile" className="bg-card border border-border rounded-2xl shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow">
               <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center text-warning"><Star className="w-5 h-5" /></div>
@@ -91,6 +97,7 @@ export default function VendorHome() {
           </div>
         </Link>
       </div>
+      </PullToRefresh>
     </VendorLayout>
   );
 }

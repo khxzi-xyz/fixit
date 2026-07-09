@@ -62,6 +62,12 @@ export class AdminController {
     return this.adminService.getUsers();
   }
 
+  @Post('users/:id/update')
+  async updateUser(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+    if (req.user?.role !== 'ADMIN') throw new UnauthorizedException('Admin only');
+    return this.adminService.updateUser(id, body);
+  }
+
   @Get('kyc')
   async getKycQueue(@Req() req: any) {
     if (req.user?.role !== 'ADMIN') throw new UnauthorizedException('Admin only');

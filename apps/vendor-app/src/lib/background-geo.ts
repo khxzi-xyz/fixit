@@ -1,6 +1,6 @@
-import { Geolocation, PositionOptions, WatchPositionCallback } from "@capacitor/geolocation";
-import { supabase } from "./supabase";
 import { Capacitor } from "@capacitor/core";
+import { supabase } from "./supabase";
+import type { PositionOptions, WatchPositionCallback } from "@capacitor/geolocation";
 
 let watchId: string | null = null;
 let activeJobId: string | null = null;
@@ -37,6 +37,7 @@ export async function startBackgroundTracking(jobId: string) {
   };
 
   try {
+    const { Geolocation } = await import("@capacitor/geolocation");
     const id = await Geolocation.watchPosition(options, callback);
     watchId = id;
   } catch (error) {
@@ -51,6 +52,7 @@ export async function stopBackgroundTracking() {
   if (!Capacitor.isNativePlatform()) return;
 
   if (watchId !== null) {
+    const { Geolocation } = await import("@capacitor/geolocation");
     await Geolocation.clearWatch({ id: watchId });
     watchId = null;
   }

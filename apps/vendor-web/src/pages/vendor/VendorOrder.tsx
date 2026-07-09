@@ -125,7 +125,10 @@ export default function VendorOrder() {
       <div className="hero-blue text-white px-4 pt-5 pb-12 rounded-b-3xl shadow-md">
         <div className="flex justify-between items-start">
           <div>
-            <Badge className="bg-white/15 text-white border-0 hover:bg-white/15 mb-2">{status.replace(/_/g, " ")}</Badge>
+            <div className="flex items-center gap-2 mb-2">
+              <Badge className="bg-white/15 text-white border-0 hover:bg-white/15">{status.replace(/_/g, " ")}</Badge>
+              {job?.short_id ? <span className="text-white/70 font-mono text-[10px] font-bold px-2 py-0.5 bg-white/10 rounded-full border border-white/20">#{job.short_id}</span> : <span className="text-white/70 font-mono text-[10px] font-bold px-2 py-0.5 bg-white/10 rounded-full border border-white/20">#{job?.job_id?.substring(0, 8).toUpperCase()}</span>}
+            </div>
             <h1 className="text-xl font-extrabold">{job?.description?.slice(0, 36) || "Active job"}</h1>
             <p className="text-white/70 text-sm mt-1">Muscat</p>
           </div>

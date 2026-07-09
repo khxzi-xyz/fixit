@@ -4,6 +4,7 @@ import { SUPABASE_CLIENT } from '../../supabase/supabase.module';
 import { requireDb } from '../../common/db.util';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 import { PayoutService } from '../warranty/payout.service';
+import { RewardsService } from '../rewards/rewards.service';
 
 /**
  * Triple-Verify completion (master_specs Module 06). Before / vendor-after /
@@ -17,6 +18,7 @@ export class CompletionService {
     @Inject(SUPABASE_CLIENT) private readonly db: SupabaseClient | null,
     private readonly realtime: RealtimeGateway,
     private readonly payouts: PayoutService,
+    private readonly rewards: RewardsService,
   ) {}
 
   private async loadJob(jobId: string) {
@@ -131,6 +133,10 @@ export class CompletionService {
       if (vendorId) {
         await db.from('vendor_profiles').update({ is_busy: false, busy_job_id: null }).eq('vendor_id', vendorId).then(() => undefined, () => undefined);
       }
+
+      // Reward referrals for both consumer and vendor
+      await this.rewards.onJobCompleted(consumerId);
+      if (vendorId) await this.rewards.onJobCompleted(vendorId);
 
       // Bind the rolling payout (60% releases immediately). Warranty terms
       // should already be agreed; createSchedule is idempotent.

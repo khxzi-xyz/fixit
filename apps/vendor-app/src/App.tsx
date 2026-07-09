@@ -8,7 +8,7 @@ import { OnboardingGate } from "@/components/OnboardingGate";
 import { NetworkGuard } from "@/components/NetworkGuard";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { setToken } from "@/lib/api";
+import { setToken, getToken } from "@/lib/api";
 import { loginWithFingerprint } from "@/lib/biometrics";
 
 // Layouts
@@ -72,7 +72,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        <Redirect to="/auth/vendor/login" />
+        {getToken() ? <Redirect to="/vendor/home" /> : <Redirect to="/auth/vendor/login" />}
       </Route>
 
 
@@ -82,6 +82,7 @@ function Router() {
       <Route path="/auth/vendor/kyc-biz" component={VendorKycBiz} />
       <Route path="/auth/vendor/kyc-id" component={VendorKycId} />
       <Route path="/auth/vendor/pending" component={VendorPending} />
+      <Route path="/auth/user/otp" component={UserOTP} />
 
 
 
@@ -129,7 +130,8 @@ function App() {
         sessionChecked = true;
         
         // Only prompt for biometrics if enabled and on auth screen
-        if (localStorage.getItem("fixit_bio_enabled") === "true" && window.location.pathname.includes("/auth/")) {
+        const path = window.location.pathname;
+        if (localStorage.getItem("fixit_bio_enabled") === "true" && (path.includes("/auth/") || path === "/")) {
           loginWithFingerprint().then(async (result) => {
             if (result?.token) {
               setToken(result.token);

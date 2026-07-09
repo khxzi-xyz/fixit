@@ -77,32 +77,31 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
     >
       {/* PTR Indicator */}
       <div
-        className="absolute left-0 right-0 flex justify-center pointer-events-none transition-all duration-150 z-50"
+        className="absolute left-0 right-0 flex justify-center pointer-events-none z-[100]"
         style={{
-          top: refreshing ? "12px" : `${pullDistance - 30}px`,
+          top: refreshing ? "20px" : `${pullDistance - 40}px`,
           opacity: refreshing || pullDistance > 10 ? 1 : 0,
-          transform: `scale(${Math.min(pullDistance / 50, 1)})`,
+          transform: `scale(${Math.min((pullDistance + 10) / 50, 1)})`,
+          transition: pullDistance === 0 || refreshing ? "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)" : "none",
         }}
       >
-        <div className="bg-card border border-border shadow-lg rounded-full p-2.5 flex items-center justify-center bg-white dark:bg-zinc-900">
-          <Loader2
-            className={`w-5 h-5 text-primary ${
-              refreshing ? "animate-spin" : ""
-            }`}
-            style={{
-              transform: refreshing ? "none" : `rotate(${pullDistance * 4}deg)`,
-            }}
-          />
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-lg rounded-full w-10 h-10 flex items-center justify-center">
+          {refreshing ? (
+            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <svg
+              className="w-5 h-5 text-primary"
+              style={{ transform: `rotate(${pullDistance * 5}deg)`, opacity: pullDistance / 50 }}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          )}
         </div>
       </div>
 
       {/* Content wrapper */}
-      <div
-        style={{
-          transform: refreshing ? "translateY(50px)" : `translateY(${pullDistance * 0.5}px)`,
-          transition: pullDistance === 0 ? "transform 0.2s ease-out" : "none",
-        }}
-      >
+      <div className="w-full h-full">
         {children}
       </div>
     </div>

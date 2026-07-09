@@ -185,7 +185,7 @@ export class AuthService {
   }
 
   /** Verify the latest OTP, upsert the user, and issue an access token. */
-  async verifyOtp(phoneNumber: string, code: string, fullName?: string, role: Role = 'CONSUMER') {
+  async verifyOtp(phoneNumber: string, code: string, fullName?: string, role: Role = 'CONSUMER', referralCode?: string) {
     const db = requireDb(this.db);
     const { data: otp, error } = await db
       .from('otp_codes')
@@ -208,7 +208,9 @@ export class AuthService {
 
     // Find or create the user.
     let { data: user } = await db.from('users').select('*').eq('phone_number', phoneNumber).maybeSingle();
+    let isNewUser = false;
     if (!user) {
+      isNewUser = true;
       const insert = await db
         .from('users')
         .insert({ phone_number: phoneNumber, full_name: fullName ?? 'New User', role })
@@ -216,6 +218,23 @@ export class AuthService {
         .single();
       if (insert.error) throw new BadRequestException(insert.error.message);
       user = insert.data;
+    }
+
+    if (isNewUser && referralCode) {
+      try {
+        // Find the referrer by code
+        const cleanCode = referralCode.trim().toUpperCase();
+        const { data: referrer } = await db.from('user_rewards').select('user_id').eq('referral_code', cleanCode).maybeSingle();
+        if (referrer && referrer.user_id !== user.user_id) {
+          await db.from('referrals').insert({
+            referrer_id: referrer.user_id,
+            referred_id: user.user_id,
+            code: cleanCode
+          });
+        }
+      } catch (e) {
+        this.logger.warn(`Failed to process referral code during signup: ${e}`);
+      }
     }
 
     const accessToken = await this.jwt.signAsync({ sub: user.user_id, role: user.role, full_name: user.full_name, phone_number: user.phone_number });
@@ -245,5 +264,31 @@ export class AuthService {
 
     const accessToken = await this.jwt.signAsync({ sub: user.user_id, role: user.role, full_name: user.full_name, phone_number: user.phone_number });
     return { accessToken, user };
+  }
+
+  async getTrustedDevices(userId: string) {
+    const db = requireDb(this.db);
+    const { data, error } = await db.from('trusted_devices').select('*').eq('user_id', userId).order('last_active', { ascending: false });
+    if (error) throw new BadRequestException(error.message);
+    return data || [];
+  }
+
+  async registerTrustedDevice(userId: string, deviceName: string, ipAddress: string) {
+    const db = requireDb(this.db);
+    const { data, error } = await db.from('trusted_devices').insert({
+      user_id: userId,
+      device_name: deviceName,
+      ip_address: ipAddress,
+      last_active: new Date().toISOString()
+    }).select('*').single();
+    if (error) throw new BadRequestException(error.message);
+    return data;
+  }
+
+  async removeTrustedDevice(userId: string, deviceId: string) {
+    const db = requireDb(this.db);
+    const { error } = await db.from('trusted_devices').delete().eq('user_id', userId).eq('device_id', deviceId);
+    if (error) throw new BadRequestException(error.message);
+    return { success: true };
   }
 }

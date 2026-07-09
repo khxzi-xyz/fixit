@@ -13,15 +13,15 @@ interface ServiceIconProps {
 
 export const ServiceIcon: React.FC<ServiceIconProps> = ({ id, className = "w-6 h-6" }) => {
   switch (id) {
-    case "ELECTRICIAN": return <Zap className={`${className} text-amber-500 fill-amber-500/20`} />;
-    case "PLUMBER": return <Wrench className={`${className} text-primary`} />;
-    case "CARPENTER": return <Hammer className={`${className} text-amber-600`} />;
-    case "AC_REPAIR": return <Snowflake className={`${className} text-cyan-400`} />;
-    case "PAINTER": return <Paintbrush className={`${className} text-purple-500`} />;
+    case "ELECTRICIAN": return <img src="/icon_electrician.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Electrician" />;
+    case "PLUMBER": return <img src="/icon_plumber.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Plumber" />;
+    case "CARPENTER": return <img src="/icon_carpenter.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Carpenter" />;
+    case "AC_REPAIR": return <img src="/icon_acrepair.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="AC Repair" />;
+    case "PAINTER": return <img src="/icon_painter.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Painter" />;
     case "HANDYMAN": return <Wrench className={`${className} text-slate-400`} />;
     case "LOCKSMITH": return <Key className={`${className} text-yellow-500`} />;
-    case "PEST_CONTROL": return <Bug className={`${className} text-emerald-600`} />;
-    case "CLEANER": return <Sparkles className={`${className} text-sky-400 fill-sky-400/20`} />;
+    case "PEST_CONTROL": return <img src="/icon_pestcontrol.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Pest Control" />;
+    case "CLEANER": return <img src="/icon_cleaner.png" className={className.replace(/text-[a-z0-9\-]+/g, "").trim()} alt="Cleaner" />;
     case "GARDENER": return <Trees className={`${className} text-green-500`} />;
     case "MECHANIC": return <Settings className={`${className} text-red-500`} />;
     case "TAXI": return <Car className={`${className} text-yellow-500`} />;

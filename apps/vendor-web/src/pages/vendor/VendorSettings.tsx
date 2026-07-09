@@ -9,10 +9,13 @@ import { Input } from "@/components/ui/input";
 import { api, setToken, tokenClaims } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { useI18n } from "@/lib/i18n";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 export default function VendorSettings() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useI18n();
   
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
   const [notif, setNotif] = useState(() => localStorage.getItem("FixIt Now_notif") !== "0");
@@ -26,18 +29,18 @@ export default function VendorSettings() {
 
   const [mySkills, setMySkills] = useState<any[]>([]);
 
-  useEffect(() => {
+  const load = async () => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setSessionUser(data.user);
         setEditName(data.user.user_metadata?.full_name || tokenClaims()?.full_name || "");
       }
     });
-    api.vendorAnalytics().then(d => {
-      // Just getting a check if they are logged in.
-    }).catch(() => {});
+    api.vendorAnalytics().then(d => {}).catch(() => {});
     api.mySkillTags().then(setMySkills).catch(() => {});
-  }, []);
+  };
+
+  useEffect(() => { load(); }, []);
 
   const toggleTheme = (v: boolean) => {
     setDark(v);
@@ -84,10 +87,11 @@ export default function VendorSettings() {
 
   return (
     <VendorLayout>
+      <PullToRefresh onRefresh={async () => { await load(); }}>
       <div className="hero-blue text-white px-4 pt-5 pb-8 rounded-b-3xl shadow-md">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/vendor/home")} className="bg-white/20 p-2 rounded-full hover:bg-white/30 transition-colors"><ChevronLeft className="w-6 h-6" /></button>
-          <h1 className="text-2xl font-extrabold">Shop Settings</h1>
+          <h1 className="text-2xl font-extrabold">{t("settings.title", "Shop Settings")}</h1>
         </div>
       </div>
 
@@ -162,6 +166,25 @@ export default function VendorSettings() {
           </Card>
         </div>
 
+        {/* Security & Verification */}
+        <div className="space-y-4">
+          <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">Security</h2>
+          <Card className="bg-card border border-border/50 shadow-sm rounded-2xl overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/vendor/settings/triple-verify")}>
+            <CardContent className="p-5 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="font-bold text-base block">Triple-Verify</span>
+                  <span className="text-xs text-muted-foreground">Boost your profile trust score</span>
+                </div>
+              </div>
+              <ChevronLeft className="w-5 h-5 text-muted-foreground rotate-180" />
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Support */}
         <div className="space-y-4">
           <h2 className="text-sm font-black text-foreground uppercase tracking-widest px-1">Vendor Support</h2>
@@ -194,7 +217,7 @@ export default function VendorSettings() {
               <div className="flex items-center justify-between p-5 hover:bg-muted/20 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning"><Bell className="w-5 h-5" /></div>
-                  <span className="font-bold text-base">Push Notifications</span>
+                  <span className="font-bold text-base">{t("settings.notifications", "Push Notifications")}</span>
                 </div>
                 <Switch checked={notif} onCheckedChange={toggleNotif} className="scale-110" />
               </div>
@@ -210,11 +233,12 @@ export default function VendorSettings() {
             <button className="text-xs font-bold text-muted-foreground hover:text-foreground hover:underline">Terms of Service</button>
           </div>
           <Button variant="outline" onClick={signOut} className="w-full h-14 rounded-2xl border-destructive/30 text-destructive bg-destructive/5 hover:bg-destructive hover:text-destructive-foreground font-extrabold shadow-sm hover:shadow-md transition-all">
-            <LogOut className="w-5 h-5 mr-2" /> Log Out
+            <LogOut className="w-5 h-5 mr-2" /> {t("profile.logout", "Log Out")}
           </Button>
         </div>
 
       </div>
+      </PullToRefresh>
     </VendorLayout>
   );
 }

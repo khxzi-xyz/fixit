@@ -48,11 +48,13 @@ export function swr<T>(
   onData: (data: T) => void
 ): Promise<T> {
   const cacheKey = `fixit_cache_${key}`;
+  let hasCache = false;
   if (typeof window !== "undefined") {
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached !== null) {
         onData(JSON.parse(cached));
+        hasCache = true;
       }
     } catch { /* ignore cache parse error */ }
   }
@@ -65,7 +67,8 @@ export function swr<T>(
     onData(fresh);
     return fresh;
   }).catch((err) => {
-    // If network fails but cache exists, we still served cached data
+    // If network fails but cache exists, swallow error to keep cached UI visible
+    if (hasCache) return Promise.resolve(null as unknown as T);
     return Promise.reject(err);
   });
 }
@@ -109,6 +112,8 @@ export const api = {
   availableCoupons: () => req<any[]>("GET", "/rewards/coupons"),
 
   // ── Categories + Jobs ─────────────────────────────────────────────
+  upsertVendorProfile: (input: { categoryIds: string[]; radiusMeters: number }) => req<any>("PUT", "/vendors/me", input),
+  updateLocation: (lat: number, lng: number) => req<any>("PUT", "/vendors/me/location", { lat, lng }),
   categories: () => req<{ category_id: string; display_name: string; icon_key?: string; framework?: string }[]>("GET", "/categories"),
   createJob: (input: { categoryId: string; urgency: string; description?: string; lat: number; lng: number; postingKind?: string; bountyPrice?: number; aiRewritten?: boolean; originalDescription?: string; mediaUrls?: string[] }) =>
     req<any>("POST", "/jobs", input),

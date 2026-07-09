@@ -16,17 +16,23 @@ export default function VendorChats() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.vendorMine().then((j) => {
-      const active = (Array.isArray(j) ? j : []).filter(
-        (x) => x.status === "IN_PROGRESS" || x.status === "ASSIGNED"
-      );
-      setJobs(active);
-    }).catch(() => {});
+    import("@/lib/api").then(({ swr }) => {
+      swr("vendor_mine", api.vendorMine, (j) => {
+        const active = (Array.isArray(j) ? j : []).filter(
+          (x) => x.status === "IN_PROGRESS" || x.status === "ASSIGNED"
+        );
+        setJobs(active);
+      }).catch(() => {});
+    });
   }, []);
 
   useEffect(() => {
     if (!activeJob) return;
-    const load = () => api.getMessages(activeJob.job_id).then(setMessages).catch(() => {});
+    const load = () => {
+      import("@/lib/api").then(({ swr }) => {
+        swr(`messages_${activeJob.job_id}`, () => api.getMessages(activeJob.job_id), setMessages).catch(() => {});
+      });
+    };
     load();
     const t = setInterval(load, 5000);
     return () => clearInterval(t);

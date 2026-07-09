@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
-import { LocalNotifications } from "@capacitor/local-notifications";
 import { getToken } from "@/lib/api";
 
 export function NotificationManager() {
@@ -20,18 +19,23 @@ export function NotificationManager() {
 
     // Listen for new notifications
     socket.on("notification", async (data: { title: string; body: string; id?: string }) => {
-      await LocalNotifications.schedule({
-        notifications: [
-          {
-            title: data.title,
-            body: data.body,
-            id: new Date().getTime(),
-            schedule: { at: new Date(Date.now() + 1000) },
-            actionTypeId: "",
-            extra: null
-          }
-        ]
-      });
+      try {
+        const { LocalNotifications } = await import("@capacitor/local-notifications");
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              title: data.title,
+              body: data.body,
+              id: new Date().getTime(),
+              schedule: { at: new Date(Date.now() + 1000) },
+              actionTypeId: "",
+              extra: null
+            }
+          ]
+        });
+      } catch (e) {
+        console.warn("LocalNotifications not available", e);
+      }
     });
 
     return () => {

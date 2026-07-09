@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
-import { api, getToken } from "@/lib/api";
+import { api, getToken, swr } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 import { Bell, MapPin, Search, ChevronRight, Zap, Star, Shield, Clock, TrendingUp, Gift, ShoppingCart, Siren, Calendar, Sparkles, Heart } from "lucide-react";
 import { PullToRefresh } from "@/components/PullToRefresh";
 
@@ -31,11 +32,21 @@ const STATUS_COLORS: Record<string, string> = {
 
 import { ServiceIcon } from "@/components/ServiceIcon";
 import { Geolocation } from "@capacitor/geolocation";
+import { RatingModal } from "@/components/RatingModal";
 
 export default function ConsumerHome() {
   const [, navigate] = useLocation();
   const [unread, setUnread] = useState(0);
-  const [address, setAddress] = useState("Muscat, Oman");
+  const [address, setAddress] = useState(() => {
+    try {
+      const cached = localStorage.getItem("fixit_cache_addresses");
+      if (cached) {
+        const arr = JSON.parse(cached);
+        if (Array.isArray(arr) && arr.length > 0) return arr[0].label || "Muscat, Oman";
+      }
+    } catch {}
+    return "Muscat, Oman";
+  });
   const [adIdx, setAdIdx] = useState(0);
   const adTimer = useRef<ReturnType<typeof setInterval>>();
 
@@ -53,16 +64,10 @@ export default function ConsumerHome() {
           lat = c.lat;
           lng = c.lng;
         } else {
-          // If not cached, attempt to get real coordinates and save them
-          try {
-            await Geolocation.requestPermissions();
-            const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 5000 });
-            lat = pos.coords.latitude;
-            lng = pos.coords.longitude;
-            localStorage.setItem("fixit_cached_location", JSON.stringify({ lat, lng }));
-          } catch (geoErr) {
-            console.warn("Geolocation failed, using default", geoErr);
-          }
+          // Do NOT automatically request location here because it causes the app to reload on some platforms.
+          // Wait for the user to explicitly tap "Locate Me" or select an address.
+          lat = 23.588;
+          lng = 58.3829;
         }
       } catch (e) {
         console.warn("Location cache error", e);
@@ -72,15 +77,31 @@ export default function ConsumerHome() {
     }
   });
 
-  const loadExtra = useCallback(async () => {
-    try {
-      const n = await api.notifications();
+  const [ratingJob, setRatingJob] = useState<any>(null);
+
+  useEffect(() => {
+    // Find the first COMPLETED job that hasn't been rated or skipped locally
+    const unrated = jobs.find((j: any) => 
+      j.status === "COMPLETED" && 
+      !localStorage.getItem(`rated_job_${j.job_id}`)
+    );
+    if (unrated) setRatingJob(unrated);
+  }, [jobs]);
+
+  const handleRatingDone = () => {
+    if (ratingJob) {
+      localStorage.setItem(`rated_job_${ratingJob.job_id}`, "true");
+      setRatingJob(null);
+    }
+  };
+
+  const loadExtra = useCallback(() => {
+    swr("notifications", api.notifications, (n) => {
       setUnread(Array.isArray(n) ? n.filter((x: any) => !x.read_at).length : 0);
-    } catch { /**/ }
-    try {
-      const a = await api.addresses();
+    }).catch(() => {});
+    swr("addresses", api.addresses, (a) => {
       if (Array.isArray(a) && a.length > 0) setAddress(a[0].label || "Muscat, Oman");
-    } catch { /**/ }
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -100,17 +121,20 @@ export default function ConsumerHome() {
   }, [ads.length]);
 
   const activeJobs = jobs.filter((j) => j.status !== "COMPLETED" && j.status !== "CANCELLED");
+  const queryClient = useQueryClient();
+  const { t } = useI18n();
 
   return (
     <ConsumerLayout>
+      <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries(); loadExtra(); }}>
       <div className="sticky top-0 z-40 bg-primary text-primary-foreground text-white border-b border-primary/20 shadow-sm pt-[env(safe-area-inset-top,2rem)] pb-2 transition-all rounded-b-3xl">
         <div className="flex items-center gap-3 px-5 pt-2 pb-3">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" className="w-9 h-9 rounded-full bg-white/20 p-1.5 shadow-sm" alt="FixIt Now" />
-            <span className="text-xl font-black tracking-tight text-white">FixIt</span>
+            <img src="/logo.png" className="w-9 h-9 rounded-full bg-white/20 p-1.5 shadow-sm" alt={t("app.name", "FixIt Now")} />
+            <span className="text-xl font-black tracking-tight text-white">{t("app.name", "FixIt").replace(" Now", "")}</span>
           </div>
           <button onClick={() => navigate("/profile/addresses")} className="flex-1 flex flex-col justify-center items-end text-right min-w-0 ml-1">
-            <span className="text-[10px] text-white/70 uppercase tracking-widest font-bold">Location</span>
+            <span className="text-[10px] text-white/70 uppercase tracking-widest font-bold">{t("home.location")}</span>
             <div className="flex items-center gap-1 justify-end">
               <MapPin className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
               <span className="text-sm font-black text-white truncate">{address}</span>
@@ -132,46 +156,31 @@ export default function ConsumerHome() {
             onClick={() => navigate("/search")}
             className="w-full flex items-center gap-3 h-12 bg-white/20 border border-white/30 rounded-full px-4 text-white text-sm hover:bg-white/30 transition-all shadow-inner"
           >
-            <Search className="w-5 h-5 text-white" />
-            <span className="text-white font-bold flex-1 text-left">Search for a service…</span>
+            <Search className="w-5 h-5 text-white/70" />
+            <span className="text-white/80">{t("home.searchPlaceholder")}</span>
           </button>
         </div>
       </div>
 
       <div className="px-4 py-4 space-y-5 pb-28">
         {/* ── Ad Banner ── */}
-        {ads.length > 0 && (
-          <div className="relative rounded-full overflow-hidden h-32 shadow-lg">
-            <div
-              className="absolute inset-0 flex items-center justify-between px-5"
-              style={{ background: ads[adIdx]?.background_color || "linear-gradient(135deg, #1B6EF3, #0d3a8c)" }}
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-base font-black leading-tight">{ads[adIdx]?.title}</p>
-                {ads[adIdx]?.subtitle && <p className="text-white/75 text-xs mt-1">{ads[adIdx].subtitle}</p>}
-                {ads[adIdx]?.cta_url && (
-                  <button
-                    onClick={() => { api.trackAdClick(ads[adIdx].ad_id); if (ads[adIdx].cta_url?.startsWith("/")) navigate(ads[adIdx].cta_url); }}
-                    className="mt-2 px-3 py-1 bg-white/20 border border-white/30 rounded-full text-white text-xs font-bold hover:bg-white/30 transition-colors"
-                  >
-                    {ads[adIdx].cta_label || "Learn More"}
-                  </button>
-                )}
-              </div>
-              {ads[adIdx]?.image_url && (
-                <img src={ads[adIdx].image_url} className="h-24 w-24 object-contain ml-3" alt="" />
-              )}
-            </div>
-            {/* Dots */}
-            {ads.length > 1 && (
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                {ads.map((_, i) => (
-                  <button key={i} onClick={() => setAdIdx(i)} className={`h-1.5 rounded-full transition-all ${i === adIdx ? "w-4 bg-white" : "w-1.5 bg-white/40"}`} />
-                ))}
-              </div>
-            )}
+        <div className="relative rounded-[1.5rem] overflow-hidden h-40 shadow-lg border border-border">
+          <div className="absolute inset-0 flex items-center justify-between" style={{ background: "#0F172A" }}>
+            <img src={adIdx % 2 === 0 ? "/promo_banner_1_1783502085541.png" : "/promo_banner_2_1783502094201.png"} className="w-full h-full object-cover opacity-90 transition-opacity duration-500" alt="Promo" />
           </div>
-        )}
+          {/* Action Overlay */}
+          <div className="absolute bottom-3 left-4">
+            <button onClick={() => navigate("/upgrade")} className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-full shadow hover:bg-primary/90">
+              Upgrade Now
+            </button>
+          </div>
+          {/* Dots */}
+          <div className="absolute bottom-4 right-4 flex gap-1.5">
+            {[0, 1].map((i) => (
+              <button key={i} onClick={() => setAdIdx(i)} className={`h-1.5 rounded-full transition-all ${i === adIdx % 2 ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />
+            ))}
+          </div>
+        </div>
 
         {/* ── Active Job Alert ── */}
         {activeJobs.length > 0 && (
@@ -181,7 +190,7 @@ export default function ConsumerHome() {
                 <Zap className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-primary font-bold">Active Job</p>
+                <p className="text-xs text-blue-500 font-bold uppercase tracking-wider">{t("home.activeJob")}</p>
                 <p className="text-sm font-semibold truncate">{activeJobs[0].description?.slice(0, 50) || activeJobs[0].category_id}</p>
               </div>
               <div className={`px-2 py-1 rounded-full text-xs font-bold ${STATUS_COLORS[activeJobs[0].status] || "bg-muted text-muted-foreground"}`}>
@@ -192,27 +201,70 @@ export default function ConsumerHome() {
           </Link>
         )}
 
-        {/* ── Service Grid ── */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-black dark:text-white">What do you need?</h2>
-            <Link href="/post-job"><span className="text-xs font-bold text-primary">See all →</span></Link>
+        {/* Categories / Services */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between px-1 mb-4">
+            <h2 className="text-lg font-black tracking-tight">{t("home.services")}</h2>
+            <button onClick={() => navigate("/categories")} className="text-sm font-bold text-primary hover:text-primary/80 transition-colors">
+              {t("home.viewAll")}
+            </button>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-x-2 gap-y-4">
             {SERVICE_GRID.map((s) => (
               <button
                 key={s.id}
-                onClick={() => navigate(s.id === "OTHER" ? "/post-job" : `/post-job`)}
-                className="flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-full hover:border-primary/40 active:scale-95 transition-all shadow-sm"
+                onClick={() => navigate(s.id === "OTHER" ? "/categories" : `/post-job?category=${s.id}`)}
+                className="flex flex-col items-center gap-2 group"
               >
-                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-sm">
-                  <ServiceIcon id={s.id} className="w-6 h-6" />
+                <div className="w-[4.2rem] h-[4.2rem] rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-primary/10 group-hover:scale-105 transition-all shadow-sm">
+                  <ServiceIcon id={s.id} className="w-7 h-7 text-primary" />
                 </div>
-                <span className="text-[11px] font-bold text-center leading-tight text-foreground dark:text-white opacity-90">{s.label}</span>
+                <span className="text-[10px] font-bold text-center leading-tight px-1 break-words">{s.label}</span>
               </button>
             ))}
           </div>
         </div>
+
+        {/* Vendors */}
+        {vendors.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between px-1 mb-4">
+              <h2 className="text-lg font-black tracking-tight">{t("home.topVendors")}</h2>
+              <button className="text-sm font-bold text-primary hover:text-primary/80 transition-colors">
+                {t("home.viewAll")}
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4">
+              {vendors.map((v: any, i: number) => {
+                const name = v.display_name || v.full_name || `Pro #${i + 1}`;
+                const initials = name.slice(0, 2).toUpperCase();
+                return (
+                  <Link key={v.vendor_id || i} href={`/vendor/${v.vendor_id || v.user_id}`}>
+                    <div className="flex-shrink-0 w-44 bg-card border border-border/50 rounded-full p-4 shadow-sm hover:shadow-md cursor-pointer hover:border-primary/40 transition-all">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center text-xl font-black text-primary mb-3 shadow-inner relative">
+                        {v.avatar_url ? <img src={v.avatar_url} className="w-full h-full object-cover rounded-full" /> : initials}
+                        {v.is_pro ? (
+                          <img src="/goldenverifiedbadgepro.png" className="w-6 h-6 absolute -bottom-1.5 -right-1.5 drop-shadow-md" alt="Pro" />
+                        ) : (
+                          <img src="/bluetickverifiedbadge.png" className="w-5 h-5 absolute -bottom-1 -right-1 drop-shadow-md" alt="Verified" />
+                        )}
+                      </div>
+                      <p className="text-sm font-black truncate">{name}</p>
+                      <p className="text-[11px] font-medium text-muted-foreground truncate">{v.primary_category || "General"}</p>
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <div className="flex items-center gap-1 bg-yellow-500/10 px-1.5 py-0.5 rounded-md">
+                          <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                          <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400">{typeof v.rating === "number" ? v.rating.toFixed(1) : "5.0"}</span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-muted-foreground ml-auto bg-muted px-1.5 py-0.5 rounded-md">{v.distance_km ? `${Number(v.distance_km).toFixed(1)}km` : "Nearby"}</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* ── Power Features Quick Access ── */}
         <div>
@@ -355,6 +407,16 @@ export default function ConsumerHome() {
           </div>
         )}
       </div>
+      </PullToRefresh>
+
+      {ratingJob && (
+        <RatingModal
+          open={!!ratingJob}
+          onOpenChange={(open) => !open && handleRatingDone()}
+          jobId={ratingJob.job_id}
+          onSuccess={handleRatingDone}
+        />
+      )}
     </ConsumerLayout>
   );
 }

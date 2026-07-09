@@ -31,12 +31,12 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (c: strin
   return (
     <div className="relative">
       <button type="button" onClick={() => setOpen((v) => !v)}
-        className="h-14 px-3 bg-muted/60 border border-border rounded-full flex items-center gap-1.5 font-bold text-sm whitespace-nowrap focus:ring-2 focus:ring-primary outline-none min-w-[88px]">
+        className="h-14 px-3 bg-muted/60 border border-border rounded-xl flex items-center gap-1.5 font-bold text-sm whitespace-nowrap focus:ring-2 focus:ring-primary outline-none min-w-[88px]">
         <span className="text-lg">{selected.flag}</span>
         <span>{selected.code}</span>
       </button>
       {open && (
-        <div className="absolute z-50 mt-2 w-52 bg-popover border border-border rounded-full shadow-xl overflow-hidden">
+        <div className="absolute z-50 mt-2 w-52 bg-popover border border-border rounded-xl shadow-xl overflow-hidden">
           {CODES.map((c) => (
             <button key={c.code} type="button" onClick={() => { onChange(c.code); setOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted transition-colors ${c.code === value ? "bg-slate-50 dark:bg-slate-900 font-bold text-primary" : ""}`}>
@@ -62,6 +62,12 @@ export function UserLogin() {
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
   
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const hashParams = new URLSearchParams(typeof window !== "undefined" ? window.location.hash.slice(1) : "");
+  const isReset = searchParams.get("reset") === "1" || hashParams.get("type") === "recovery";
+  const [showResetPassword, setShowResetPassword] = useState(isReset);
+  const [newPassword, setNewPassword] = useState("");
+  
   // Biometric state
   const [bioAvailable, setBioAvailable] = useState(false);
   const [showBioPrompt, setShowBioPrompt] = useState(false);
@@ -71,18 +77,17 @@ export function UserLogin() {
     isFingerprintAvailable().then(avail => {
       setBioAvailable(avail);
       if (avail && localStorage.getItem("fixit_bio_enabled") === "true") {
-        doBioLogin();
+        if (!isReset) doBioLogin();
       }
     }).catch(() => {});
-  }, []);
+  }, [isReset]);
 
   const doBioLogin = async () => {
     const creds = await loginWithFingerprint();
     if (creds && creds.token) {
       setBusy(true);
-      // creds.token is stored as the supabase access_token
-      // We can restore session directly
-      const { data, error } = await supabase.auth.setSession({ access_token: creds.token, refresh_token: "" });
+      // creds.token is the refresh_token saved during enableBio
+      const { data, error } = await supabase.auth.refreshSession({ refresh_token: creds.token });
       setBusy(false);
       if (!error && data.session) {
         setToken(data.session.access_token);
@@ -237,6 +242,34 @@ export function UserLogin() {
     navigate("/home");
   };
 
+  if (showResetPassword) {
+    return (
+      <AuthLayout title="Reset Password" subtitle="Enter your new password">
+        <div className="space-y-4">
+          <Input type="password" placeholder="New Password (min 6 chars)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-14 rounded-xl bg-muted/60 text-base" />
+          <Button onClick={async () => {
+            if (newPassword.length < 6) return toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+            setBusy(true);
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            setBusy(false);
+            if (error) return toast({ title: "Failed to update", description: error.message, variant: "destructive" });
+            
+            toast({ title: "Password Updated!" });
+            sessionStorage.removeItem("fixit_otp_intent");
+            
+            if (bioAvailable && localStorage.getItem("fixit_bio_enabled") !== "true") {
+              setShowBioPrompt(true);
+            } else {
+              navigate("/home");
+            }
+          }} disabled={busy} className="w-full h-14 rounded-xl text-base font-bold">
+            {busy ? "Updating..." : "Update Password"}
+          </Button>
+        </div>
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout title="Welcome back" subtitle="Sign in to your account">
       <div className="space-y-5">
@@ -247,7 +280,7 @@ export function UserLogin() {
               type="button" 
               onClick={doBioLogin} 
               disabled={busy} 
-              className="w-full h-16 rounded-full bg-primary text-primary-foreground font-black text-lg gap-3 shadow-lg hover:scale-[0.98] transition-transform"
+              className="w-full h-16 rounded-xl bg-primary text-primary-foreground font-black text-lg gap-3 shadow-lg hover:scale-[0.98] transition-transform"
             >
               <Fingerprint className="w-8 h-8" />
               Sign in with Biometrics
@@ -262,11 +295,11 @@ export function UserLogin() {
         )}
 
         {/* Tab */}
-        <div className="flex bg-muted/50 p-1 rounded-full">
-          <button onClick={() => setTab("phone")} className={`flex-1 py-2 text-sm font-bold rounded-full flex items-center justify-center gap-1.5 transition-all ${tab === "phone" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}>
+        <div className="flex bg-muted/50 p-1 rounded-xl">
+          <button onClick={() => setTab("phone")} className={`flex-1 py-2 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${tab === "phone" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}>
             <Phone className="w-4 h-4" /> Phone
           </button>
-          <button onClick={() => setTab("email")} className={`flex-1 py-2 text-sm font-bold rounded-full flex items-center justify-center gap-1.5 transition-all ${tab === "email" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}>
+          <button onClick={() => setTab("email")} className={`flex-1 py-2 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${tab === "email" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}>
             <Mail className="w-4 h-4" /> Email
           </button>
         </div>
@@ -280,7 +313,7 @@ export function UserLogin() {
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 12))}
                 onKeyDown={(e) => e.key === "Enter" && sendOtp()}
                 placeholder="9123 4567"
-                className="flex-1 h-14 bg-muted/60 border border-border rounded-full px-4 text-lg font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all" />
+                className="flex-1 h-14 bg-muted/60 border border-border rounded-xl px-4 text-lg font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
@@ -291,13 +324,13 @@ export function UserLogin() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required
                   onKeyDown={(e) => e.key === "Enter" && loginPhone()}
-                  className="h-14 rounded-full bg-muted/60 border-border text-base pl-10 pr-10" />
+                  className="h-14 rounded-xl bg-muted/60 border-border text-base pl-10 pr-10" />
                 <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
-            <Button onClick={loginPhone} disabled={busy} className="w-full h-14 rounded-full text-base font-bold gap-2">
+            <Button onClick={loginPhone} disabled={busy} className="w-full h-14 rounded-xl text-base font-bold gap-2">
               {busy ? "Loading…" : <><span>Sign in</span><ArrowRight className="w-5 h-5" /></>}
             </Button>
             <button type="button" onClick={sendOtp} disabled={busy}
@@ -312,7 +345,7 @@ export function UserLogin() {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
-                  className="h-14 rounded-full bg-muted/60 border-border text-base pl-10" />
+                  className="h-14 rounded-xl bg-muted/60 border-border text-base pl-10" />
               </div>
             </div>
             <div>
@@ -323,16 +356,16 @@ export function UserLogin() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
-                  className="h-14 rounded-full bg-muted/60 border-border text-base pl-10 pr-10" />
+                  className="h-14 rounded-xl bg-muted/60 border-border text-base pl-10 pr-10" />
                 <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
-            <Button type="button" onClick={loginEmail} disabled={busy} className="w-full h-14 rounded-full text-base font-bold gap-2">
+            <Button type="button" onClick={loginEmail} disabled={busy} className="w-full h-14 rounded-xl text-base font-bold gap-2">
               {busy ? "Signing in…" : <><span>Sign in</span><ArrowRight className="w-5 h-5" /></>}
             </Button>
-            <Button type="button" variant="outline" onClick={sendMagicLink} disabled={busy} className="w-full h-14 rounded-full text-base font-bold">
+            <Button type="button" variant="outline" onClick={sendMagicLink} disabled={busy} className="w-full h-14 rounded-xl text-base font-bold">
               Send Magic Link
             </Button>
           </div>
@@ -347,13 +380,13 @@ export function UserLogin() {
         <div className="space-y-2.5">
           {isGoogleConfigured() && (
             <Button variant="outline" onClick={loginGoogle} disabled={busy}
-              className="w-full h-12 rounded-full border-border font-semibold gap-2 hover:bg-muted/50">
+              className="w-full h-12 rounded-xl border-border font-semibold gap-2 hover:bg-muted/50">
               <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="" />
               Continue with Google
             </Button>
           )}
           <Button variant="ghost" onClick={guest}
-            className="w-full h-12 rounded-full font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40">
+            className="w-full h-12 rounded-xl font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40">
             Browse as guest
           </Button>
         </div>
@@ -367,7 +400,7 @@ export function UserLogin() {
       {showBioPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
           <div className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Fingerprint className="w-8 h-8 text-primary" />
             </div>
             <h3 className="text-xl font-black text-center mb-2">Enable Biometric Login</h3>
@@ -375,10 +408,10 @@ export function UserLogin() {
               Use your fingerprint or face to sign in quickly and securely next time.
             </p>
             <div className="space-y-3">
-              <Button onClick={enableBio} className="w-full h-12 rounded-full text-base font-bold">
+              <Button onClick={enableBio} className="w-full h-12 rounded-xl text-base font-bold">
                 Enable Biometrics
               </Button>
-              <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-full text-sm font-bold text-muted-foreground">
+              <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-xl text-sm font-bold text-muted-foreground">
                 Not now
               </Button>
             </div>
@@ -494,18 +527,27 @@ export function UserOTP() {
       }
 
       setToken(tokenStr);
+
+      // If there's a referral code from an invite link, claim it now
+      const refCode = localStorage.getItem("fixit_ref_code");
+      if (refCode) {
+        try {
+          // Fire and forget claim
+          await fetch(`${api.base}/rewards/referral/claim`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${tokenStr}` },
+            body: JSON.stringify({ code: refCode })
+          });
+          localStorage.removeItem("fixit_ref_code");
+        } catch (e) {}
+      }
+      
       sessionStorage.removeItem("fixit_otp_role");
       sessionStorage.removeItem("fixit_otp_name");
       sessionStorage.removeItem("fixit_otp_phone");
       sessionStorage.removeItem("fixit_guest");
       sessionStorage.removeItem("fixit_link_only");
       sessionStorage.removeItem("fixit_otp_intent");
-
-      // Referral attribution: if the user arrived via /invite/:code, record it.
-      const refCode = localStorage.getItem("fixit_ref_code");
-      if (refCode && role !== "VENDOR") {
-        api.claimReferral(refCode).catch(() => {});
-      }
 
       if (role === "VENDOR") {
         // The vendor dashboard is its own app — hand the session over.
@@ -539,7 +581,7 @@ export function UserOTP() {
 
   const enableBio = async () => {
     if (tempSession) {
-      await saveSecureToken(tempSession.user.id, tempSession.access_token);
+      await saveSecureToken(tempSession.user.id, tempSession.refresh_token);
       localStorage.setItem("fixit_bio_enabled", "true");
       finalizeLogin(tempSession);
     }
@@ -569,7 +611,7 @@ export function UserOTP() {
     return (
       <AuthLayout title="Reset Password" subtitle="Enter your new password" backTo="/auth/user/login">
         <div className="space-y-4">
-          <Input type="password" placeholder="New Password (min 6 chars)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-14 rounded-full bg-muted/60 text-base" />
+          <Input type="password" placeholder="New Password (min 6 chars)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-14 rounded-xl bg-muted/60 text-base" />
           <Button onClick={async () => {
             if (newPassword.length < 6) return toast({ title: "Password must be at least 6 characters", variant: "destructive" });
             setBusy(true);
@@ -585,7 +627,7 @@ export function UserOTP() {
             } else {
               finalizeLogin(tempSession);
             }
-          }} disabled={busy} className="w-full h-14 rounded-full text-base font-bold">
+          }} disabled={busy} className="w-full h-14 rounded-xl text-base font-bold">
             {busy ? "Updating..." : "Update Password"}
           </Button>
         </div>
@@ -593,7 +635,7 @@ export function UserOTP() {
         {showBioPrompt && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
             <div className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Fingerprint className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-xl font-black text-center mb-2">Enable Biometric Login</h3>
@@ -601,8 +643,8 @@ export function UserOTP() {
                 Use your fingerprint or face to sign in quickly next time.
               </p>
               <div className="space-y-3">
-                <Button onClick={enableBio} className="w-full h-12 rounded-full text-base font-bold">Enable Biometrics</Button>
-                <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-full text-sm font-bold text-muted-foreground">Not now</Button>
+                <Button onClick={enableBio} className="w-full h-12 rounded-xl text-base font-bold">Enable Biometrics</Button>
+                <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-xl text-sm font-bold text-muted-foreground">Not now</Button>
               </div>
             </div>
           </div>
@@ -627,7 +669,7 @@ export function UserOTP() {
               autoFocus={i === 0}
               onChange={(e) => updateDigit(i, e.target.value)}
               onKeyDown={(e) => onKeyDown(i, e)}
-              className={`w-12 h-14 text-center text-2xl font-black rounded-full border-2 outline-none transition-all bg-muted/40
+              className={`w-12 h-14 text-center text-2xl font-black rounded-xl border-2 outline-none transition-all bg-muted/40
                 ${d ? "border-primary bg-slate-50 dark:bg-slate-900 text-primary shadow-[0_0_12px_rgba(27,110,243,0.2)]" : "border-border text-foreground"}
                 focus:border-primary focus:ring-2 focus:ring-primary/30`}
             />
@@ -637,12 +679,12 @@ export function UserOTP() {
         {/* Progress dots */}
         <div className="flex justify-center gap-1.5">
           {digits.map((d, i) => (
-            <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${d ? "bg-primary scale-110" : "bg-border"}`} />
+            <div key={i} className={`w-1.5 h-1.5 rounded-xl transition-all ${d ? "bg-primary scale-110" : "bg-border"}`} />
           ))}
         </div>
 
         <Button onClick={() => verify(digits.join(""))} disabled={busy || filled < 6}
-          className="w-full h-14 rounded-full text-base font-bold gap-2">
+          className="w-full h-14 rounded-xl text-base font-bold gap-2">
           {busy ? "Verifying…" : <><span>Verify & Sign in</span><ArrowRight className="w-5 h-5" /></>}
         </Button>
 
@@ -666,7 +708,7 @@ export function UserOTP() {
       {showBioPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
           <div className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Fingerprint className="w-8 h-8 text-primary" />
             </div>
             <h3 className="text-xl font-black text-center mb-2">Enable Biometric Login</h3>
@@ -674,10 +716,10 @@ export function UserOTP() {
               Use your fingerprint or face to sign in quickly and securely next time.
             </p>
             <div className="space-y-3">
-              <Button onClick={enableBio} className="w-full h-12 rounded-full text-base font-bold">
+              <Button onClick={enableBio} className="w-full h-12 rounded-xl text-base font-bold">
                 Enable Biometrics
               </Button>
-              <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-full text-sm font-bold text-muted-foreground">
+              <Button variant="ghost" onClick={skipBio} className="w-full h-12 rounded-xl text-sm font-bold text-muted-foreground">
                 Not now
               </Button>
             </div>

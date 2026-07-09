@@ -43,27 +43,32 @@ export default function VendorWallet() {
 
   return (
     <VendorLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-12 rounded-b-3xl shadow-md">
-        <h1 className="text-xl font-extrabold mb-4">Earnings</h1>
-        <p className="text-sm font-medium text-white/70 mb-1">Available for payout</p>
-        <div className="flex items-baseline gap-2">
-          <h2 className="text-5xl font-black">{balance.toFixed(2)}</h2>
-          <span className="text-xl text-white/80 font-medium">OMR</span>
+      <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 text-foreground px-4 pt-5 pb-12 rounded-b-[32px] shadow-sm overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 opacity-50 pointer-events-none translate-x-4 -translate-y-4">
+          <img src="/vendor_wallet_illustration.png" alt="Wallet Illustration" className="w-full h-full object-contain" />
+        </div>
+        <div className="relative z-10">
+          <h1 className="text-xl font-extrabold mb-4 text-foreground">Earnings</h1>
+          <p className="text-sm font-medium text-muted-foreground mb-1">Available for payout</p>
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-5xl font-black text-foreground">{balance.toFixed(2)}</h2>
+            <span className="text-xl text-muted-foreground font-medium">OMR</span>
+          </div>
         </div>
       </div>
 
       <div className="px-4 -mt-6 space-y-6">
-        <Card className="bg-card border-border shadow-md rounded-full">
+        <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px]">
           <CardContent className="p-4 space-y-3">
             <p className="text-sm font-bold">Request a payout</p>
             {!isPayoutDay && (
-              <div className="p-3 rounded-full bg-warning/10 border border-warning/30 text-warning-foreground text-xs">
+              <div className="p-4 rounded-[16px] bg-warning/10 border border-warning/30 text-warning-foreground text-xs">
                 <strong className="text-warning">Settlement window closed.</strong> Withdrawals are processed on <b>Monday</b> &amp; <b>Thursday</b>. Next window: <b>{nextDay}</b>.
               </div>
             )}
             <div className="flex gap-2">
-              <Input value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} placeholder={balance.toFixed(2)} inputMode="decimal" className="h-12 w-28 rounded-full bg-muted" disabled={!isPayoutDay} />
-              <Button onClick={payout} disabled={busy || !isPayoutDay} className="flex-1 h-12 rounded-full font-bold">
+              <Input value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))} placeholder={balance.toFixed(2)} inputMode="decimal" className="h-12 w-28 rounded-[16px] bg-muted/50" disabled={!isPayoutDay} />
+              <Button onClick={payout} disabled={busy || !isPayoutDay} className="flex-1 h-12 rounded-[16px] font-bold">
                 <ArrowDownRight className="w-5 h-5 mr-2" /> {busy ? "Requesting…" : isPayoutDay ? "Withdraw" : "Locked until " + nextDay}
               </Button>
             </div>
@@ -72,14 +77,14 @@ export default function VendorWallet() {
         </Card>
 
         <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-card border-border shadow-sm rounded-full">
+          <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px]">
             <CardContent className="p-4">
               <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-1">In Escrow</p>
               <div className="flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-primary" /><h3 className="text-xl font-black">{escrow.toFixed(2)} <span className="text-xs text-muted-foreground font-medium">OMR</span></h3></div>
               <p className="text-[10px] text-muted-foreground mt-1">Awaiting warranty clearance</p>
             </CardContent>
           </Card>
-          <Card className="bg-card border-border shadow-sm rounded-full">
+          <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px]">
             <CardContent className="p-4">
               <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Strikes</p>
               <div className="flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-success" /><h3 className="text-xl font-black text-success">0/3</h3></div>
@@ -94,7 +99,7 @@ export default function VendorWallet() {
             {payouts.length === 0 ? (
               <p className="text-sm text-muted-foreground">No payouts yet -complete jobs to start earning.</p>
             ) : payouts.map((tx) => (
-              <div key={tx.txn_id} className="flex items-center justify-between p-4 bg-card border border-border rounded-full shadow-sm">
+              <div key={tx.txn_id} className="flex items-center justify-between p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] shadow-sm">
                 <div>
                   <p className="font-bold">{Math.abs(tx.amount).toFixed(2)} OMR</p>
                   {tx.note && <p className="text-xs text-muted-foreground">{tx.note}</p>}

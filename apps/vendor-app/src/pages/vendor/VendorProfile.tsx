@@ -31,9 +31,9 @@ export default function VendorProfile() {
 
   return (
     <VendorLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-16 rounded-b-3xl shadow-md">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 text-foreground px-4 pt-5 pb-16 rounded-b-[32px] shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-extrabold">Shop Profile</h1>
+          <h1 className="text-xl font-extrabold text-foreground">Shop Profile</h1>
           {!isPro && (
             <Link href="/vendor/upgrade">
               <Badge className="bg-warning text-white border-0 font-bold hover:bg-warning">UPGRADE PRO</Badge>
@@ -59,12 +59,12 @@ export default function VendorProfile() {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-extrabold truncate">{name}</h2>
-              {isPro && <ShieldCheck className="w-5 h-5 text-white shrink-0" />}
+              <h2 className="text-xl font-extrabold truncate text-foreground">{name}</h2>
+              {isPro && <ShieldCheck className="w-5 h-5 text-primary shrink-0" />}
             </div>
-            <div className="flex items-center gap-2 text-sm text-white/80 mt-1">
-              <Star className="w-4 h-4 fill-current" /><span className="font-bold">{avgRating != null ? avgRating.toFixed(1) : "—"}</span>
-              <span className="text-white/60">· {reviews.length} review{reviews.length === 1 ? "" : "s"} · {tier} tier</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+              <Star className="w-4 h-4 fill-warning text-warning" /><span className="font-bold">{avgRating != null ? avgRating.toFixed(1) : "—"}</span>
+              <span className="text-muted-foreground/80">· {reviews.length} review{reviews.length === 1 ? "" : "s"} · {tier} tier</span>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function VendorProfile() {
               {reviews.slice(0, 5).map((r: any, i: number) => {
                 const stars = r.rating ?? r.rating_stars ?? 0;
                 return (
-                  <div key={r.review_id ?? i} className="bg-card border border-border rounded-full shadow-sm p-3">
+                  <div key={r.review_id ?? i} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] shadow-sm p-4">
                     <div className="flex items-center gap-1 mb-1">
                       {[1, 2, 3, 4, 5].map((s) => <Star key={s} className={`w-3.5 h-3.5 ${s <= stars ? "fill-warning text-warning" : "text-muted-foreground/30"}`} />)}
                     </div>
@@ -101,7 +101,7 @@ export default function VendorProfile() {
             ) : skills.map((s: any, i: number) => {
               const approved = (s.status ?? "APPROVED").toUpperCase() === "APPROVED";
               return (
-                <div key={i} className={`flex items-center justify-between p-3 bg-card border border-border rounded-full shadow-sm ${approved ? "" : "opacity-70"}`}>
+                <div key={i} className={`flex items-center justify-between p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] shadow-sm ${approved ? "" : "opacity-70"}`}>
                   <span className="font-semibold text-sm">{s.skill_name ?? s.label ?? s.category_id ?? "Skill"}</span>
                   <div className={`flex items-center gap-1 text-xs font-bold ${approved ? "text-success" : "text-warning"}`}>
                     {approved ? <><CheckCircle2 className="w-4 h-4" /> APPROVED</> : "PENDING"}
@@ -112,7 +112,7 @@ export default function VendorProfile() {
           </div>
         </div>
 
-        <Card className="bg-card border-border shadow-sm rounded-full overflow-hidden">
+        <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px] overflow-hidden">
           <CardContent className="p-0">
             {[
               { icon: Settings, label: "Shop Settings", href: "/vendor/settings" },

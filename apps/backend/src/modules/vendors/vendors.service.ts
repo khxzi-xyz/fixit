@@ -43,6 +43,15 @@ export class VendorsService {
     return data;
   }
 
+  /** Background location tracking */
+  async updateLocation(vendorId: string, lat: number, lng: number) {
+    const db = requireDb(this.db);
+    const point = `SRID=4326;POINT(${lng} ${lat})`;
+    const { data, error } = await db.from('vendor_profiles').update({ service_area_geom: point }).eq('vendor_id', vendorId).select('*').single();
+    if (error) throw new BadRequestException(error.message);
+    return data;
+  }
+
   /** Admin: set verification status (PRD §1.A.2/§1.A.3). */
   async setVerification(vendorId: string, status: 'PENDING' | 'VERIFIED' | 'SUSPENDED') {
     const db = requireDb(this.db);

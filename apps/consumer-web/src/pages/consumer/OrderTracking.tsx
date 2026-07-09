@@ -121,7 +121,10 @@ export default function OrderTracking() {
 
           <div className="flex justify-between items-start mb-6">
             <div>
-              <Badge className="bg-primary text-primary-foreground mb-2 shadow-[0_0_10px_rgba(27,110,243,0.3)]">{String(status).replace(/_/g, " ")}</Badge>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge className="bg-primary text-primary-foreground shadow-[0_0_10px_rgba(27,110,243,0.3)]">{String(status).replace(/_/g, " ")}</Badge>
+                {job?.short_id ? <span className="text-muted-foreground font-mono text-xs font-bold px-2 py-0.5 bg-muted rounded-full">#{job.short_id}</span> : <span className="text-muted-foreground font-mono text-xs font-bold px-2 py-0.5 bg-muted rounded-full">#{job?.job_id?.substring(0, 8).toUpperCase()}</span>}
+              </div>
               <h1 className="text-2xl font-bold tracking-tight">{job?.description?.slice(0, 40) ?? "Your order"}</h1>
               <p className="text-muted-foreground text-sm mt-1">{tracking?.status === "ARRIVED" ? "Vendor has arrived" : "Tracking in progress"}</p>
             </div>

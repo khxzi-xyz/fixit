@@ -54,25 +54,27 @@ export default function VendorJobDetail() {
 
   return (
     <VendorLayout>
-      <div className="hero-blue text-white px-4 pt-5 pb-6 rounded-b-3xl shadow-md">
-        <button onClick={() => navigate("/vendor/jobs")} className="inline-flex items-center text-sm font-medium text-white/80 mb-3">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 text-foreground px-4 pt-5 pb-6 rounded-b-[32px] shadow-sm">
+        <button onClick={() => navigate("/vendor/jobs")} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-3 transition-colors">
           <ChevronLeft className="w-4 h-4 mr-1" /> Back to Feed
         </button>
         <div className="flex items-center gap-2 mb-2">
-          {urgent && <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded uppercase">Urgent</span>}
-          <span className="text-white/70 text-xs">Job #{String(jobId).slice(0, 6)}</span>
+          {urgent && <span className="bg-destructive/10 text-destructive text-[10px] font-bold px-2 py-1 rounded uppercase">Urgent</span>}
+          <span className="text-muted-foreground text-xs font-medium">Job #{String(jobId).slice(0, 6)}</span>
         </div>
-        <h1 className="text-xl font-extrabold">{job?.category_id ? String(job.category_id).replace(/_/g, " ") : "Job"} request</h1>
+        <h1 className="text-xl font-extrabold text-foreground">{job?.category_id ? String(job.category_id).replace(/_/g, " ") : "Job"} request</h1>
       </div>
 
       <div className="p-4 space-y-6 pb-36">
-        <p className="text-muted-foreground leading-relaxed bg-card p-4 rounded-full border border-border shadow-sm">
+        <p className="text-muted-foreground leading-relaxed bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px] p-5">
           {job?.description || "Loading job details…"}
         </p>
 
-        <div className="flex items-center gap-2 text-sm font-medium bg-card border border-border p-3 rounded-full shadow-sm">
-          <MapPin className="w-5 h-5 text-primary" />
-          <span>Muscat{job?.distance_km ? ` · ~${Number(job.distance_km).toFixed(1)} km away` : ""}</span>
+        <div className="flex items-center gap-3 text-sm font-medium bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-[24px] p-5">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <MapPin className="w-5 h-5 text-primary" />
+          </div>
+          <span className="text-foreground">Muscat{job?.distance_km ? ` · ~${Number(job.distance_km).toFixed(1)} km away` : ""}</span>
         </div>
 
         {media.length > 0 && (
@@ -80,7 +82,7 @@ export default function VendorJobDetail() {
             <h3 className="font-bold mb-3">Client media</h3>
             <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
               {media.map((url, i) => (
-                <img key={i} src={url} alt="" className="w-24 h-24 rounded-full border border-border object-cover shrink-0" />
+                <img key={i} src={url} alt="" className="w-24 h-24 rounded-[16px] border border-border object-cover shrink-0" />
               ))}
             </div>
           </div>
@@ -92,16 +94,16 @@ export default function VendorJobDetail() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Labor (OMR)</Label>
-                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="15" className="h-14 text-lg bg-card border-border rounded-full" />
+                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="15" className="h-14 text-lg bg-muted/50 border-0 rounded-[16px]" />
               </div>
               <div className="space-y-2">
                 <Label>ETA (mins)</Label>
-                <Input type="number" value={eta} onChange={(e) => setEta(e.target.value)} placeholder="30" className="h-14 text-lg bg-card border-border rounded-full" />
+                <Input type="number" value={eta} onChange={(e) => setEta(e.target.value)} placeholder="30" className="h-14 text-lg bg-muted/50 border-0 rounded-[16px]" />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Warranty offer (days)</Label>
-              <select value={warranty} onChange={(e) => setWarranty(e.target.value)} className="w-full h-14 px-3 rounded-full border border-border bg-card text-foreground focus:ring-2 focus:ring-primary outline-none">
+              <select value={warranty} onChange={(e) => setWarranty(e.target.value)} className="w-full h-14 px-3 rounded-[16px] border-0 bg-muted/50 text-foreground focus:ring-2 focus:ring-primary outline-none">
                 <option value="7">7 Days</option>
                 <option value="14">14 Days</option>
                 <option value="30">30 Days</option>
@@ -112,7 +114,7 @@ export default function VendorJobDetail() {
         </div>
       </div>
 
-      <div className="fixed bottom-[68px] left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border z-40">
+      <div className="fixed bottom-[68px] left-0 right-0 p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-800/50 z-40">
         <Button onClick={submit} disabled={busy} className="w-full h-14 rounded-full text-lg font-bold">
           <Zap className="w-5 h-5 mr-2" /> {busy ? "Placing bid…" : "Place Bid (1 Token)"}
         </Button>

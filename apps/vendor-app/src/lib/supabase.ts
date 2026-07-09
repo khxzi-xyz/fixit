@@ -1,5 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { Preferences } from "@capacitor/preferences";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.SUPABASE_URL || "https://placeholder.supabase.co";
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY || "placeholder";
@@ -8,25 +7,32 @@ if (!import.meta.env.VITE_SUPABASE_URL && !import.meta.env.SUPABASE_URL) {
   console.warn("⚠️ Missing Supabase credentials in .env. Auth will not work.");
 }
 
-// Custom storage adapter for Capacitor
+// Isomorphic storage adapter — uses Capacitor Preferences on native, localStorage on web
 const capacitorStorage = {
   getItem: async (key: string): Promise<string | null> => {
     try {
+      const { Preferences } = await import("@capacitor/preferences");
       const { value } = await Preferences.get({ key });
       return value;
     } catch {
-      return null;
+      return localStorage.getItem(key);
     }
   },
   setItem: async (key: string, value: string): Promise<void> => {
     try {
+      const { Preferences } = await import("@capacitor/preferences");
       await Preferences.set({ key, value });
-    } catch {}
+    } catch {
+      localStorage.setItem(key, value);
+    }
   },
   removeItem: async (key: string): Promise<void> => {
     try {
+      const { Preferences } = await import("@capacitor/preferences");
       await Preferences.remove({ key });
-    } catch {}
+    } catch {
+      localStorage.removeItem(key);
+    }
   },
 };
 
@@ -38,3 +44,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: false,
   },
 });
+

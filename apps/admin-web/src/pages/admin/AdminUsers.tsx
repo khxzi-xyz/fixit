@@ -4,13 +4,19 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, ShieldAlert, RefreshCw, Users } from "lucide-react";
+import { Search, ShieldAlert, RefreshCw, Users, Edit } from "lucide-react";
 import { api } from "@/lib/api";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({ full_name: "", phone_number: "", role: "", password: "" });
+  const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -34,6 +40,30 @@ export default function AdminUsers() {
     if (role === "VENDOR") return "bg-primary/10 text-primary border-primary/20";
     if (role === "ADMIN") return "bg-destructive/10 text-destructive border-destructive/20";
     return "bg-muted text-muted-foreground border-border";
+  };
+
+  const handleUpdateUser = async () => {
+    if (!editingUser) return;
+    setBusy(true);
+    try {
+      const updates: any = {
+        full_name: editForm.full_name,
+        phone_number: editForm.phone_number,
+        role: editForm.role
+      };
+      if (editForm.password.trim()) {
+        if (editForm.password.length < 6) throw new Error("Password must be at least 6 characters");
+        updates.password = editForm.password;
+      }
+      await api.req('POST', `/admin/users/${editingUser.user_id}/update`, updates);
+      toast({ title: "User updated successfully" });
+      setEditingUser(null);
+      load();
+    } catch (e: any) {
+      toast({ title: "Failed to update", description: e.message, variant: "destructive" });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -66,15 +96,16 @@ export default function AdminUsers() {
           <Card className="bg-card border-border overflow-hidden">
             <div className="divide-y divide-border overflow-x-auto">
               <div className="grid grid-cols-12 gap-4 p-4 bg-muted/50 text-xs font-bold text-muted-foreground uppercase min-w-[700px]">
-                <div className="col-span-4">User</div>
+                <div className="col-span-3">User</div>
                 <div className="col-span-2">Role</div>
                 <div className="col-span-2">Plan</div>
                 <div className="col-span-2 text-center">Strikes</div>
                 <div className="col-span-2 text-center">Status</div>
+                <div className="col-span-1 text-center">Actions</div>
               </div>
               {filtered.map((u: any) => (
                 <div key={u.user_id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/30 transition-colors min-w-[700px]">
-                  <div className="col-span-4 min-w-0">
+                  <div className="col-span-3 min-w-0">
                     <p className="font-semibold text-sm truncate">{u.full_name ?? "Unknown"}</p>
                     <p className="text-xs text-muted-foreground font-mono">{u.phone_number ?? String(u.user_id).slice(0, 12)}</p>
                   </div>
@@ -97,12 +128,55 @@ export default function AdminUsers() {
                       {u.is_active !== false ? "Active" : "Suspended"}
                     </Badge>
                   </div>
+                  <div className="col-span-1 flex justify-center">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                      setEditingUser(u);
+                      setEditForm({ full_name: u.full_name || "", phone_number: u.phone_number || "", role: u.role || "CONSUMER", password: "" });
+                    }}>
+                      <Edit className="w-4 h-4 text-muted-foreground" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
           </Card>
         )}
       </div>
+
+      <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
+        <DialogContent className="sm:max-w-md bg-card border-border rounded-xl">
+          <DialogHeader>
+            <DialogTitle>Edit User Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-semibold mb-1 block">Full Name</label>
+              <Input value={editForm.full_name} onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))} className="bg-muted/50 border-border" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold mb-1 block">Phone Number</label>
+              <Input value={editForm.phone_number} onChange={(e) => setEditForm(prev => ({ ...prev, phone_number: e.target.value }))} className="bg-muted/50 border-border" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold mb-1 block">Role</label>
+              <select value={editForm.role} onChange={(e) => setEditForm(prev => ({ ...prev, role: e.target.value }))} className="w-full h-10 px-3 bg-muted/50 border border-border rounded-md text-sm outline-none focus:ring-2 focus:ring-primary">
+                <option value="CONSUMER">CONSUMER</option>
+                <option value="VENDOR">VENDOR</option>
+                <option value="ADMIN">ADMIN</option>
+              </select>
+            </div>
+            <div className="pt-2 border-t border-border mt-2">
+              <label className="text-sm font-semibold mb-1 block text-destructive">Change Password</label>
+              <p className="text-xs text-muted-foreground mb-2">Leave blank if you don't want to change it.</p>
+              <Input type="password" placeholder="New Password" value={editForm.password} onChange={(e) => setEditForm(prev => ({ ...prev, password: e.target.value }))} className="bg-muted/50 border-border" />
+            </div>
+          </div>
+          <div className="flex gap-2 justify-end mt-4">
+            <Button variant="ghost" onClick={() => setEditingUser(null)}>Cancel</Button>
+            <Button onClick={handleUpdateUser} disabled={busy}>{busy ? "Saving..." : "Save Changes"}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

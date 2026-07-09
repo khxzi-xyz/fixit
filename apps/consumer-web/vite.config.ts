@@ -33,37 +33,16 @@ export default defineConfig({
     host: "0.0.0.0",
   },
   build: {
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          // Core React runtime
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/scheduler')) {
-            return 'react-vendor';
-          }
-          // Radix UI + shadcn components
-          if (id.includes('@radix-ui') || id.includes('cmdk') || id.includes('vaul') || id.includes('react-hook-form') || id.includes('@hookform')) {
-            return 'ui-vendor';
-          }
-          // Capacitor native plugins
-          if (id.includes('@capacitor') || id.includes('capacitor-native-biometric') || id.includes('@capgo') || id.includes('@capawesome')) {
-            return 'capacitor-plugins';
-          }
-          // Supabase + tanstack query
-          if (id.includes('@supabase') || id.includes('@tanstack')) {
-            return 'data-layer';
-          }
-          // Lucide icons
-          if (id.includes('lucide-react')) {
-            return 'icons';
-          }
-          // Date utilities
-          if (id.includes('date-fns') || id.includes('wouter') || id.includes('zod')) {
-            return 'utils-vendor';
-          }
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          vendor: ['wouter', '@tanstack/react-query'],
+          supabase: ['@supabase/supabase-js'],
+          ui: ['lucide-react', 'clsx', 'tailwind-merge']
         }
       }
     }
-  }
+  },
 });
-

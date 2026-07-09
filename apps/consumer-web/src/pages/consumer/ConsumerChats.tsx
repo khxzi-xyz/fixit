@@ -1,27 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { ConsumerLayout } from "@/components/layouts/ConsumerLayout";
 import { api } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { MessageCircle, Sparkles, ChevronRight, Briefcase } from "lucide-react";
 
 /** Chats hub: the permanent FixIt Support (AI) thread pinned on top, then job chats. */
 export default function ConsumerChats() {
   const [, navigate] = useLocation();
+  const { t } = useI18n();
+  const queryClient = useQueryClient();
   const [jobs, setJobs] = useState<any[]>([]);
 
-  useEffect(() => {
-    import("@/lib/api").then(({ swr }) => {
-      swr("my_jobs", api.myJobs, (j) =>
-        setJobs(j.filter((x: any) => ["ASSIGNED", "IN_PROGRESS", "VENDOR_MARKED_COMPLETE"].includes(x.status)))
-      ).catch(() => setJobs([]));
+  const load = useCallback(() => {
+    return new Promise<void>((resolve) => {
+      import("@/lib/api").then(({ swr }) => {
+        swr("my_jobs", api.myJobs, (j) => {
+          setJobs(j.filter((x: any) => ["ASSIGNED", "IN_PROGRESS", "VENDOR_MARKED_COMPLETE"].includes(x.status)));
+          resolve();
+        }).catch(() => { setJobs([]); resolve(); });
+      });
     });
   }, []);
 
+  useEffect(() => { load(); }, [load]);
+
   return (
     <ConsumerLayout>
+      <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries(); await load(); }}>
       <div className="sticky top-0 z-40 bg-primary text-primary-foreground border-b border-border text-white px-4 pt-4 pb-6 rounded-b-3xl shadow-md">
-        <h1 className="text-xl font-extrabold flex items-center gap-2"><MessageCircle className="w-5 h-5"/> Chats</h1>
-        <p className="text-white/75 mt-1 text-sm">Your active conversations</p>
+        <h1 className="text-xl font-extrabold flex items-center gap-2"><MessageCircle className="w-5 h-5"/> {t("chats.title", "Chats")}</h1>
+        <p className="text-white/75 mt-1 text-sm">{t("chats.activeConvos", "Your active conversations")}</p>
       </div>
 
       <div className="p-4 space-y-3">
@@ -36,7 +47,7 @@ export default function ConsumerChats() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-black text-sm flex items-center gap-1.5">
-              FixIt Support <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+              {t("chats.support", "FixIt Support")} <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
               <span className="px-1.5 py-0.5 bg-primary/15 text-primary text-[9px] font-black rounded-full uppercase">AI + Agents</span>
             </p>
             <p className="text-xs text-muted-foreground truncate mt-0.5">Always online · instant answers about jobs, refunds & plans</p>
@@ -51,7 +62,7 @@ export default function ConsumerChats() {
               <MessageCircle className="w-10 h-10" />
             </div>
             <div>
-              <h2 className="font-bold text-lg mb-1">No Active Job Chats</h2>
+              <h2 className="font-bold text-lg mb-1">{t("chats.noChats", "No Active Job Chats")}</h2>
               <p className="text-sm text-muted-foreground max-w-[250px] mx-auto">When you assign a vendor to a job, your chat will appear here.</p>
             </div>
           </div>
@@ -74,6 +85,7 @@ export default function ConsumerChats() {
           ))
         )}
       </div>
+      </PullToRefresh>
     </ConsumerLayout>
   );
 }

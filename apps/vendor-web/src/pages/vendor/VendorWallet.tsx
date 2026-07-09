@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { VendorLayout } from "@/components/layouts/VendorLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,17 +8,25 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowDownRight, ShieldAlert, History, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { api, type Wallet as WalletT, type Txn } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 export default function VendorWallet() {
+  const { t } = useI18n();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const [wallet, setWallet] = useState<WalletT | null>(null);
   const [txns, setTxns] = useState<Txn[]>([]);
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const load = useCallback(async () => {
-    try { setWallet(await api.wallet()); } catch { /**/ }
-    try { setTxns(await api.walletTxns()); } catch { /**/ }
+  const load = useCallback(() => {
+    return new Promise<void>((resolve) => {
+      let done = 0;
+      const check = () => { done++; if (done === 2) resolve(); };
+      api.wallet().then(setWallet).catch(() => {}).finally(check);
+      api.walletTxns().then(setTxns).catch(() => {}).finally(check);
+    });
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -41,8 +50,9 @@ export default function VendorWallet() {
 
   return (
     <VendorLayout>
+      <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries(); await load(); }}>
       <div className="hero-blue text-white px-4 pt-5 pb-12 rounded-b-3xl shadow-md">
-        <h1 className="text-xl font-extrabold mb-4">Earnings</h1>
+        <h1 className="text-xl font-extrabold mb-4">{t("wallet.title", "Earnings")}</h1>
         <p className="text-sm font-medium text-white/70 mb-1">Available for payout</p>
         <div className="flex items-baseline gap-2">
           <h2 className="text-5xl font-black">{balance.toFixed(2)}</h2>
@@ -50,7 +60,7 @@ export default function VendorWallet() {
         </div>
       </div>
 
-      <div className="px-4 -mt-6 space-y-6">
+      <div className="px-4 -mt-6 space-y-6 pb-20">
         <Card className="bg-card border-border shadow-md rounded-2xl">
           <CardContent className="p-4 space-y-3">
             <p className="text-sm font-bold">Request a payout</p>
@@ -106,6 +116,7 @@ export default function VendorWallet() {
           </div>
         </div>
       </div>
+      </PullToRefresh>
     </VendorLayout>
   );
 }
